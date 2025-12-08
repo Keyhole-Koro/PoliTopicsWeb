@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  localstack:
+    image: localstack/localstack:3.8
+    container_name: politopics-localstack
+    ports:
+      - "4569:4569"
+    environment:
+      - SERVICES=dynamodb,s3
+      - DEBUG=0
+      - DEFAULT_REGION=ap-northeast-1
+    volumes:
+      - "./infra/localstack-init:/etc/localstack/init/ready.d"
+      - "localstack-data:/var/lib/localstack"
+
+  app:
+    image: node:22
+    working_dir: /workspaces/app
+    command: sleep infinity
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - DATA_MODE=mock
+      - AWS_REGION=ap-northeast-1
+      - LOCALSTACK_URL=http://localstack:4569
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - POLITOPICS_TABLE=politopics-stage
+    volumes:
+      - ./:/workspaces/app
+    depends_on:
+      - localstack
+
+volumes:
+  localstack-data:

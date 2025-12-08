@@ -1,0 +1,222 @@
+[
+  {
+    "id": "issue-001",
+    "title": "気候危機集中審議、越冬エネルギー対策を協議",
+    "description": "参議院環境委員会は冬季の電力逼迫に備え、再エネ調達と節電技術導入について議論した。",
+    "date": "2024-04-12T02:10:00Z",
+    "month": "2024-04",
+    "categories": ["環境", "エネルギー"],
+    "keywords": ["再エネ", "節電", "気候危機"],
+    "participants": ["河野桜", "山崎拓海"],
+    "imageKind": "committee",
+    "session": "213",
+    "nameOfHouse": "参議院",
+    "nameOfMeeting": "環境委員会",
+    "terms": ["脱炭素転換支援法案", "越冬需要対策計画"],
+    "payload_url": "s3://politopics-articles-stage/issue-001/payload.json",
+    "summary": "冬季の再エネ確保策とピークカット支援の即応計画を取りまとめへ。",
+    "soft_summary": "冬の電力需給に備えて再エネ導入と節電キャンペーンを議論。",
+    "participants_detail": [
+      { "name": "河野桜", "summary": "環境大臣、太陽光ストレージ導入を推進" },
+      { "name": "山崎拓海", "summary": "野党筆頭理事、需要家データ活用を提案" }
+    ]
+  },
+  {
+    "id": "issue-002",
+    "title": "子ども政策特別委、給食無償化の試算を提示",
+    "description": "所得制限のない全国給食無償化を実現するための財源案と自治体支援策が議題となった。",
+    "date": "2024-04-10T05:00:00Z",
+    "month": "2024-04",
+    "categories": ["教育", "子ども"],
+    "keywords": ["給食", "自治体交付"],
+    "participants": ["白川つかさ", "市川航"],
+    "imageKind": "committee",
+    "session": "213",
+    "nameOfHouse": "衆議院",
+    "nameOfMeeting": "子ども政策特別委員会",
+    "terms": ["学校給食法改正案"],
+    "payload_url": "s3://politopics-articles-stage/issue-002/payload.json",
+    "summary": "年間5,200億円規模の財源を国・地方折半で確保する案が大勢となった。",
+    "soft_summary": "給食無償化へ向け国と自治体が費用負担の目安を共有。",
+    "participants_detail": [
+      { "name": "白川つかさ", "summary": "委員長、物価高騰の影響を指摘" },
+      { "name": "市川航", "summary": "与党理事、農水省と連携した食材確保を説明" }
+    ]
+  },
+  {
+    "id": "issue-003",
+    "title": "地域交通再編PT、バスMaaS実証を全国展開",
+    "description": "赤字路線の再編とMaaSアプリ統合を支援する交付制度をまとめた。",
+    "date": "2024-04-08T01:45:00Z",
+    "month": "2024-04",
+    "categories": ["地域交通", "DX"],
+    "keywords": ["MaaS", "地方創生"],
+    "participants": ["田代蓮", "松浦梢"],
+    "imageKind": "committee",
+    "session": "213",
+    "nameOfHouse": "衆議院",
+    "nameOfMeeting": "交通政策調査会PT",
+    "terms": ["地域交通維持法案"],
+    "payload_url": "s3://politopics-articles-stage/issue-003/payload.json",
+    "summary": "赤字路線の統合とデマンド交通の同時実証で利用者情報の一元管理を進める。",
+    "soft_summary": "バス再編とMaaSアプリを組み合わせた全国支援枠を創設。",
+    "participants_detail": [
+      { "name": "田代蓮", "summary": "PT座長、自治体毎のダッシュボード提供を示唆" },
+      { "name": "松浦梢", "summary": "国交政務官、地方創生交付金で支援すると表明" }
+    ]
+  },
+  {
+    "id": "issue-004",
+    "title": "災害対策特委、流域治水DXを5河川で拡張",
+    "description": "国交省はリアルタイム洪水予測を地方局が共有するシステムを実装すると説明した。",
+    "date": "2024-04-05T03:30:00Z",
+    "month": "2024-04",
+    "categories": ["防災", "DX"],
+    "keywords": ["流域治水", "洪水予測"],
+    "participants": ["宮尾慎", "佐伯玲奈"],
+    "imageKind": "committee",
+    "session": "213",
+    "nameOfHouse": "参議院",
+    "nameOfMeeting": "災害対策特別委員会",
+    "terms": ["水防法改正案"],
+    "payload_url": "s3://politopics-articles-stage/issue-004/payload.json",
+    "summary": "AI洪水予測ツールを関東5水系に展開し、避難判断ラインを共通化する。",
+    "soft_summary": "リアルタイム水位とAI予測を組み合わせる新システムを拡張。",
+    "participants_detail": [
+      { "name": "宮尾慎", "summary": "与党筆頭理事、自治体操作研修の拡充を要望" },
+      { "name": "佐伯玲奈", "summary": "気象庁審議官、データ統合の仕様を説明" }
+    ]
+  },
+  {
+    "id": "issue-005",
+    "title": "外交防衛委、量子暗号衛星の共同開発を了承",
+    "description": "安全保障強化のため日欧での量子暗号通信衛星プロジェクト参加を政府が報告。",
+    "date": "2024-04-03T06:15:00Z",
+    "month": "2024-04",
+    "categories": ["外交", "安全保障"],
+    "keywords": ["量子暗号", "衛星通信"],
+    "participants": ["榊原渚", "遠藤魁"],
+    "imageKind": "plenary",
+    "session": "213",
+    "nameOfHouse": "参議院",
+    "nameOfMeeting": "外交防衛委員会",
+    "terms": ["安全保障協力協定改正案"],
+    "payload_url": "s3://politopics-articles-stage/issue-005/payload.json",
+    "summary": "量子暗号衛星に防衛通信を段階移行しつつ、民間利用も想定した費用便益を精査。",
+    "soft_summary": "量子暗号衛星プロジェクトへの参加方針を了承。",
+    "participants_detail": [
+      { "name": "榊原渚", "summary": "委員長、国産技術移転の道筋を質問" },
+      { "name": "遠藤魁", "summary": "防衛副大臣、国際共同研究の工程を説明" }
+    ]
+  },
+  {
+    "id": "issue-006",
+    "title": "厚労委、介護ロボット導入交付金を恒久化",
+    "description": "介護人材不足に対し、ロボット・センシング機器の導入を恒常事業とする案がまとまった。",
+    "date": "2024-03-31T04:00:00Z",
+    "month": "2024-03",
+    "categories": ["福祉", "テクノロジー"],
+    "keywords": ["介護ロボット", "人材不足"],
+    "participants": ["高橋令", "折坂空"],
+    "imageKind": "committee",
+    "session": "213",
+    "nameOfHouse": "衆議院",
+    "nameOfMeeting": "厚生労働委員会",
+    "terms": ["介護保険法改正案"],
+    "payload_url": "s3://politopics-articles-stage/issue-006/payload.json",
+    "summary": "導入費補助率を最大3分の2へ引き上げ、データ共有要件で介護DXを後押し。",
+    "soft_summary": "介護ロボット導入交付金を恒常化し補助率を拡大。",
+    "participants_detail": [
+      { "name": "高橋令", "summary": "与党理事、利用者安全基準の策定を示唆" },
+      { "name": "折坂空", "summary": "野党理事、地方中小事業者の伴走支援を要望" }
+    ]
+  },
+  {
+    "id": "issue-007",
+    "title": "デジタル特委、行政APIカタログを公開へ",
+    "description": "共通APIカタログを整備し、自治体や民間が用途別に検索できるポータルを夏に公開する。",
+    "date": "2024-03-27T07:20:00Z",
+    "month": "2024-03",
+    "categories": ["デジタル庁", "行政サービス"],
+    "keywords": ["API", "GovTech"],
+    "participants": ["新名司", "上谷りか"],
+    "imageKind": "committee",
+    "session": "213",
+    "nameOfHouse": "衆議院",
+    "nameOfMeeting": "デジタル特別委員会",
+    "terms": ["デジタル社会形成基本法改正案"],
+    "payload_url": "s3://politopics-articles-stage/issue-007/payload.json",
+    "summary": "自治体標準APIと通知系APIを横断検索できる公開カタログをリリース。",
+    "soft_summary": "行政APIの横断検索ポータルを夏に公開。",
+    "participants_detail": [
+      { "name": "新名司", "summary": "デジタル大臣、副作用リスク評価を強調" },
+      { "name": "上谷りか", "summary": "参考人、OSSライセンス管理の支援を求める" }
+    ]
+  },
+  {
+    "id": "issue-008",
+    "title": "経済産業委、次世代蓄電池工場への巨額投資を承認",
+    "description": "国内供給網の強化とEV普及をねらい、政府保証付き投資枠の創設が与野党で合意された。",
+    "date": "2024-03-25T01:00:00Z",
+    "month": "2024-03",
+    "categories": ["産業", "エネルギー"],
+    "keywords": ["蓄電池", "EV"],
+    "participants": ["黒澤由衣", "久遠真"],
+    "imageKind": "committee",
+    "session": "213",
+    "nameOfHouse": "参議院",
+    "nameOfMeeting": "経済産業委員会",
+    "terms": ["産業競争力強化法改正案"],
+    "payload_url": "s3://politopics-articles-stage/issue-008/payload.json",
+    "summary": "国内2拠点での次世代蓄電池工場建設に官民で9,000億円を投入する。",
+    "soft_summary": "次世代蓄電池工場への官民投資枠を創設。",
+    "participants_detail": [
+      { "name": "黒澤由衣", "summary": "委員長、技術流出対策の強化を指示" },
+      { "name": "久遠真", "summary": "経産副大臣、供給網補助の詳細を説明" }
+    ]
+  },
+  {
+    "id": "issue-009",
+    "title": "総務委、地域メディア向け生成AIガイドライン策定へ",
+    "description": "フェイク検知と著作権保護を軸とした地域局向け生成AI運用ガイドを総務省が年内策定する。",
+    "date": "2024-03-20T08:40:00Z",
+    "month": "2024-03",
+    "categories": ["メディア", "AI"],
+    "keywords": ["生成AI", "著作権"],
+    "participants": ["石坂真緒", "成瀬祐真"],
+    "imageKind": "committee",
+    "session": "213",
+    "nameOfHouse": "衆議院",
+    "nameOfMeeting": "総務委員会",
+    "terms": ["放送法改正案"],
+    "payload_url": "s3://politopics-articles-stage/issue-009/payload.json",
+    "summary": "フェイク検知AIの検証データ整備と著作権クリアランスの標準を示す。",
+    "soft_summary": "地域メディア向け生成AIガイドラインを策定へ。",
+    "participants_detail": [
+      { "name": "石坂真緒", "summary": "委員長、地域局のコスト負担を懸念" },
+      { "name": "成瀬祐真", "summary": "総務副大臣、助成制度を検討と回答" }
+    ]
+  },
+  {
+    "id": "issue-010",
+    "title": "本会議、食料安定供給特別措置法を可決",
+    "description": "備蓄拡大と生産者支援を柱とした特措法が賛成多数で可決された。",
+    "date": "2024-03-18T02:20:00Z",
+    "month": "2024-03",
+    "categories": ["農業", "安全保障"],
+    "keywords": ["食料安全保障", "備蓄"],
+    "participants": ["相原悠", "佐々木歩"],
+    "imageKind": "plenary",
+    "session": "213",
+    "nameOfHouse": "衆議院",
+    "nameOfMeeting": "本会議",
+    "terms": ["食料安定供給特別措置法"],
+    "payload_url": "s3://politopics-articles-stage/issue-010/payload.json",
+    "summary": "穀物備蓄を1.5倍へ引き上げ、新規就農者向け基金を創設する。",
+    "soft_summary": "食料安定供給特別措置法が衆院本会議で可決。",
+    "participants_detail": [
+      { "name": "相原悠", "summary": "農水相、備蓄管理のデジタル化を説明" },
+      { "name": "佐々木歩", "summary": "野党代表、農地確保支援の継続を求める" }
+    ]
+  }
+]
