@@ -33,6 +33,6 @@
     }
   },
   "forwardPorts": [4000, 4569],
-  //"postCreateCommand": "npm install --workspaces --include-workspace-root && npm run build:backend",
+  "postCreateCommand": "npm install --workspaces --include-workspace-root && npm run build:backend",
   "remoteUser": "node"
 }

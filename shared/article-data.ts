@@ -1,7 +1,7 @@
 import rawArticles from "./mock/articles.json"
 import type { Article, ArticleSummary, SearchFilters } from "./types/article"
 
-const articles: Article[] = rawArticles as Article[]
+export const articles: Article[] = rawArticles as Article[]
 const articleMap = new Map<string, Article>(articles.map((article) => [article.id, article]))
 
 const sortedByDate = [...articles].sort(
@@ -74,5 +74,3 @@ function toSummary(article: Article): ArticleSummary {
     nameOfMeeting,
   }
 }
-
-export { articles }
