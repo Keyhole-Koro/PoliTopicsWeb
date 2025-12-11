@@ -6,6 +6,11 @@ locals {
   lambda_name        = coalesce(var.lambda_name, "politopics-backend-${var.environment}")
   api_name           = coalesce(var.api_name, "politopics-api-${var.environment}")
   lambda_description = coalesce(var.lambda_description, "PoliTopics backend API (${var.environment})")
+
+  tags = {
+    Environment = var.environment
+    Project     = "PoliTopics"
+  }
 }
 
 module "service" {
@@ -22,4 +27,10 @@ module "service" {
   lambda_name        = local.lambda_name
   api_name           = local.api_name
   lambda_description = local.lambda_description
+
+  use_http_api = var.use_http_api
+
+  create_dynamodb_table = var.create_dynamodb_table
+  tags                  = local.tags
+  is_localstack         = var.is_localstack
 }

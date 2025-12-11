@@ -1,3 +1,44 @@
+export type BaseSummary = {
+  based_on_orders: number[]
+  summary: string
+}
+
+export type Summary = BaseSummary
+export type SoftSummary = BaseSummary
+export type MiddleSummary = BaseSummary
+
+export type Reaction = "賛成" | "反対" | "質問" | "回答" | "中立"
+
+export type Dialog = {
+  order: number
+  summary: string
+  soft_language: string
+  reaction: Reaction
+  speaker?: string
+  position?: string
+}
+
+export type Participant = {
+  name: string
+  position?: string
+  summary: string
+  based_on_orders?: number[]
+}
+
+export type KeywordPriority = "high" | "medium" | "low"
+
+export type Keyword = {
+  keyword: string
+  priority: KeywordPriority
+}
+
+export type Term = {
+  term: string
+  definition: string
+}
+
+export type ArticleImageKind = "会議録" | "目次" | "索引" | "附録" | "追録"
+
 export type ArticleSummary = {
   id: string
   title: string
@@ -5,43 +46,25 @@ export type ArticleSummary = {
   date: string
   month: string
   categories: string[]
-  keywords: string[]
-  participants: string[]
-  imageKind: string
-  session: string
+  participants: Participant[]
+  keywords: Keyword[]
+  imageKind: ArticleImageKind
+  session: number
   nameOfHouse: string
   nameOfMeeting: string
 }
 
-export type ArticlePayload = {
-  summary: {
-    based_on_orders: number[]
-    summary: string
-  }
-  soft_summary: {
-    based_on_orders: number[]
-    summary: string
-  }
-  dialogs: {
-    order: number
-    summary: string
-    soft_language: string
-    speaker?: string
-    position?: string
-  }[]
+export default interface Article extends ArticleSummary {
+  summary: Summary
+  soft_summary: SoftSummary
+  middle_summary: MiddleSummary[]
+  dialogs: Dialog[]
+  participants: Participant[]
+  keywords: Keyword[]
+  terms: Term[]
 }
 
-export type Article = ArticleSummary & {
-  participants_detail?: {
-    name: string
-    summary: string
-  }[]
-  terms: string[]
-  payload_url: string
-  payload?: ArticlePayload
-  summary: string
-  soft_summary: string
-}
+export type { Article }
 
 export type SearchFilters = {
   words?: string[]

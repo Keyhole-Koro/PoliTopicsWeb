@@ -28,6 +28,12 @@ variable "lambda_description" {
   type        = string
 }
 
+variable "use_http_api" {
+  description = "Toggle to provision an API Gateway HTTP API (true) or REST API (false)"
+  type        = bool
+  default     = true
+}
+
 variable "table_name" {
   description = "DynamoDB table backing this environment"
   type        = string
@@ -46,4 +52,10 @@ variable "payload_bucket_name" {
 variable "payload_bucket_arn" {
   description = "Article payload bucket ARN"
   type        = string
+}
+
+variable "is_localstack" {
+  description = "Indicates if the deployment targets LocalStack"
+  type        = bool
+  default     = false
 }

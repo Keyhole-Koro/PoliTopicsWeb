@@ -6,9 +6,5 @@ output "frontend_bucket" {
 }
 
 output "article_payload_bucket" {
-  value = {
-    name = data.aws_s3_bucket.article_payload.bucket
-    arn  = data.aws_s3_bucket.article_payload.arn
-    id   = data.aws_s3_bucket.article_payload.id
-  }
+  value = local.article_payload_bucket
 }

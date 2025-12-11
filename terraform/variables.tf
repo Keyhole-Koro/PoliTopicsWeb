@@ -1,7 +1,7 @@
 variable "region" {
   description = "AWS region used for all resources"
   type        = string
-  default     = "ap-northeast-1"
+  default     = "ap-northeast-3"
 }
 
 variable "environment" {
@@ -50,4 +50,28 @@ variable "lambda_description" {
   description = "Description shared by Lambda and API resources"
   type        = string
   default     = null
+}
+
+variable "use_http_api" {
+  description = "Toggle to provision an API Gateway HTTP API (true) or a REST API fallback (false)"
+  type        = bool
+  default     = true
+}
+
+variable "create_dynamodb_table" {
+  description = "Whether to create the DynamoDB table or use an existing one"
+  type        = bool
+  default     = false
+}
+
+variable "is_localstack" {
+  description = "Flag to indicate if running against a LocalStack instance"
+  type        = bool
+  default     = true
+}
+
+variable "localstack_url" {
+  description = "URL endpoint for LocalStack services"
+  type        = string
+  default     = "http://localstack:4566"
 }

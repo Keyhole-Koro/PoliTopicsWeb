@@ -1,32 +1,70 @@
 import type { Article } from "@shared/types/article"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import { formatAsDate } from "@/lib/format"
+import { Calendar, Hash, Building, Users, Clock } from "lucide-react"
 
 type Props = {
   article: Article
 }
 
 export function ArticleMeta({ article }: Props) {
+  const meetingType = article.imageKind
+
   return (
-    <div className="rounded-lg border border-foreground/10 bg-card/50 p-4 space-y-3">
-      <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-        <span>{formatAsDate(article.date)}</span>
-        <Separator orientation="vertical" className="h-4" />
-        <span>{article.nameOfHouse}</span>
-        <Separator orientation="vertical" className="h-4" />
-        <span>{article.nameOfMeeting}</span>
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+        <div className="flex flex-wrap gap-2">
+          {article.categories.length > 0 ? (
+            article.categories.map((category) => (
+              <Badge key={category} className="bg-primary/10 text-primary">
+                {category}
+              </Badge>
+            ))
+          ) : (
+            <Badge variant="secondary" className="text-muted-foreground">
+              カテゴリ未設定
+            </Badge>
+          )}
+        </div>
+        <div className="flex items-center gap-1">
+          <Calendar className="h-4 w-4" />
+          {formatAsDate(article.date)}
+        </div>
+        {article.session ? (
+          <div className="flex items-center gap-1">
+            <Hash className="h-4 w-4" />
+            第{article.session}回国会
+          </div>
+        ) : null}
+        <Badge variant="outline" className="text-xs uppercase tracking-[0.2em]">
+          ISSUE {article.id}
+        </Badge>
       </div>
-      <div className="flex flex-wrap gap-2">
-        {article.categories.map((category) => (
-          <Badge key={category} variant="secondary">
-            {category}
-          </Badge>
-        ))}
+
+      <h1 className="text-4xl font-serif font-bold leading-tight text-foreground">{article.title}</h1>
+
+      <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+        {article.nameOfHouse ? (
+          <div className="flex items-center gap-1.5">
+            <Building className="h-4 w-4" />
+            {article.nameOfHouse}
+          </div>
+        ) : null}
+        {article.nameOfMeeting ? (
+          <div className="flex items-center gap-1.5">
+            <Users className="h-4 w-4" />
+            {article.nameOfMeeting}
+          </div>
+        ) : null}
+        <div className="flex items-center gap-1.5">
+          <Clock className="h-4 w-4" />
+          {meetingType}
+        </div>
       </div>
-      <div className="text-sm text-muted-foreground">
-        <p>Session: {article.session}</p>
-      </div>
+
+      {article.description ? (
+        <p className="text-lg leading-relaxed text-muted-foreground">{article.description}</p>
+      ) : null}
     </div>
   )
 }

@@ -9,7 +9,7 @@ import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb"
 import { articles } from "@shared/article-data"
 
 const tableName = process.env.POLITOPICS_TABLE ?? "politopics-stage"
-const region = process.env.AWS_REGION ?? "ap-northeast-1"
+const region = process.env.AWS_REGION ?? "ap-northeast-3"
 const endpoint = process.env.LOCALSTACK_URL ?? "http://localstack:4569"
 
 async function main() {
@@ -45,7 +45,6 @@ async function main() {
       nameOfHouse: article.nameOfHouse,
       nameOfMeeting: article.nameOfMeeting,
       terms: article.terms,
-      payload_url: article.payload_url,
       summary: article.summary,
       soft_summary: article.soft_summary,
       GSI1PK: "ARTICLE",
@@ -64,11 +63,12 @@ async function main() {
     const sk = buildThinIndexSk(article.date, article.id)
 
     for (const keyword of article.keywords) {
+      const keywordValue = keyword.keyword.toLowerCase()
       await docClient.send(
         new PutCommand({
           TableName: tableName,
           Item: {
-            PK: `KEYWORD#${keyword.toLowerCase()}`,
+            PK: `KEYWORD#${keywordValue}`,
             SK: sk,
             type: "THIN_INDEX",
             kind: "KEYWORD_INDEX",

@@ -4,7 +4,7 @@ This directory contains supporting assets (like LocalStack init scripts) for the
 
 ## Services
 
-- **localstack**: Emulates AWS DynamoDB and S3. Buckets for article payloads and the SPA build are created through the init script.
+- **localstack**: Emulates AWS DynamoDB, S3, IAM, Lambda, and API Gateway. Buckets for article payloads and the SPA build are created through the init script.
 - **app**: Runs the backend TypeScript service in watch mode.
 
 ## Usage

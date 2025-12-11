@@ -28,7 +28,7 @@ export function searchArticles(filters: SearchFilters = {}): ArticleSummary[] {
         (word) =>
           article.title.toLowerCase().includes(word) ||
           article.description.toLowerCase().includes(word) ||
-          article.keywords.some((keyword) => keyword.toLowerCase().includes(word)),
+          article.keywords.some((keyword) => keyword.keyword.toLowerCase().includes(word)),
       )
 
     const matchesCategories =

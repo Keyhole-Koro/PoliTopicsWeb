@@ -62,7 +62,7 @@ export function buildKeywordStats(articles: ArticleSummary[]): KeywordStat[] {
   const counts = new Map<string, number>()
   articles.forEach((article) => {
     ;(article.keywords ?? []).forEach((keyword) => {
-      counts.set(keyword, (counts.get(keyword) ?? 0) + 1)
+      counts.set(keyword.keyword, (counts.get(keyword.keyword) ?? 0) + 1)
     })
   })
 
@@ -81,7 +81,7 @@ export function buildParticipantStats(articles: ArticleSummary[]): ParticipantSt
   const counts = new Map<string, number>()
   articles.forEach((article) => {
     ;(article.participants ?? []).forEach((participant) => {
-      counts.set(participant, (counts.get(participant) ?? 0) + 1)
+      counts.set(participant.name, (counts.get(participant.name) ?? 0) + 1)
     })
   })
 
@@ -94,7 +94,7 @@ export function buildParticipantStats(articles: ArticleSummary[]): ParticipantSt
 export function buildPersonInsight(selectedPerson: string | null, articles: ArticleSummary[]): PersonInsight | null {
   if (!selectedPerson) return null
   const related = articles
-    .filter((article) => (article.participants ?? []).includes(selectedPerson))
+    .filter((article) => (article.participants ?? []).some((participant) => participant.name === selectedPerson))
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
   if (related.length === 0) {
@@ -102,7 +102,7 @@ export function buildPersonInsight(selectedPerson: string | null, articles: Arti
   }
 
   const meetings = Array.from(new Set(related.map((article) => article.nameOfMeeting))).filter(Boolean).slice(0, 4)
-  const keywords = Array.from(new Set(related.flatMap((article) => article.keywords ?? [])))
+  const keywords = Array.from(new Set(related.flatMap((article) => (article.keywords ?? []).map((keyword) => keyword.keyword))))
     .filter(Boolean)
     .slice(0, 6)
 

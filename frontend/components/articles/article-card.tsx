@@ -26,8 +26,8 @@ export function ArticleCard({ article }: Props) {
         <p className="text-sm text-muted-foreground line-clamp-4">{article.description}</p>
         <div className="flex flex-wrap gap-2">
           {article.keywords.slice(0, 3).map((keyword) => (
-            <Badge key={keyword} variant="secondary">
-              #{keyword}
+            <Badge key={keyword.keyword} variant="secondary">
+              #{keyword.keyword}
             </Badge>
           ))}
         </div>

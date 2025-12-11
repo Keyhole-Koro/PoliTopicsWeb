@@ -42,3 +42,27 @@ variable "lambda_description" {
   description = "Description shared by Lambda and API resources"
   type        = string
 }
+
+variable "use_http_api" {
+  description = "Toggle between API Gateway HTTP API and REST API resources"
+  type        = bool
+  default     = true
+}
+
+variable "create_dynamodb_table" {
+  description = "Whether to create the DynamoDB table or use an existing one"
+  type        = bool
+  default     = false
+}
+
+variable "is_localstack" {
+  description = "Flag indicating whether resources are targeting LocalStack"
+  type        = bool
+  default     = false
+}
+
+variable "tags" {
+  description = "A map of tags to assign to created resources"
+  type        = map(string)
+  default     = {}
+}

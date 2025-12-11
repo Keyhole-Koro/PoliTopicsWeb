@@ -1,19 +1,6 @@
 version: "3.9"
 
 services:
-  localstack:
-    image: localstack/localstack:3.8
-    container_name: politopics-localstack
-    ports:
-      - "4569:4569"
-    environment:
-      - SERVICES=dynamodb,s3
-      - DEBUG=0
-      - DEFAULT_REGION=ap-northeast-1
-    volumes:
-      - "./infra/localstack-init:/etc/localstack/init/ready.d"
-      - "localstack-data:/var/lib/localstack"
-
   app:
     image: node:22
     working_dir: /workspaces/app
@@ -23,13 +10,41 @@ services:
     environment:
       - PORT=4000
       - DATA_MODE=mock
-      - AWS_REGION=ap-northeast-1
-      - LOCALSTACK_URL=http://localstack:4569
+      - AWS_REGION=ap-northeast-3
+      - LOCALSTACK_URL=http://localstack:4566
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
       - POLITOPICS_TABLE=politopics-stage
     volumes:
       - ./:/workspaces/app
+    depends_on:
+      - localstack
+
+  localstack:
+    image: localstack/localstack:3.8
+    container_name: politopics-localstack
+    ports:
+      - "4569:4566"
+    environment:
+      - SERVICES=lambda,apigateway,dynamodb,s3,iam,sts
+      - LS_SERVICES=lambda,apigateway,dynamodb,s3,iam,sts
+      - DEBUG=0
+      - DEFAULT_REGION=ap-northeast-3
+    volumes:
+      - "./infra/localstack-init:/etc/localstack/init/ready.d"
+      - "localstack-data:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin:latest
+    container_name: politopics-dynamodb-admin
+    environment:
+      - DYNAMO_ENDPOINT=http://localstack:4566
+      - AWS_REGION=ap-northeast-3
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+    ports:
+      - "8003:8001"
     depends_on:
       - localstack
 

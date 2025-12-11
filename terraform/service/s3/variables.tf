@@ -12,3 +12,9 @@ variable "article_payload_bucket" {
   description = "Existing S3 bucket with article payloads"
   type        = string
 }
+
+variable "is_localstack" {
+  description = "Flag indicating whether resources are targeting LocalStack"
+  type        = bool
+  default     = false
+}

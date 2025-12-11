@@ -3,12 +3,7 @@
   "dockerComposeFile": ["../docker-compose.yml"],
   "service": "app",
   "workspaceFolder": "/workspaces/app",
-  "overrideCommand": false,
   "features": {
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "22",
-      "pnpm": "latest"
-    },
     "ghcr.io/devcontainers/features/aws-cli:1": {},
     "ghcr.io/devcontainers/features/terraform:1": {
       "version": "1.9.5"
@@ -33,6 +28,9 @@
     }
   },
   "forwardPorts": [4000, 4569],
-  "postCreateCommand": "npm install --workspaces --include-workspace-root && npm run build:backend",
+  "postCreateCommand": [
+      "chmod +x .devcontainer/post-create.sh",
+      ".devcontainer/post-create.sh"
+    ],
   "remoteUser": "node"
 }

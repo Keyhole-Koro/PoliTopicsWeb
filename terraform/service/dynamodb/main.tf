@@ -1,3 +1,64 @@
-data "aws_dynamodb_table" "articles" {
-  name = var.articles_table
+locals {
+  tags = var.tags
+}
+
+resource "aws_dynamodb_table" "politopics" {
+  count        = var.create_dynamodb_table ? 1 : 0
+  name         = var.table_name
+  billing_mode = "PAY_PER_REQUEST"
+
+  hash_key  = "PK"
+  range_key = "SK"
+
+  attribute {
+    name = "PK"
+    type = "S"
+  }
+
+  attribute {
+    name = "SK"
+    type = "S"
+  }
+
+  attribute {
+    name = "GSI1PK"
+    type = "S"
+  }
+
+  attribute {
+    name = "GSI1SK"
+    type = "S"
+  }
+
+  global_secondary_index {
+    name            = "ArticleByDate"
+    hash_key        = "GSI1PK"
+    range_key       = "GSI1SK"
+    projection_type = "ALL"
+  }
+
+  attribute {
+    name = "GSI2PK"
+    type = "S"
+  }
+
+  attribute {
+    name = "GSI2SK"
+    type = "S"
+  }
+
+  global_secondary_index {
+    name            = "MonthDateIndex"
+    hash_key        = "GSI2PK"
+    range_key       = "GSI2SK"
+    projection_type = "ALL"
+  }
+
+  tags = local.tags
+}
+
+data "aws_dynamodb_table" "politopics" {
+  count      = var.create_dynamodb_table ? 0 : 1
+  name       = var.table_name
+  depends_on = [aws_dynamodb_table.politopics]
 }

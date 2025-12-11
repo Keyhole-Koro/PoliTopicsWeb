@@ -44,6 +44,23 @@ resource "aws_s3_bucket_policy" "frontend_public" {
   })
 }
 
-data "aws_s3_bucket" "article_payload" {
+resource "aws_s3_bucket" "article_payload" {
+  count  = var.is_localstack ? 1 : 0
   bucket = var.article_payload_bucket
+
+  tags = {
+    Environment = var.environment
+  }
+}
+
+locals {
+  article_payload_bucket = var.is_localstack ? {
+    name = aws_s3_bucket.article_payload[0].bucket
+    arn  = aws_s3_bucket.article_payload[0].arn
+    id   = aws_s3_bucket.article_payload[0].id
+  } : {
+    name = var.article_payload_bucket
+    arn  = "arn:aws:s3:::${var.article_payload_bucket}"
+    id   = var.article_payload_bucket
+  }
 }

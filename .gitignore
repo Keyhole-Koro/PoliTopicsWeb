@@ -4,3 +4,9 @@ node_modules
 dist
 frontend/out
 shared/**/*.js
+
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+tfplan

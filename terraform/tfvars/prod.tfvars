@@ -1,4 +1,4 @@
-region      = "ap-northeast-1"
+region      = "ap-northeast-3"
 environment = "prod"
 
 frontend_bucket        = "politopics-frontend-prod"
@@ -10,3 +10,5 @@ api_name           = "politopics-api-prod"
 lambda_description = "PoliTopics backend API (production)"
 
 backend_lambda_package = "../backend/dist/backend.zip"
+create_dynamodb_table  = false
+is_localstack          = false

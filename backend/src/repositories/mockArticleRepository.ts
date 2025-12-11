@@ -26,8 +26,8 @@ export class MockArticleRepository implements ArticleRepository {
       }
 
       article.keywords.forEach((keyword) => {
-        if (keyword.toLowerCase().includes(normalized)) {
-          suggestions.add(keyword)
+        if (keyword.keyword.toLowerCase().includes(normalized)) {
+          suggestions.add(keyword.keyword)
         }
       })
     })

@@ -1,5 +1,4 @@
-bucket         = "politopics-terraform"
-key            = "state/stage.tfstate"
-region         = "ap-northeast-1"
-dynamodb_table = "politopics-terraform-locks"
+bucket         = "politopics-web-stage-state-bucket"
+key            = "politopics-web/stage.tfstate"
+region         = "ap-northeast-3"
 encrypt        = true

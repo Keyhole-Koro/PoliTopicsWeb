@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import type { Reaction as ArticleReaction } from "@shared/types/article"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -23,6 +24,8 @@ import {
 } from "lucide-react"
 import type { JSX } from "react/jsx-runtime"
 
+type ViewerReaction = ArticleReaction
+
 export interface Dialog {
   order: number
   speaker: string
@@ -30,21 +33,15 @@ export interface Dialog {
   speaker_position: string
   speaker_role: string
   summary: string
+  original_text?: string
   soft_summary: string
+  reaction?: ViewerReaction
   response_to: ResponseTo[]
 }
 
 export interface ResponseTo {
   dialog_id: number
-  reaction: Reaction
-}
-
-export enum Reaction {
-  AGREE = "agree",
-  DISAGREE = "disagree",
-  NEUTRAL = "neutral",
-  QUESTION = "question",
-  ANSWER = "answer",
+  reaction: ViewerReaction
 }
 
 interface Term {
@@ -59,52 +56,49 @@ interface DialogViewerProps {
   className?: string
 }
 
-function getReactionIcon(reaction: Reaction): string {
+function getReactionIcon(reaction?: ViewerReaction): string {
   switch (reaction) {
-    case Reaction.AGREE:
+    case "賛成":
       return "✓"
-    case Reaction.DISAGREE:
+    case "反対":
       return "✗"
-    case Reaction.NEUTRAL:
-      return "○"
-    case Reaction.QUESTION:
+    case "質問":
       return "?"
-    case Reaction.ANSWER:
+    case "回答":
       return "!"
+    case "中立":
     default:
       return "○"
   }
 }
 
-function getReactionColor(reaction: Reaction): string {
+function getReactionColor(reaction?: ViewerReaction): string {
   switch (reaction) {
-    case Reaction.AGREE:
+    case "賛成":
       return "text-green-600 bg-green-50"
-    case Reaction.DISAGREE:
+    case "反対":
       return "text-red-600 bg-red-50"
-    case Reaction.NEUTRAL:
-      return "text-gray-500 bg-gray-50"
-    case Reaction.QUESTION:
+    case "質問":
       return "text-blue-600 bg-blue-50"
-    case Reaction.ANSWER:
+    case "回答":
       return "text-purple-600 bg-purple-50"
+    case "中立":
     default:
       return "text-gray-500 bg-gray-50"
   }
 }
 
-function getReactionLabel(reaction: Reaction): string {
+function getReactionLabel(reaction?: ViewerReaction): string {
   switch (reaction) {
-    case Reaction.AGREE:
+    case "賛成":
       return "賛成"
-    case Reaction.DISAGREE:
+    case "反対":
       return "反対"
-    case Reaction.NEUTRAL:
-      return "中立"
-    case Reaction.QUESTION:
+    case "質問":
       return "質問"
-    case Reaction.ANSWER:
+    case "回答":
       return "回答"
+    case "中立":
     default:
       return "中立"
   }
@@ -169,7 +163,7 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedSpeaker, setSelectedSpeaker] = useState<string>("all")
   const [selectedGroup, setSelectedGroup] = useState<string>("all")
-  const [selectedReaction, setSelectedReaction] = useState<string>("all")
+  const [selectedReaction, setSelectedReaction] = useState<ViewerReaction | "all">("all")
   const [viewMode, setViewMode] = useState<"timeline" | "summary">("timeline")
   const [expandedDialogs, setExpandedDialogs] = useState<Set<number>>(new Set())
   const [textMode, setTextMode] = useState<"original" | "soft_summary" | "summary">("soft_summary")
@@ -186,19 +180,24 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
   }, [dialogs])
 
   const filteredDialogs = useMemo(() => {
+    const normalizedSearch = searchTerm.toLowerCase()
+
     return dialogs.filter((dialog) => {
       const matchesSearch =
         searchTerm === "" ||
-        dialog.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        dialog.speaker.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        dialog.soft_summary.toLowerCase().includes(searchTerm.toLowerCase())
+        dialog.summary.toLowerCase().includes(normalizedSearch) ||
+        dialog.speaker.toLowerCase().includes(normalizedSearch) ||
+        dialog.soft_summary.toLowerCase().includes(normalizedSearch) ||
+        (dialog.original_text ?? "").toLowerCase().includes(normalizedSearch)
 
       const matchesSpeaker = selectedSpeaker === "all" || dialog.speaker === selectedSpeaker
 
       const matchesGroup = selectedGroup === "all" || dialog.speaker_group === selectedGroup
 
       const matchesReaction =
-        selectedReaction === "all" || dialog.response_to.some((response) => response.reaction === selectedReaction)
+        selectedReaction === "all" ||
+        dialog.reaction === selectedReaction ||
+        dialog.response_to.some((response) => response.reaction === selectedReaction)
 
       return matchesSearch && matchesSpeaker && matchesGroup && matchesReaction
     })
@@ -290,17 +289,17 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
                   </SelectContent>
                 </Select>
 
-                <Select value={selectedReaction} onValueChange={setSelectedReaction}>
+                <Select value={selectedReaction} onValueChange={(value) => setSelectedReaction(value as ViewerReaction | "all")}>
                   <SelectTrigger>
                     <SelectValue placeholder="すべての反応" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">すべての反応</SelectItem>
-                    <SelectItem value={Reaction.AGREE}>賛成</SelectItem>
-                    <SelectItem value={Reaction.DISAGREE}>反対</SelectItem>
-                    <SelectItem value={Reaction.QUESTION}>質問</SelectItem>
-                    <SelectItem value={Reaction.ANSWER}>回答</SelectItem>
-                    <SelectItem value={Reaction.NEUTRAL}>中立</SelectItem>
+                    <SelectItem value="賛成">賛成</SelectItem>
+                    <SelectItem value="反対">反対</SelectItem>
+                    <SelectItem value="質問">質問</SelectItem>
+                    <SelectItem value="回答">回答</SelectItem>
+                    <SelectItem value="中立">中立</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -374,10 +373,11 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
                 {filteredDialogs.map((dialog, index) => {
                   const isExpanded = expandedDialogs.has(dialog.order)
                   const isOriginalVisible = originalTextVisible.has(dialog.order)
+                  const originalText = dialog.original_text ?? dialog.summary
 
                   const displayText =
                     textMode === "original"
-                      ? dialog.summary
+                      ? originalText
                       : textMode === "soft_summary"
                         ? dialog.soft_summary
                         : dialog.summary
@@ -433,7 +433,7 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
                                     <span className="text-xs font-medium text-muted-foreground">原文</span>
                                   </div>
                                   <div className="text-sm text-foreground leading-relaxed bg-muted/30 p-3 rounded-md">
-                                    {highlightTerms(dialog.summary, terms)}
+                                    {highlightTerms(originalText, terms)}
                                   </div>
                                 </div>
                               )}
@@ -495,9 +495,11 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
           <TabsContent value="summary" className="space-y-4">
             <div className="grid gap-4">
               {filteredDialogs.map((dialog) => {
+                const isOriginalVisible = originalTextVisible.has(dialog.order)
+                const originalText = dialog.original_text ?? dialog.summary
                 const displayText =
                   textMode === "original"
-                    ? dialog.summary
+                    ? originalText
                     : textMode === "soft_summary"
                       ? dialog.soft_summary
                       : dialog.summary
@@ -522,8 +524,41 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
                           <div className="text-sm text-muted-foreground leading-relaxed break-words">
                             {highlightTerms(displayText, terms)}
                           </div>
+                          {isOriginalVisible && textMode !== "original" && (
+                            <div className="mt-4 pt-4 border-t border-border">
+                              <div className="flex items-center gap-2 mb-2">
+                                <FileText className="w-4 h-4 text-muted-foreground" />
+                                <span className="text-xs font-medium text-muted-foreground">原文</span>
+                              </div>
+                              <div className="text-sm text-foreground leading-relaxed bg-muted/30 p-3 rounded-md">
+                                {highlightTerms(originalText, terms)}
+                              </div>
+                            </div>
+                          )}
+                          {textMode !== "original" && (
+                            <div className="flex justify-start pt-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => toggleOriginalText(dialog.order)}
+                                className="flex items-center gap-1 text-xs"
+                              >
+                                {isOriginalVisible ? (
+                                  <>
+                                    <ChevronUp className="w-4 h-4" />
+                                    原文を隠す
+                                  </>
+                                ) : (
+                                  <>
+                                    <ChevronDown className="w-4 h-4" />
+                                    原文を表示
+                                  </>
+                                )}
+                              </Button>
+                            </div>
+                          )}
                           {dialog.response_to.length > 0 && (
-                            <div className="flex flex-wrap items-center gap-2 mt-2 pt-2 border-t">
+                            <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t">
                               {dialog.response_to.map((response, index) => (
                                 <span
                                   key={index}

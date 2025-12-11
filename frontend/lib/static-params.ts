@@ -8,7 +8,7 @@ export function getPopularSearchParams(limit = 12) {
   const keywordSet = new Set<string>()
 
   articles.forEach((article) => {
-    article.keywords.forEach((keyword) => keywordSet.add(keyword))
+    article.keywords.forEach((keyword) => keywordSet.add(keyword.keyword))
     keywordSet.add(article.nameOfMeeting)
   })
 

@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 
 dotenv.config({ path: process.env.ENV_PATH ?? path.resolve(process.cwd(), ".env") })
 
-const DEFAULT_REGION = "ap-northeast-1"
+const DEFAULT_REGION = "ap-northeast-3"
 
 export const appConfig = {
   port: Number(process.env.PORT ?? 4000),

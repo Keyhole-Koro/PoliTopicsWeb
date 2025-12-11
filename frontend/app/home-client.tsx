@@ -29,6 +29,7 @@ type Props = {
 }
 
 const FILTER_STORAGE_KEY = "politopics-home-filters"
+const GRID_PAGE_SIZE = 6
 
 export function HomeClient({ articles }: Props) {
   const router = useRouter()
@@ -43,6 +44,7 @@ export function HomeClient({ articles }: Props) {
   const [selectedPerson, setSelectedPerson] = useState<string | null>(null)
   const [showFilters, setShowFilters] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
+  const [gridVisibleCount, setGridVisibleCount] = useState(GRID_PAGE_SIZE)
 
   useEffect(() => {
     try {
@@ -148,8 +150,8 @@ export function HomeClient({ articles }: Props) {
               article.nameOfHouse.toLowerCase().includes(word) ||
               article.nameOfMeeting.toLowerCase().includes(word) ||
               article.categories.some((category) => category.toLowerCase().includes(word)) ||
-              article.keywords.some((keyword) => keyword.toLowerCase().includes(word)) ||
-              article.participants.some((participant) => participant.toLowerCase().includes(word))
+              article.keywords.some((keyword) => keyword.keyword.toLowerCase().includes(word)) ||
+              article.participants.some((participant) => participant.name.toLowerCase().includes(word))
           )
         })
 
@@ -185,8 +187,27 @@ export function HomeClient({ articles }: Props) {
 
   const featuredArticle = filteredArticles[0]
   const latestArticles = filteredArticles.slice(1, 5)
-  const gridArticles =
-    hasActiveFilters || filteredArticles.length <= 4 ? filteredArticles : filteredArticles.slice(4)
+  const gridArticles = useMemo(() => {
+    return hasActiveFilters || filteredArticles.length <= 4 ? filteredArticles : filteredArticles.slice(4)
+  }, [filteredArticles, hasActiveFilters])
+  const visibleGridArticles = useMemo(
+    () => gridArticles.slice(0, gridVisibleCount),
+    [gridArticles, gridVisibleCount],
+  )
+  const canLoadMore = gridArticles.length > gridVisibleCount
+
+  useEffect(() => {
+    setGridVisibleCount(GRID_PAGE_SIZE)
+  }, [
+    searchTerm,
+    selectedCategory,
+    selectedHouse,
+    selectedMeeting,
+    dateRange,
+    selectedDate,
+    hasActiveFilters,
+    filteredArticles,
+  ])
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -228,6 +249,10 @@ export function HomeClient({ articles }: Props) {
     setSearchTerm(keyword)
     setSelectedPerson(null)
     focusSearchSection()
+  }
+
+  function handleLoadMore() {
+    setGridVisibleCount((count) => count + GRID_PAGE_SIZE)
   }
 
   function handleClearFilters() {
@@ -337,7 +362,7 @@ export function HomeClient({ articles }: Props) {
 
           <ArticleGridSection
             title={hasActiveFilters ? "検索結果" : "すべての審議"}
-            articles={gridArticles}
+            articles={visibleGridArticles}
             hasActiveFilters={hasActiveFilters}
             onClearFilters={handleClearFilters}
             onCategoryClick={handleCategoryClick}
@@ -346,6 +371,8 @@ export function HomeClient({ articles }: Props) {
             onHouseClick={handleHouseClick}
             onMeetingClick={handleMeetingClick}
             onNavigate={(path) => router.push(path)}
+            canLoadMore={canLoadMore}
+            onLoadMore={handleLoadMore}
           />
         </div>
       </div>

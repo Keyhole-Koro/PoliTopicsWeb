@@ -61,8 +61,8 @@ resource "aws_lambda_function" "backend" {
   filename         = pathexpand(var.backend_lambda_package)
   source_code_hash = filebase64sha256(pathexpand(var.backend_lambda_package))
   handler          = "dist/lambda.handler"
-  runtime          = "nodejs22.x"
-  memory_size      = 512
+  runtime          = var.is_localstack ? "nodejs20.x" : "nodejs22.x"
+  memory_size      = 128
   timeout          = 10
   description      = var.lambda_description
 
@@ -80,6 +80,7 @@ resource "aws_lambda_function" "backend" {
 }
 
 resource "aws_apigatewayv2_api" "backend" {
+  count         = var.use_http_api ? 1 : 0
   name          = var.api_name
   protocol_type = "HTTP"
   description   = var.lambda_description
@@ -96,7 +97,8 @@ resource "aws_apigatewayv2_api" "backend" {
 }
 
 resource "aws_apigatewayv2_integration" "backend" {
-  api_id                 = aws_apigatewayv2_api.backend.id
+  count                  = var.use_http_api ? 1 : 0
+  api_id                 = aws_apigatewayv2_api.backend[0].id
   integration_type       = "AWS_PROXY"
   integration_uri        = aws_lambda_function.backend.invoke_arn
   integration_method     = "POST"
@@ -104,13 +106,15 @@ resource "aws_apigatewayv2_integration" "backend" {
 }
 
 resource "aws_apigatewayv2_route" "backend" {
-  api_id    = aws_apigatewayv2_api.backend.id
+  count     = var.use_http_api ? 1 : 0
+  api_id    = aws_apigatewayv2_api.backend[0].id
   route_key = "$default"
-  target    = "integrations/${aws_apigatewayv2_integration.backend.id}"
+  target    = "integrations/${aws_apigatewayv2_integration.backend[0].id}"
 }
 
 resource "aws_apigatewayv2_stage" "backend" {
-  api_id      = aws_apigatewayv2_api.backend.id
+  count       = var.use_http_api ? 1 : 0
+  api_id      = aws_apigatewayv2_api.backend[0].id
   name        = var.environment
   auto_deploy = true
 
@@ -119,10 +123,105 @@ resource "aws_apigatewayv2_stage" "backend" {
   }
 }
 
-resource "aws_lambda_permission" "backend_invoke" {
+resource "aws_api_gateway_rest_api" "backend" {
+  count       = var.use_http_api ? 0 : 1
+  name        = var.api_name
+  description = var.lambda_description
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+
+  tags = {
+    Environment = var.environment
+  }
+}
+
+resource "aws_api_gateway_method" "backend_root" {
+  count         = var.use_http_api ? 0 : 1
+  rest_api_id   = aws_api_gateway_rest_api.backend[0].id
+  resource_id   = aws_api_gateway_rest_api.backend[0].root_resource_id
+  http_method   = "ANY"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "backend_root" {
+  count                   = var.use_http_api ? 0 : 1
+  rest_api_id             = aws_api_gateway_rest_api.backend[0].id
+  resource_id             = aws_api_gateway_rest_api.backend[0].root_resource_id
+  http_method             = aws_api_gateway_method.backend_root[0].http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${aws_lambda_function.backend.arn}/invocations"
+}
+
+resource "aws_api_gateway_resource" "backend_proxy" {
+  count       = var.use_http_api ? 0 : 1
+  rest_api_id = aws_api_gateway_rest_api.backend[0].id
+  parent_id   = aws_api_gateway_rest_api.backend[0].root_resource_id
+  path_part   = "{proxy+}"
+}
+
+resource "aws_api_gateway_method" "backend_proxy" {
+  count         = var.use_http_api ? 0 : 1
+  rest_api_id   = aws_api_gateway_rest_api.backend[0].id
+  resource_id   = aws_api_gateway_resource.backend_proxy[0].id
+  http_method   = "ANY"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "backend_proxy" {
+  count                   = var.use_http_api ? 0 : 1
+  rest_api_id             = aws_api_gateway_rest_api.backend[0].id
+  resource_id             = aws_api_gateway_resource.backend_proxy[0].id
+  http_method             = aws_api_gateway_method.backend_proxy[0].http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${aws_lambda_function.backend.arn}/invocations"
+}
+
+resource "aws_api_gateway_deployment" "backend" {
+  count       = var.use_http_api ? 0 : 1
+  rest_api_id = aws_api_gateway_rest_api.backend[0].id
+
+  triggers = {
+    redeployment = sha1(jsonencode({
+      root_integration  = aws_api_gateway_integration.backend_root[0].id
+      proxy_integration = aws_api_gateway_integration.backend_proxy[0].id
+    }))
+  }
+
+  depends_on = [
+    aws_api_gateway_integration.backend_root,
+    aws_api_gateway_integration.backend_proxy
+  ]
+}
+
+resource "aws_api_gateway_stage" "backend" {
+  count         = var.use_http_api ? 0 : 1
+  rest_api_id   = aws_api_gateway_rest_api.backend[0].id
+  deployment_id = aws_api_gateway_deployment.backend[0].id
+  stage_name    = var.environment
+
+  tags = {
+    Environment = var.environment
+  }
+}
+
+resource "aws_lambda_permission" "backend_invoke_http" {
+  count         = var.use_http_api ? 1 : 0
   statement_id  = "AllowExecutionFromHttpApi-${var.environment}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.backend.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.backend.execution_arn}/*/*"
+  source_arn    = "${aws_apigatewayv2_api.backend[0].execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "backend_invoke_rest" {
+  count         = var.use_http_api ? 0 : 1
+  statement_id  = "AllowExecutionFromRestApi-${var.environment}"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.backend.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.backend[0].execution_arn}/*/*"
 }

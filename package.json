@@ -9,6 +9,8 @@
     "build:frontend": "npm --prefix frontend run build",
     "lint:frontend": "npm --prefix frontend run lint",
     "dev:backend": "npm --prefix backend run dev",
-    "build:backend": "npm --prefix backend run build"
+    "build:backend": "npm --prefix backend run build",
+    "test": "npm run test:search",
+    "test:search": "node backend/node_modules/.bin/tsx shared/tests/searchArticles.test.ts"
   }
 }
