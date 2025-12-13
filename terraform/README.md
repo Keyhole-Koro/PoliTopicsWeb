@@ -86,6 +86,16 @@ terraform plan -var-file=tfvars/localstack.tfvars -out=tfplan
 terraform apply "tfplan"
 ```
 
+### 3. Sync application `.env` files from outputs
+
+After `terraform apply` succeeds, run the helper to copy the Terraform outputs (table names, buckets, API URL, etc.) into the local backend and frontend environment files:
+
+```sh
+./sync-env.sh
+```
+
+This writes `backend/.env` and `frontend/.env.local` with the latest values. Both files are auto-generated; delete them if you ever want to manage the environment variables manually.
+
 ### Conditional DynamoDB Creation
 
 The DynamoDB table creation is controlled by the `create_dynamodb_table` variable.

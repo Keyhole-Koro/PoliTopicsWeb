@@ -2,7 +2,7 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "target": "ES2020",
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "Node",
     "baseUrl": ".",
     "outDir": "dist",
@@ -17,6 +17,6 @@
       "@data/*": ["../data/*"]
     }
   },
-  "include": ["src/**/*.ts", "../shared/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "../shared/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

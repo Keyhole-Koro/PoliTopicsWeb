@@ -1,0 +1,40 @@
+import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2, Context } from "aws-lambda"
+import awsLambdaFastify from "@fastify/aws-lambda"
+import type { FastifyInstance } from "fastify"
+import { createApp } from "./http/app"
+
+let fastifyInstance: FastifyInstance | null = null
+let lambdaProxy: ReturnType<typeof awsLambdaFastify> | null = null
+
+async function getFastifyProxy() {
+  if (lambdaProxy) {
+    return lambdaProxy
+  }
+
+  if (!fastifyInstance) {
+    fastifyInstance = await createApp()
+  }
+
+  if (!lambdaProxy) {
+    lambdaProxy = awsLambdaFastify(fastifyInstance)
+  }
+
+  await fastifyInstance.ready()
+  return lambdaProxy
+}
+
+export async function handler(
+  event: APIGatewayProxyEventV2,
+  context: Context,
+): Promise<APIGatewayProxyResultV2> {
+  const proxy = await getFastifyProxy()
+  return new Promise<APIGatewayProxyResultV2>((resolve, reject) => {
+    proxy(event, context, (error, result) => {
+      if (error) {
+        reject(error)
+        return
+      }
+      resolve((result as APIGatewayProxyResultV2) ?? { statusCode: 200, body: "" })
+    })
+  })
+}

@@ -60,7 +60,7 @@ resource "aws_lambda_function" "backend" {
   role             = aws_iam_role.backend_lambda.arn
   filename         = pathexpand(var.backend_lambda_package)
   source_code_hash = filebase64sha256(pathexpand(var.backend_lambda_package))
-  handler          = "dist/lambda.handler"
+  handler          = "backend/src/lambda.handler"
   runtime          = var.is_localstack ? "nodejs20.x" : "nodejs22.x"
   memory_size      = 128
   timeout          = 10
@@ -68,9 +68,10 @@ resource "aws_lambda_function" "backend" {
 
   environment {
     variables = {
-      DATA_MODE        = "dynamo"
       AWS_REGION       = var.region
       POLITOPICS_TABLE = var.table_name
+      POLITOPICS_ARTICLE_BUCKET = var.payload_bucket_name
+      ENV              = var.environment
     }
   }
 
@@ -106,6 +107,7 @@ resource "aws_apigatewayv2_integration" "backend" {
 }
 
 resource "aws_apigatewayv2_route" "backend" {
+  # turn off because of free tier limitations
   count     = var.use_http_api ? 1 : 0
   api_id    = aws_apigatewayv2_api.backend[0].id
   route_key = "$default"
@@ -124,6 +126,7 @@ resource "aws_apigatewayv2_stage" "backend" {
 }
 
 resource "aws_api_gateway_rest_api" "backend" {
+  # use api gateway v1 instead of v2 because of free tier limitations
   count       = var.use_http_api ? 0 : 1
   name        = var.api_name
   description = var.lambda_description

@@ -30,6 +30,8 @@ export type DynamoArticleItem = {
   soft_summary?: SoftSummary | string;
   middle_summary?: MiddleSummary[];
   dialogs?: Dialog[];
+  payload_key?: string;
+  payload_url?: string;
 };
 
 export type DynamoIndexItem = {
@@ -48,12 +50,19 @@ export type DynamoIndexItem = {
   nameOfMeeting?: string;
 };
 
+export type ArticlePayloadData = {
+  summary?: Summary | string;
+  soft_summary?: SoftSummary | string;
+  middle_summary?: MiddleSummary[];
+  dialogs?: Dialog[];
+};
+
 export function mapArticleToSummary(item: Record<string, unknown>): ArticleSummary {
   const article = mapItemToArticle(item as DynamoArticleItem);
   return toSummary(article);
 }
 
-export function mapItemToArticle(item: DynamoArticleItem): Article {
+export function mapItemToArticle(item: DynamoArticleItem, payload?: ArticlePayloadData): Article {
   const id = item.PK.replace("A#", "");
   return {
     id,
@@ -68,10 +77,10 @@ export function mapItemToArticle(item: DynamoArticleItem): Article {
     session: typeof item.session === "number" ? item.session : Number(item.session) || 0,
     nameOfHouse: item.nameOfHouse ?? "",
     nameOfMeeting: item.nameOfMeeting ?? "",
-    summary: normalizeSummary(item.summary),
-    soft_summary: normalizeSummary(item.soft_summary),
-    middle_summary: normalizeMiddleSummaries(item.middle_summary),
-    dialogs: normalizeDialogs(item.dialogs),
+    summary: normalizeSummary(payload?.summary ?? item.summary),
+    soft_summary: normalizeSummary(payload?.soft_summary ?? item.soft_summary),
+    middle_summary: normalizeMiddleSummaries(payload?.middle_summary ?? item.middle_summary),
+    dialogs: normalizeDialogs(payload?.dialogs ?? item.dialogs),
     terms: normalizeTerms(item.terms),
   };
 }

@@ -5,12 +5,21 @@ import {
   ResourceInUseException,
   ResourceNotFoundException,
 } from "@aws-sdk/client-dynamodb"
+import {
+  CreateBucketCommand,
+  HeadBucketCommand,
+  PutObjectCommand,
+  S3Client,
+  type BucketLocationConstraint,
+} from "@aws-sdk/client-s3"
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb"
 import { articles } from "@shared/article-data"
 
-const tableName = process.env.POLITOPICS_TABLE ?? "politopics-stage"
+const tableName = process.env.POLITOPICS_TABLE ?? "politopics-localstack"
+const articlePayloadBucket = process.env.POLITOPICS_ARTICLE_BUCKET ?? "politopics-articles-local"
 const region = process.env.AWS_REGION ?? "ap-northeast-3"
 const endpoint = process.env.LOCALSTACK_URL ?? "http://localstack:4569"
+const forcePathStyle = Boolean(process.env.LOCALSTACK_URL ?? undefined)
 
 async function main() {
   const client = new DynamoDBClient({
@@ -25,10 +34,24 @@ async function main() {
   const docClient = DynamoDBDocumentClient.from(client, {
     marshallOptions: { removeUndefinedValues: true },
   })
+  const s3Client = new S3Client({
+    region,
+    endpoint,
+    forcePathStyle,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID ?? "test",
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? "test",
+    },
+  })
 
   await ensureTable(client)
+  await ensureBucket(s3Client)
 
   for (const article of articles) {
+    const payloadKey = buildPayloadKey(article.id)
+    await uploadPayload(s3Client, payloadKey, article)
+
+    const payloadUrl = buildPayloadUrl(payloadKey)
     const articleItem = {
       PK: `A#${article.id}`,
       SK: "META",
@@ -45,8 +68,8 @@ async function main() {
       nameOfHouse: article.nameOfHouse,
       nameOfMeeting: article.nameOfMeeting,
       terms: article.terms,
-      summary: article.summary,
-      soft_summary: article.soft_summary,
+      payload_key: payloadKey,
+      payload_url: payloadUrl,
       GSI1PK: "ARTICLE",
       GSI1SK: article.date,
       GSI2PK: `Y#${article.month.replace("-", "#M#")}`,
@@ -147,6 +170,66 @@ async function ensureTable(client: DynamoDBClient) {
       throw error
     }
   }
+}
+
+async function ensureBucket(s3Client: S3Client) {
+  try {
+    await s3Client.send(
+      new HeadBucketCommand({
+        Bucket: articlePayloadBucket,
+      }),
+    )
+    return
+  } catch (error) {
+    const statusCode = (error as { $metadata?: { httpStatusCode?: number } }).$metadata?.httpStatusCode
+    if (statusCode && statusCode !== 404) {
+      throw error
+    }
+  }
+
+  // eslint-disable-next-line no-console
+  console.info("Creating article payload bucket", articlePayloadBucket)
+
+  await s3Client.send(
+    new CreateBucketCommand({
+      Bucket: articlePayloadBucket,
+      ...{
+          CreateBucketConfiguration: { LocationConstraint: region as BucketLocationConstraint },
+        }
+      ,
+    }),
+  )
+}
+
+async function uploadPayload(s3Client: S3Client, payloadKey: string, article: (typeof articles)[number]) {
+  const body = JSON.stringify({
+    summary: article.summary,
+    soft_summary: article.soft_summary,
+    middle_summary: article.middle_summary,
+    dialogs: article.dialogs,
+  })
+
+  await s3Client.send(
+    new PutObjectCommand({
+      Bucket: articlePayloadBucket,
+      Key: payloadKey,
+      Body: body,
+      ContentType: "application/json",
+    }),
+  )
+}
+
+function buildPayloadKey(id: string): string {
+  return `articles/${id}.json`
+}
+
+function buildPayloadUrl(payloadKey: string): string {
+  if (endpoint) {
+    const base = endpoint.replace(/\/$/, "")
+    return `${base}/${articlePayloadBucket}/${payloadKey}`
+  }
+
+  return `https://${articlePayloadBucket}.s3.${region}.amazonaws.com/${payloadKey}`
 }
 
 function buildThinIndexSk(date: string, id: string): string {

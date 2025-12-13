@@ -9,12 +9,13 @@ services:
       - "4000:4000"
     environment:
       - PORT=4000
-      - DATA_MODE=mock
+      - ENV=local
       - AWS_REGION=ap-northeast-3
       - LOCALSTACK_URL=http://localstack:4566
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
-      - POLITOPICS_TABLE=politopics-stage
+      - POLITOPICS_TABLE=politopics-localstack
+      - POLITOPICS_ARTICLE_BUCKET=politopics-articles-local
     volumes:
       - ./:/workspaces/app
     depends_on:
@@ -31,7 +32,6 @@ services:
       - DEBUG=0
       - DEFAULT_REGION=ap-northeast-3
     volumes:
-      - "./infra/localstack-init:/etc/localstack/init/ready.d"
       - "localstack-data:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
 

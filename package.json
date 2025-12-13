@@ -10,6 +10,8 @@
     "lint:frontend": "npm --prefix frontend run lint",
     "dev:backend": "npm --prefix backend run dev",
     "build:backend": "npm --prefix backend run build",
+    "build:local:backend": "npm --prefix backend run build:local",
+    "deploy:localstack": "npm run build:local:backend && cd terraform && terraform apply -auto-approve -var-file=tfvars/localstack.tfvars",
     "test": "npm run test:search",
     "test:search": "node backend/node_modules/.bin/tsx shared/tests/searchArticles.test.ts"
   }
