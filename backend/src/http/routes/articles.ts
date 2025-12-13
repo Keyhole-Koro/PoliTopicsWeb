@@ -8,6 +8,10 @@ type HeadlinesResponse = { items: ArticleSummary[]; limit: number }
 type SearchQuery = {
   words?: string
   categories?: string
+  houses?: string
+  meetings?: string
+  dateStart?: string
+  dateEnd?: string
   sort?: SearchFilters["sort"]
   limit?: string
 }
@@ -16,6 +20,11 @@ type SearchResponse = { query: SearchFilters; items: ArticleSummary[]; total: nu
 type SuggestQuery = {
   input?: string
   limit?: string
+  categories?: string
+  houses?: string
+  meetings?: string
+  dateStart?: string
+  dateEnd?: string
 }
 type SuggestResponse = { input: string; suggestions: string[] }
 
@@ -35,6 +44,10 @@ const articlesRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
     const filters: SearchFilters = {
       words: toList(request.query.words),
       categories: toList(request.query.categories),
+      houses: toList(request.query.houses),
+      meetings: toList(request.query.meetings),
+      dateStart: sanitizeDate(request.query.dateStart),
+      dateEnd: sanitizeDate(request.query.dateEnd),
       sort: (request.query.sort as SearchFilters["sort"]) ?? "date_desc",
       limit: toNumber(request.query.limit, 20),
     }
@@ -46,7 +59,14 @@ const articlesRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   fastify.get<{ Querystring: SuggestQuery; Reply: SuggestResponse }>("/search/suggest", async (request) => {
     const input = request.query.input ?? ""
     const limit = toNumber(request.query.limit, 5)
-    const suggestions = await fastify.articleRepository.getSuggestions(input, limit)
+    const filters: Pick<SearchFilters, "categories" | "houses" | "meetings" | "dateStart" | "dateEnd"> = {
+      categories: toList(request.query.categories),
+      houses: toList(request.query.houses),
+      meetings: toList(request.query.meetings),
+      dateStart: sanitizeDate(request.query.dateStart),
+      dateEnd: sanitizeDate(request.query.dateEnd),
+    }
+    const suggestions = await fastify.articleRepository.getSuggestions(input, limit, filters)
     return { input, suggestions }
   })
 
@@ -73,6 +93,15 @@ function toNumber(value: string | undefined | null, fallback: number): number {
   if (!value) return fallback
   const parsed = Number(value)
   return Number.isFinite(parsed) ? parsed : fallback
+}
+
+function sanitizeDate(value?: string | null): string | undefined {
+  if (!value) return undefined
+  const timestamp = Date.parse(value)
+  if (Number.isNaN(timestamp)) {
+    return undefined
+  }
+  return new Date(timestamp).toISOString()
 }
 
 export default fp(articlesRoutes, {

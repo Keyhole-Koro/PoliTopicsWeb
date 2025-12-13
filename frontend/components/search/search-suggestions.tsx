@@ -9,7 +9,7 @@ export function SearchSuggestions({ suggestions, onSelect }: Props) {
   }
 
   return (
-    <ul className="absolute left-0 right-0 top-full mt-2 rounded-lg border border-border bg-background/95 shadow-lg z-10">
+    <ul className="absolute left-0 right-0 top-full z-10 mt-2 rounded-lg border border-border bg-background shadow-lg">
       {suggestions.map((suggestion) => (
         <li key={suggestion}>
           <button

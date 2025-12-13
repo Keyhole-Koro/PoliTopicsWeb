@@ -1,4 +1,5 @@
 import type React from "react"
+import type { SearchFilters } from "@shared/types/article"
 import { CalendarIcon, Filter, Search, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -21,8 +22,8 @@ type Filters = {
   selectedCategory: string
   selectedHouse: string
   selectedMeeting: string
-  dateRange: string
-  selectedDate?: Date
+  dateStart?: Date
+  dateEnd?: Date
 }
 
 type Props = {
@@ -42,8 +43,10 @@ type Props = {
   onChangeCategory: (value: string) => void
   onChangeHouse: (value: string) => void
   onChangeMeeting: (value: string) => void
-  onChangeDateRange: (value: string) => void
-  onChangeDate: (date: Date | undefined) => void
+  onChangeDateStart: (date: Date | undefined) => void
+  onChangeDateEnd: (date: Date | undefined) => void
+  sortOrder: SearchFilters["sort"]
+  onChangeSortOrder: (value: SearchFilters["sort"]) => void
 }
 
 export function SearchControls({
@@ -63,8 +66,10 @@ export function SearchControls({
   onChangeCategory,
   onChangeHouse,
   onChangeMeeting,
-  onChangeDateRange,
-  onChangeDate,
+  onChangeDateStart,
+  onChangeDateEnd,
+  sortOrder,
+  onChangeSortOrder,
 }: Props) {
   return (
     <section id="search-section" className="border-b bg-background py-10">
@@ -100,9 +105,26 @@ export function SearchControls({
               クリア
             </Button>
           )}
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>並び替え</span>
+            <Select value={sortOrder} onValueChange={(value) => onChangeSortOrder(value as SearchFilters["sort"])}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="date_desc">新しい順</SelectItem>
+                <SelectItem value="date_asc">古い順</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        {showFilters && (
+        <div
+          aria-hidden={!showFilters}
+          className={`overflow-hidden transition-[max-height,opacity] duration-300 ${
+            showFilters ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+          }`}
+        >
           <Card>
             <CardContent className="pt-6">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -124,12 +146,12 @@ export function SearchControls({
                   onChange={onChangeMeeting}
                   options={filterOptions.meetings}
                 />
-                <DateRangeSelect value={filters.dateRange} onChange={onChangeDateRange} />
-                <DatePicker value={filters.selectedDate} onChange={onChangeDate} />
+                <DatePicker label="開始日" value={filters.dateStart} onChange={onChangeDateStart} />
+                <DatePicker label="終了日" value={filters.dateEnd} onChange={onChangeDateEnd} />
               </div>
             </CardContent>
           </Card>
-        )}
+        </div>
       </div>
     </section>
   )
@@ -163,46 +185,21 @@ function FilterSelect({ label, value, onChange, options }: FilterSelectProps) {
   )
 }
 
-type DateRangeSelectProps = {
-  value: string
-  onChange: (value: string) => void
-}
-
-function DateRangeSelect({ value, onChange }: DateRangeSelectProps) {
-  return (
-    <div>
-      <p className="mb-2 text-sm font-medium">期間</p>
-      <Select value={value} onValueChange={onChange}>
-        <SelectTrigger>
-          <SelectValue placeholder="期間" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">すべて</SelectItem>
-          <SelectItem value="1week">過去1週間</SelectItem>
-          <SelectItem value="1month">過去1ヶ月</SelectItem>
-          <SelectItem value="3months">過去3ヶ月</SelectItem>
-          <SelectItem value="6months">過去6ヶ月</SelectItem>
-          <SelectItem value="1year">過去1年</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-  )
-}
-
 type DatePickerProps = {
+  label: string
   value?: Date
   onChange: (date: Date | undefined) => void
 }
 
-function DatePicker({ value, onChange }: DatePickerProps) {
+function DatePicker({ label, value, onChange }: DatePickerProps) {
   return (
     <div>
-      <p className="mb-2 text-sm font-medium">日付</p>
+      <p className="mb-2 text-sm font-medium">{label}</p>
       <Popover>
         <PopoverTrigger asChild>
           <Button variant="outline" className="w-full justify-start gap-2 text-left font-normal">
             <CalendarIcon className="h-4 w-4" />
-            {value ? format(value, "yyyy/MM/dd", { locale: ja }) : "日付を選択"}
+            {value ? format(value, "yyyy/MM/dd", { locale: ja }) : `${label}を選択`}
           </Button>
         </PopoverTrigger>
         <PopoverContent align="start" className="w-auto p-0">
@@ -210,7 +207,7 @@ function DatePicker({ value, onChange }: DatePickerProps) {
           {value && (
             <div className="border-t p-3">
               <Button variant="ghost" size="sm" className="w-full" onClick={() => onChange(undefined)}>
-                日付をクリア
+                クリア
               </Button>
             </div>
           )}

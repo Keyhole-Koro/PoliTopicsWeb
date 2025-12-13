@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import type { ArticleSummary, SearchFilters } from "@shared/types/article"
 import { Input } from "@/components/ui/input"
@@ -11,54 +11,132 @@ import { fetchSearch, fetchSuggestions } from "@/lib/api"
 import { SearchSuggestions } from "@/components/search/search-suggestions"
 import { Search } from "lucide-react"
 
-type Props = {
-  initialWords: string[]
+type StaticFilters = {
+  categories: string[]
+  houses: string[]
+  meetings: string[]
+  dateStart?: string
+  dateEnd?: string
 }
 
-export function SearchClient({ initialWords }: Props) {
+type Props = {
+  initialWords: string[]
+  initialFilters?: StaticFilters & Pick<SearchFilters, "sort">
+}
+
+const SEARCH_DEBOUNCE_MS = 300
+
+export function SearchClient({ initialWords, initialFilters }: Props) {
   const router = useRouter()
   const [words, setWords] = useState(initialWords)
-  const [sort, setSort] = useState<SearchFilters["sort"]>("date_desc")
+  const [sort, setSort] = useState<SearchFilters["sort"]>(initialFilters?.sort ?? "date_desc")
   const [results, setResults] = useState<ArticleSummary[]>([])
   const [query, setQuery] = useState(initialWords.join(","))
+  const [debouncedQuery, setDebouncedQuery] = useState(query)
   const [suggestions, setSuggestions] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    setLoading(true)
-    fetchSearch({ words, sort, limit: 24 })
-      .then((response) => setResults(response.items))
-      .finally(() => setLoading(false))
-  }, [words, sort])
+  const staticFilters = useMemo<StaticFilters>(
+    () => ({
+      categories: initialFilters?.categories ?? [],
+      houses: initialFilters?.houses ?? [],
+      meetings: initialFilters?.meetings ?? [],
+      dateStart: initialFilters?.dateStart,
+      dateEnd: initialFilters?.dateEnd,
+    }),
+    [initialFilters],
+  )
 
   useEffect(() => {
-    if (query.trim().length < 2) {
+    setSort(initialFilters?.sort ?? "date_desc")
+  }, [initialFilters])
+
+  useEffect(() => {
+    setLoading(true)
+    fetchSearch({
+      words,
+      sort,
+      limit: 24,
+      categories: staticFilters.categories,
+      houses: staticFilters.houses,
+      meetings: staticFilters.meetings,
+      dateStart: staticFilters.dateStart,
+      dateEnd: staticFilters.dateEnd,
+    })
+      .then((response) => setResults(response.items))
+      .finally(() => setLoading(false))
+  }, [words, sort, staticFilters])
+
+  useEffect(() => {
+    if (query === debouncedQuery) {
+      return
+    }
+    const timeout = setTimeout(() => setDebouncedQuery(query), SEARCH_DEBOUNCE_MS)
+    return () => clearTimeout(timeout)
+  }, [query, debouncedQuery])
+
+  useEffect(() => {
+    if (debouncedQuery.trim().length < 2) {
       setSuggestions([])
       return
     }
 
     const controller = new AbortController()
-    fetchSuggestions(query.trim(), 5, controller.signal)
+    fetchSuggestions(debouncedQuery.trim(), {
+      limit: 5,
+      filters: staticFilters,
+      signal: controller.signal,
+    })
       .then((response) => setSuggestions(response.suggestions))
       .catch(() => setSuggestions([]))
 
     return () => controller.abort()
-  }, [query])
+  }, [debouncedQuery])
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
     const normalized = normalizeWords(query)
+    if (!normalized) return
     setWords(splitWords(normalized))
-    router.push(`/search/${encodeURIComponent(normalized)}`)
+    router.push(buildSearchPath(normalized, sort, staticFilters))
   }
 
   function handleSuggestionSelect(value: string) {
     const normalized = normalizeWords(value)
+    if (!normalized) return
     setQuery(normalized)
     setWords(splitWords(normalized))
-    router.push(`/search/${encodeURIComponent(normalized)}`)
+    router.push(buildSearchPath(normalized, sort, staticFilters))
     setSuggestions([])
   }
+
+  function handleSortChange(value: SearchFilters["sort"]) {
+    setSort(value)
+    if (words.length === 0) return
+    const normalized = normalizeWords(words.join(","))
+    router.replace(buildSearchPath(normalized, value, staticFilters))
+  }
+
+  const activeFilterChips = useMemo(() => {
+    const chips: string[] = []
+    if (staticFilters.categories.length > 0) {
+      chips.push(`カテゴリー: ${staticFilters.categories.join(", ")}`)
+    }
+    if (staticFilters.houses.length > 0) {
+      chips.push(`院: ${staticFilters.houses.join(", ")}`)
+    }
+    if (staticFilters.meetings.length > 0) {
+      chips.push(`会議: ${staticFilters.meetings.join(", ")}`)
+    }
+    if (staticFilters.dateStart || staticFilters.dateEnd) {
+      const parts = [
+        staticFilters.dateStart ? formatDisplayDate(staticFilters.dateStart) : "指定なし",
+        staticFilters.dateEnd ? formatDisplayDate(staticFilters.dateEnd) : "指定なし",
+      ]
+      chips.push(`期間: ${parts.join(" 〜 ")}`)
+    }
+    return chips
+  }, [staticFilters])
 
   return (
     <div className="space-y-6">
@@ -81,7 +159,7 @@ export function SearchClient({ initialWords }: Props) {
         </div>
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
           <span>ソート順</span>
-          <Select value={sort} onValueChange={(value) => setSort(value as SearchFilters["sort"])}>
+          <Select value={sort} onValueChange={(value) => handleSortChange(value as SearchFilters["sort"])}>
             <SelectTrigger className="w-[160px]">
               <SelectValue />
             </SelectTrigger>
@@ -91,6 +169,15 @@ export function SearchClient({ initialWords }: Props) {
             </SelectContent>
           </Select>
         </div>
+        {activeFilterChips.length > 0 && (
+          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+            {activeFilterChips.map((chip) => (
+              <span key={chip} className="rounded-full bg-muted px-3 py-1">
+                {chip}
+              </span>
+            ))}
+          </div>
+        )}
       </form>
 
       {loading ? (
@@ -118,4 +205,35 @@ function normalizeWords(value: string) {
 
 function splitWords(value: string) {
   return value ? value.split(",") : []
+}
+
+function buildSearchPath(words: string, sort: SearchFilters["sort"], filters: StaticFilters): string {
+  const params = new URLSearchParams()
+  if (filters.categories && filters.categories.length > 0) {
+    params.set("categories", filters.categories.join(","))
+  }
+  if (filters.houses && filters.houses.length > 0) {
+    params.set("houses", filters.houses.join(","))
+  }
+  if (filters.meetings && filters.meetings.length > 0) {
+    params.set("meetings", filters.meetings.join(","))
+  }
+  if (filters.dateStart) {
+    params.set("dateStart", filters.dateStart)
+  }
+  if (filters.dateEnd) {
+    params.set("dateEnd", filters.dateEnd)
+  }
+  if (sort !== "date_desc") {
+    params.set("sort", sort)
+  }
+  const query = params.toString()
+  const base = `/search/${encodeURIComponent(words)}`
+  return query ? `${base}?${query}` : base
+}
+
+function formatDisplayDate(value: string): string {
+  const timestamp = Number(new Date(value))
+  if (Number.isNaN(timestamp)) return value
+  return new Date(timestamp).toLocaleDateString("ja-JP")
 }

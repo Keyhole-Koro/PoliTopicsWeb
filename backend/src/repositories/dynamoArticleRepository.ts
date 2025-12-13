@@ -11,7 +11,6 @@ import {
   mapArticleToSummary,
   mapIndexToSummary,
   mapItemToArticle,
-  normalizeKeywords,
   type ArticlePayloadData,
   type DynamoArticleItem,
 } from "./dynamoArticleMapper";
@@ -69,7 +68,7 @@ export class DynamoArticleRepository implements ArticleRepository {
     }
   }
 
-  async getHeadlines(limit = 6): Promise<ArticleSummary[]> {
+  async getHeadlines(limit = 6, sort: SearchFilters["sort"] = "date_desc"): Promise<ArticleSummary[]> {
     const response = await this.docClient.send(
       new QueryCommand({
         TableName: this.tableName,
@@ -79,7 +78,7 @@ export class DynamoArticleRepository implements ArticleRepository {
           ":article": "ARTICLE",
         },
         Limit: limit,
-        ScanIndexForward: false,
+        ScanIndexForward: sort === "date_asc",
       }),
     );
 
@@ -87,7 +86,16 @@ export class DynamoArticleRepository implements ArticleRepository {
   }
 
   async searchArticles(filters: SearchFilters): Promise<ArticleSummary[]> {
-    const { words = [], categories = [], sort = "date_desc", limit = 20 } = filters;
+    const {
+      words = [],
+      categories = [],
+      houses = [],
+      meetings = [],
+      sort = "date_desc",
+      limit = 20,
+      dateStart,
+      dateEnd,
+    } = filters;
 
     if (words.length > 0) {
       const primaryWord = words[0].toLowerCase();
@@ -101,7 +109,7 @@ export class DynamoArticleRepository implements ArticleRepository {
         }),
       );
 
-      return (response.Items ?? [])
+      const items = (response.Items ?? [])
         .map(mapIndexToSummary)
         .filter((item): item is ArticleSummary => Boolean(item))
         .filter((item) => {
@@ -111,6 +119,8 @@ export class DynamoArticleRepository implements ArticleRepository {
             normalizedTargets.some((target) => target === categoryName.toLowerCase()),
           );
         });
+
+      return this.filterArticles(items, { categories, houses, meetings, dateStart, dateEnd });
     }
 
     if (categories.length > 0) {
@@ -124,12 +134,28 @@ export class DynamoArticleRepository implements ArticleRepository {
         }),
       );
 
-      return (response.Items ?? [])
+      const items = (response.Items ?? [])
         .map(mapIndexToSummary)
         .filter((item): item is ArticleSummary => Boolean(item));
+
+      return this.filterArticles(items, { categories, houses, meetings, dateStart, dateEnd });
     }
 
-    return this.getHeadlines(limit);
+    const response = await this.docClient.send(
+      new QueryCommand({
+        TableName: this.tableName,
+        IndexName: "ArticleByDate",
+        KeyConditionExpression: "GSI1PK = :article",
+        ExpressionAttributeValues: {
+          ":article": "ARTICLE",
+        },
+        Limit: limit,
+        ScanIndexForward: sort === "date_asc",
+      }),
+    );
+
+    const items = (response.Items ?? []).map(mapArticleToSummary);
+    return this.filterArticles(items, { categories, houses, meetings, dateStart, dateEnd });
   }
 
   async getArticle(id: string): Promise<Article | undefined> {
@@ -152,7 +178,70 @@ export class DynamoArticleRepository implements ArticleRepository {
     return mapItemToArticle(item, payload);
   }
 
-  async getSuggestions(input: string, limit = 5): Promise<string[]> {
+  private filterArticles(
+    articles: ArticleSummary[],
+    filters: Pick<SearchFilters, "categories" | "houses" | "meetings" | "dateStart" | "dateEnd">,
+  ): ArticleSummary[] {
+    const categories = (filters.categories ?? []).map((category) => category.toLowerCase());
+    const houses = filters.houses ?? [];
+    const meetings = filters.meetings ?? [];
+    const startTime = this.normalizeBoundary(filters.dateStart, "start");
+    const endTime = this.normalizeBoundary(filters.dateEnd, "end");
+
+    return articles.filter((article) => {
+      if (
+        categories.length > 0 &&
+        !article.categories.some((category) => categories.includes(category.toLowerCase()))
+      ) {
+        return false;
+      }
+      if (houses.length > 0 && !houses.includes(article.nameOfHouse)) {
+        return false;
+      }
+      if (meetings.length > 0 && !meetings.includes(article.nameOfMeeting)) {
+        return false;
+      }
+
+      if (!startTime && !endTime) {
+        return true;
+      }
+
+      const articleDate = Number(new Date(article.date));
+      if (Number.isNaN(articleDate)) {
+        return false;
+      }
+
+      if (startTime && articleDate < startTime) {
+        return false;
+      }
+
+      if (endTime && articleDate > endTime) {
+        return false;
+      }
+
+      return true;
+    });
+  }
+
+  private normalizeBoundary(value: string | undefined, type: "start" | "end"): number | undefined {
+    if (!value) return undefined;
+    const timestamp = Number(new Date(value));
+    if (Number.isNaN(timestamp)) return undefined;
+
+    const date = new Date(timestamp);
+    if (type === "start") {
+      date.setHours(0, 0, 0, 0);
+    } else {
+      date.setHours(23, 59, 59, 999);
+    }
+    return date.getTime();
+  }
+
+  async getSuggestions(
+    input: string,
+    limit = 5,
+    filters: Pick<SearchFilters, "categories" | "houses" | "meetings" | "dateStart" | "dateEnd"> = {},
+  ): Promise<string[]> {
     if (!input.trim()) return [];
     const word = input.toLowerCase();
 
@@ -164,17 +253,26 @@ export class DynamoArticleRepository implements ArticleRepository {
           ":pk": `KEYWORD#${word}`,
         },
         Limit: limit,
-        ProjectionExpression: "title, keywords",
       }),
     );
 
+    const summaries = (response.Items ?? [])
+      .map(mapIndexToSummary)
+      .filter((item): item is ArticleSummary => Boolean(item));
+    const filtered = this.filterArticles(summaries, {
+      categories: filters.categories ?? [],
+      houses: filters.houses ?? [],
+      meetings: filters.meetings ?? [],
+      dateStart: filters.dateStart,
+      dateEnd: filters.dateEnd,
+    });
+
     const suggestions = new Set<string>();
-    for (const item of response.Items ?? []) {
-      if (item.title) {
-        suggestions.add(item.title as string);
+    for (const article of filtered) {
+      if (article.title) {
+        suggestions.add(article.title);
       }
-      const keywords = normalizeKeywords((item as Record<string, unknown>).keywords);
-      keywords.forEach((keyword) => suggestions.add(keyword.keyword));
+      article.keywords.forEach((keyword) => suggestions.add(keyword.keyword));
     }
 
     return Array.from(suggestions).slice(0, limit);

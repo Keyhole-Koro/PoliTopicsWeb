@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import type { ArticleSummary } from "@shared/types/article"
+import type { ArticleSummary, SearchFilters } from "@shared/types/article"
 import { fetchSuggestions } from "@/lib/api"
 import { HomeHeader } from "@/components/home/home-header"
 import { AboutPanel } from "@/components/home/about-panel"
@@ -17,7 +17,6 @@ import {
   buildParticipantStats,
   buildPersonInsight,
   focusSearchSection,
-  isWithinRange,
   normalizeWords,
   type KeywordStat,
   type ParticipantStat,
@@ -34,14 +33,16 @@ const GRID_PAGE_SIZE = 6
 export function HomeClient({ articles }: Props) {
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
+  const [searchInputValue, setSearchInputValue] = useState("")
   const [suggestions, setSuggestions] = useState<string[]>([])
   const [isTyping, setIsTyping] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [selectedHouse, setSelectedHouse] = useState("all")
   const [selectedMeeting, setSelectedMeeting] = useState("all")
-  const [dateRange, setDateRange] = useState("all")
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
+  const [dateStart, setDateStart] = useState<Date | undefined>(undefined)
+  const [dateEnd, setDateEnd] = useState<Date | undefined>(undefined)
   const [selectedPerson, setSelectedPerson] = useState<string | null>(null)
+  const [sortOrder, setSortOrder] = useState<SearchFilters["sort"]>("date_desc")
   const [showFilters, setShowFilters] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
   const [gridVisibleCount, setGridVisibleCount] = useState(GRID_PAGE_SIZE)
@@ -51,19 +52,35 @@ export function HomeClient({ articles }: Props) {
       const saved = localStorage.getItem(FILTER_STORAGE_KEY)
       if (!saved) return
       const parsed = JSON.parse(saved)
-      setSearchTerm(parsed.searchTerm ?? "")
       setSelectedCategory(parsed.selectedCategory ?? "all")
       setSelectedHouse(parsed.selectedHouse ?? "all")
       setSelectedMeeting(parsed.selectedMeeting ?? "all")
-      setDateRange(parsed.dateRange ?? "all")
       setSelectedPerson(parsed.selectedPerson ?? null)
-      if (parsed.selectedDate) {
-        setSelectedDate(new Date(parsed.selectedDate))
+      setSortOrder(parsed.sortOrder ?? "date_desc")
+      if (parsed.dateStart) {
+        setDateStart(new Date(parsed.dateStart))
+      }
+      if (parsed.dateEnd) {
+        setDateEnd(new Date(parsed.dateEnd))
       }
     } catch (error) {
       console.warn("[home] failed to restore filters", error)
     }
   }, [])
+
+  useEffect(() => {
+    setSearchInputValue(searchTerm)
+  }, [searchTerm])
+
+  useEffect(() => {
+    if (searchInputValue === searchTerm) {
+      return
+    }
+    const timeout = setTimeout(() => {
+      setSearchTerm(searchInputValue)
+    }, 300)
+    return () => clearTimeout(timeout)
+  }, [searchInputValue, searchTerm])
 
   useEffect(() => {
     if (!searchTerm.trim()) {
@@ -73,16 +90,17 @@ export function HomeClient({ articles }: Props) {
 
   useEffect(() => {
     const payload = {
-      searchTerm,
       selectedCategory,
       selectedHouse,
       selectedMeeting,
-      dateRange,
       selectedPerson,
-      selectedDate: selectedDate?.toISOString(),
+      dateStart: dateStart?.toISOString(),
+      dateEnd: dateEnd?.toISOString(),
+      sortOrder,
     }
+    console.log("[home] saving filters to localStorage")
     localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(payload))
-  }, [searchTerm, selectedCategory, selectedHouse, selectedMeeting, dateRange, selectedPerson, selectedDate])
+  }, [selectedCategory, selectedHouse, selectedMeeting, selectedPerson, dateStart, dateEnd, sortOrder])
 
   useEffect(() => {
     if (!isTyping || searchTerm.trim().length < 2) {
@@ -91,12 +109,23 @@ export function HomeClient({ articles }: Props) {
     }
 
     const controller = new AbortController()
-    fetchSuggestions(searchTerm.trim(), 5, controller.signal)
+    const suggestionFilters: Partial<SearchFilters> = {
+      categories: selectedCategory === "all" ? [] : [selectedCategory],
+      houses: selectedHouse === "all" ? [] : [selectedHouse],
+      meetings: selectedMeeting === "all" ? [] : [selectedMeeting],
+      dateStart: dateStart?.toISOString(),
+      dateEnd: dateEnd?.toISOString(),
+    }
+    fetchSuggestions(searchTerm.trim(), {
+      limit: 5,
+      filters: suggestionFilters,
+      signal: controller.signal,
+    })
       .then((response) => setSuggestions(response.suggestions))
       .catch(() => setSuggestions([]))
 
     return () => controller.abort()
-  }, [isTyping, searchTerm])
+  }, [isTyping, searchTerm, selectedCategory, selectedHouse, selectedMeeting, dateStart, dateEnd, sortOrder])
 
   const safeArticles = useMemo(() => {
     return articles.map((article) => ({
@@ -137,7 +166,7 @@ export function HomeClient({ articles }: Props) {
   )
 
   const filteredArticles = useMemo(() => {
-    return safeArticles.filter((article) => {
+    const matches = safeArticles.filter((article) => {
       const normalizedSearch = searchTerm.trim().toLowerCase()
       const searchWords = normalizedSearch ? normalizedSearch.split(/[,\s]+/).filter(Boolean) : []
 
@@ -159,30 +188,35 @@ export function HomeClient({ articles }: Props) {
       const houseMatch = selectedHouse === "all" || article.nameOfHouse === selectedHouse
       const meetingMatch = selectedMeeting === "all" || article.nameOfMeeting === selectedMeeting
       const articleDate = new Date(article.date)
-      const rangeMatch = isWithinRange(articleDate, dateRange)
-      const specificDateMatch = selectedDate
-        ? article.date && sameDay(articleDate, selectedDate)
-        : true
+      const withinCustomRange = isWithinCustomRange(articleDate, dateStart, dateEnd)
 
-      return searchMatch && categoryMatch && houseMatch && meetingMatch && rangeMatch && specificDateMatch
+      return searchMatch && categoryMatch && houseMatch && meetingMatch && withinCustomRange
     })
-  }, [safeArticles, dateRange, searchTerm, selectedCategory, selectedDate, selectedHouse, selectedMeeting])
+
+    return matches.sort((a, b) => {
+      const aTime = new Date(a.date).getTime()
+      const bTime = new Date(b.date).getTime()
+      return sortOrder === "date_desc" ? bTime - aTime : aTime - bTime
+    })
+  }, [safeArticles, searchTerm, selectedCategory, selectedHouse, selectedMeeting, dateStart, dateEnd, sortOrder])
 
   const hasActiveFilters =
     searchTerm.trim() !== "" ||
     selectedCategory !== "all" ||
     selectedHouse !== "all" ||
     selectedMeeting !== "all" ||
-    dateRange !== "all" ||
-    selectedDate !== undefined
+    dateStart !== undefined ||
+    dateEnd !== undefined ||
+    sortOrder !== "date_desc"
 
   const activeFilterCount = [
     searchTerm.trim() !== "",
     selectedCategory !== "all",
     selectedHouse !== "all",
     selectedMeeting !== "all",
-    dateRange !== "all",
-    selectedDate !== undefined,
+    dateStart !== undefined,
+    dateEnd !== undefined,
+    sortOrder !== "date_desc",
   ].filter(Boolean).length
 
   const featuredArticle = filteredArticles[0]
@@ -203,25 +237,27 @@ export function HomeClient({ articles }: Props) {
     selectedCategory,
     selectedHouse,
     selectedMeeting,
-    dateRange,
-    selectedDate,
+    dateStart,
+    dateEnd,
+    sortOrder,
     hasActiveFilters,
     filteredArticles,
   ])
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
-    if (!searchTerm.trim()) return
-    const normalized = normalizeWords(searchTerm)
-    router.push(`/search/${encodeURIComponent(normalized)}`)
+    if (!searchInputValue.trim()) return
+    const normalized = normalizeWords(searchInputValue)
+    setSearchInputValue(normalized)
+    setSearchTerm(normalized)
   }
 
   function handleSuggestionSelect(value: string) {
     const normalized = normalizeWords(value)
     setSearchTerm(normalized)
+    setSearchInputValue(normalized)
     setSelectedPerson(null)
     setSuggestions([])
-    router.push(`/search/${encodeURIComponent(normalized)}`)
   }
 
   function handleCategoryClick(category: string) {
@@ -242,12 +278,31 @@ export function HomeClient({ articles }: Props) {
   function handleParticipantClick(participant: string) {
     setSelectedPerson(participant)
     setSearchTerm(participant)
+    setSearchInputValue(participant)
     focusSearchSection()
   }
 
   function handleKeywordClick(keyword: string) {
     setSearchTerm(keyword)
+    setSearchInputValue(keyword)
     setSelectedPerson(null)
+    focusSearchSection()
+  }
+
+  function handleDateStartChange(value: Date | undefined | null) {
+    const nextValue = value ?? undefined
+    setDateStart(nextValue)
+    focusSearchSection()
+  }
+
+  function handleDateEndChange(value: Date | undefined | null) {
+    const nextValue = value ?? undefined
+    setDateEnd(nextValue)
+    focusSearchSection()
+  }
+
+  function handleSortOrderChange(value: SearchFilters["sort"]) {
+    setSortOrder(value)
     focusSearchSection()
   }
 
@@ -257,12 +312,14 @@ export function HomeClient({ articles }: Props) {
 
   function handleClearFilters() {
     setSearchTerm("")
+    setSearchInputValue("")
     setSelectedCategory("all")
     setSelectedHouse("all")
     setSelectedMeeting("all")
-    setDateRange("all")
-    setSelectedDate(undefined)
+    setDateStart(undefined)
+    setDateEnd(undefined)
     setSelectedPerson(null)
+    setSortOrder("date_desc")
     setSuggestions([])
     if (typeof window !== "undefined") {
       localStorage.removeItem(FILTER_STORAGE_KEY)
@@ -279,8 +336,8 @@ export function HomeClient({ articles }: Props) {
     selectedCategory,
     selectedHouse,
     selectedMeeting,
-    dateRange,
-    selectedDate,
+    dateStart,
+    dateEnd,
   }
 
   return (
@@ -289,8 +346,8 @@ export function HomeClient({ articles }: Props) {
       <AboutPanel isOpen={showAbout} />
       <HeroSection />
       <SearchControls
-        searchTerm={searchTerm}
-        onSearchTermChange={setSearchTerm}
+        searchTerm={searchInputValue}
+        onSearchTermChange={setSearchInputValue}
         onSubmit={handleSubmit}
         onTypingStart={() => setIsTyping(true)}
         onTypingEnd={() => setIsTyping(false)}
@@ -305,14 +362,10 @@ export function HomeClient({ articles }: Props) {
         onChangeCategory={handleCategoryClick}
         onChangeHouse={handleHouseClick}
         onChangeMeeting={handleMeetingClick}
-        onChangeDateRange={(value) => {
-          setDateRange(value)
-          focusSearchSection()
-        }}
-        onChangeDate={(value) => {
-          setSelectedDate(value ?? undefined)
-          focusSearchSection()
-        }}
+        onChangeDateStart={handleDateStartChange}
+        onChangeDateEnd={handleDateEndChange}
+        sortOrder={sortOrder}
+        onChangeSortOrder={handleSortOrderChange}
       />
 
       <div className="flex-1 space-y-12 bg-background py-10">
@@ -382,9 +435,25 @@ export function HomeClient({ articles }: Props) {
   )
 }
 
-function sameDay(a: Date, b: Date) {
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+function isWithinCustomRange(date: Date, start?: Date, end?: Date): boolean {
+  const timestamp = date.getTime()
+  if (start) {
+    const startTime = new Date(start)
+    startTime.setHours(0, 0, 0, 0)
+    if (timestamp < startTime.getTime()) {
+      return false
+    }
+  }
+  if (end) {
+    const endTime = new Date(end)
+    endTime.setHours(23, 59, 59, 999)
+    if (timestamp > endTime.getTime()) {
+      return false
+    }
+  }
+  return true
 }
+
 
 type ActiveFilterSummaryProps = {
   totalCount: number

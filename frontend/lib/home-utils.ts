@@ -26,29 +26,6 @@ export function normalizeWords(value: string) {
     .join(",")
 }
 
-export function isWithinRange(date: Date, range: string) {
-  if (range === "all") return true
-  const now = Date.now()
-  const articleTime = date.getTime()
-  const diff = now - articleTime
-  const day = 24 * 60 * 60 * 1000
-
-  switch (range) {
-    case "1week":
-      return diff <= 7 * day
-    case "1month":
-      return diff <= 30 * day
-    case "3months":
-      return diff <= 90 * day
-    case "6months":
-      return diff <= 180 * day
-    case "1year":
-      return diff <= 365 * day
-    default:
-      return true
-  }
-}
-
 export function focusSearchSection() {
   if (typeof window === "undefined") return
   const section = document.getElementById("search-section")

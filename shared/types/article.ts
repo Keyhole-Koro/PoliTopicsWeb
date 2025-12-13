@@ -69,6 +69,10 @@ export type { Article }
 export type SearchFilters = {
   words?: string[]
   categories?: string[]
+  houses?: string[]
+  meetings?: string[]
+  dateStart?: string
+  dateEnd?: string
   sort?: "date_desc" | "date_asc"
   limit?: number
 }

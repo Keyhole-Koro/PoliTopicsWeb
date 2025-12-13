@@ -25,8 +25,20 @@ export async function fetchSearch(filters: SearchFilters) {
   if (filters.categories && filters.categories.length > 0) {
     params.set("categories", filters.categories.join(","))
   }
+  if (filters.houses && filters.houses.length > 0) {
+    params.set("houses", filters.houses.join(","))
+  }
+  if (filters.meetings && filters.meetings.length > 0) {
+    params.set("meetings", filters.meetings.join(","))
+  }
   if (filters.sort) {
     params.set("sort", filters.sort)
+  }
+  if (filters.dateStart) {
+    params.set("dateStart", filters.dateStart)
+  }
+  if (filters.dateEnd) {
+    params.set("dateEnd", filters.dateEnd)
   }
   if (filters.limit) {
     params.set("limit", String(filters.limit))
@@ -41,11 +53,34 @@ export async function fetchArticle(id: string) {
   return apiFetch<{ article: Article }>(`/article/${encodeURIComponent(id)}`)
 }
 
-export async function fetchSuggestions(input: string, limit = 5, signal?: AbortSignal) {
+type SuggestionOptions = {
+  limit?: number
+  filters?: Partial<SearchFilters>
+  signal?: AbortSignal
+}
+
+export async function fetchSuggestions(input: string, options: SuggestionOptions = {}) {
+  const { limit = 5, filters, signal } = options
   const params = new URLSearchParams({
     input,
     limit: String(limit),
   })
+
+  if (filters?.categories && filters.categories.length > 0) {
+    params.set("categories", filters.categories.join(","))
+  }
+  if (filters?.houses && filters.houses.length > 0) {
+    params.set("houses", filters.houses.join(","))
+  }
+  if (filters?.meetings && filters.meetings.length > 0) {
+    params.set("meetings", filters.meetings.join(","))
+  }
+  if (filters?.dateStart) {
+    params.set("dateStart", filters.dateStart)
+  }
+  if (filters?.dateEnd) {
+    params.set("dateEnd", filters.dateEnd)
+  }
 
   return apiFetch<SuggestionsResponse>(`/search/suggest?${params.toString()}`, { signal })
 }
