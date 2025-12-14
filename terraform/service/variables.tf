@@ -18,6 +18,18 @@ variable "frontend_bucket" {
   type        = string
 }
 
+variable "frontend_public_enabled" {
+  description = "Allow the frontend bucket to be publicly accessible via a bucket policy"
+  type        = bool
+  default     = true
+}
+
+variable "frontend_deploy_enabled" {
+  description = "Whether Terraform should build and upload the frontend assets during apply"
+  type        = bool
+  default     = false
+}
+
 variable "articles_table" {
   description = "Existing DynamoDB table backing this environment"
   type        = string

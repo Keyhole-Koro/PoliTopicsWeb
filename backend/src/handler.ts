@@ -28,8 +28,11 @@ export async function handler(
   context: Context,
 ): Promise<APIGatewayProxyResultV2> {
   const proxy = await getFastifyProxy()
+  const rawPath = typeof event.rawPath === "string" ? event.rawPath : "/"
+  const strippedRawPath = rawPath.replace(/^\/stage(?=\/|$)/, "") || "/"
+  const normalizedEvent = rawPath === strippedRawPath ? event : { ...event, rawPath: strippedRawPath }
   return new Promise<APIGatewayProxyResultV2>((resolve, reject) => {
-    proxy(event, context, (error, result) => {
+    proxy(normalizedEvent, context, (error, result) => {
       if (error) {
         reject(error)
         return

@@ -9,10 +9,10 @@ resource "aws_s3_bucket" "frontend" {
 resource "aws_s3_bucket_public_access_block" "frontend" {
   bucket = aws_s3_bucket.frontend.id
 
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
+  block_public_acls       = var.frontend_public_enabled ? false : true
+  block_public_policy     = var.frontend_public_enabled ? false : true
+  ignore_public_acls      = var.frontend_public_enabled ? false : true
+  restrict_public_buckets = var.frontend_public_enabled ? false : true
 }
 
 resource "aws_s3_bucket_website_configuration" "frontend" {
@@ -28,6 +28,7 @@ resource "aws_s3_bucket_website_configuration" "frontend" {
 }
 
 resource "aws_s3_bucket_policy" "frontend_public" {
+  count  = var.frontend_public_enabled ? 1 : 0
   bucket = aws_s3_bucket.frontend.id
 
   policy = jsonencode({
@@ -42,6 +43,41 @@ resource "aws_s3_bucket_policy" "frontend_public" {
       }
     ]
   })
+}
+
+resource "null_resource" "build_frontend" {
+  for_each = var.frontend_deploy_enabled ? { current = var.frontend_bucket } : {}
+
+  provisioner "local-exec" {
+    command     = "${path.module}/../../scripts/build-frontend.sh"
+    working_dir = "${path.module}/../.."
+    interpreter = ["/bin/bash", "-c"]
+  }
+
+  triggers = {
+    bucket      = each.value
+    environment = var.environment
+  }
+}
+
+resource "null_resource" "upload_frontend" {
+  for_each = var.frontend_deploy_enabled ? { current = var.frontend_bucket } : {}
+
+  depends_on = [
+    aws_s3_bucket.frontend,
+    null_resource.build_frontend["current"]
+  ]
+
+  provisioner "local-exec" {
+    command     = "${path.module}/../../scripts/upload-frontend.sh ${each.value}"
+    working_dir = "${path.module}/../.."
+    interpreter = ["/bin/bash", "-c"]
+  }
+
+  triggers = {
+    bucket      = each.value
+    environment = var.environment
+  }
 }
 
 resource "aws_s3_bucket" "article_payload" {

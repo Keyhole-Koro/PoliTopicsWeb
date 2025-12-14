@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import type { ArticleSummary, SearchFilters } from "@shared/types/article"
-import { fetchSuggestions } from "@/lib/api"
+import { fetchHeadlines, fetchSuggestions } from "@/lib/api"
 import { HomeHeader } from "@/components/home/home-header"
 import { AboutPanel } from "@/components/home/about-panel"
 import { HeroSection } from "@/components/home/hero-section"
@@ -12,6 +12,8 @@ import { PersonInsightCard } from "@/components/home/person-insight-card"
 import { FeaturedArticleCard, LatestArticlesRow, ArticleGridSection } from "@/components/home/articles-sections"
 import { KeywordTrends, KeyParticipants } from "@/components/home/stats-sections"
 import { SiteFooter } from "@/components/home/site-footer"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Button } from "@/components/ui/button"
 import {
   buildKeywordStats,
   buildParticipantStats,
@@ -23,14 +25,33 @@ import {
   type PersonInsight,
 } from "@/lib/home-utils"
 
-type Props = {
-  articles: ArticleSummary[]
-}
-
 const FILTER_STORAGE_KEY = "politopics-home-filters"
 const GRID_PAGE_SIZE = 6
+const HEADLINE_PAGE_SIZE = 6
+const HEADLINE_CACHE_TTL_MS = 5 * 60 * 1000
 
-export function HomeClient({ articles }: Props) {
+type HeadlinesCache = {
+  items: ArticleSummary[]
+  hasMore: boolean
+  fetchedAt: number
+}
+
+let headlinesCache: HeadlinesCache | null = null
+
+function readHeadlinesCache(): HeadlinesCache | null {
+  if (!headlinesCache) return null
+  if (Date.now() - headlinesCache.fetchedAt > HEADLINE_CACHE_TTL_MS) {
+    headlinesCache = null
+    return null
+  }
+  return headlinesCache
+}
+
+function writeHeadlinesCache(items: ArticleSummary[], hasMore: boolean) {
+  headlinesCache = { items, hasMore, fetchedAt: Date.now() }
+}
+
+export function HomeClient() {
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
   const [searchInputValue, setSearchInputValue] = useState("")
@@ -46,6 +67,70 @@ export function HomeClient({ articles }: Props) {
   const [showFilters, setShowFilters] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
   const [gridVisibleCount, setGridVisibleCount] = useState(GRID_PAGE_SIZE)
+  const [articles, setArticles] = useState<ArticleSummary[]>([])
+  const [isLoadingArticles, setIsLoadingArticles] = useState(true)
+  const [isLoadingMoreArticles, setIsLoadingMoreArticles] = useState(false)
+  const [articlesError, setArticlesError] = useState<string | null>(null)
+  const [hasMoreArticles, setHasMoreArticles] = useState(true)
+
+  const loadArticles = useCallback(
+    async ({
+      start = 0,
+      limit = HEADLINE_PAGE_SIZE,
+      force = false,
+    }: { start?: number; limit?: number; force?: boolean } = {}) => {
+      if (!force && start === 0) {
+        const cached = readHeadlinesCache()
+        if (cached) {
+          setArticles(cached.items)
+          setHasMoreArticles(cached.hasMore)
+          setIsLoadingArticles(false)
+          setArticlesError(null)
+          return
+        }
+      }
+
+      if (start === 0) {
+        setIsLoadingArticles(true)
+        setArticlesError(null)
+      } else {
+        setIsLoadingMoreArticles(true)
+      }
+
+      try {
+        const response = await fetchHeadlines({ start, limit })
+        setHasMoreArticles(response.hasMore)
+        setArticles((previous) => {
+          let next: ArticleSummary[]
+          if (start === 0) {
+            next = response.items
+          } else if (start >= previous.length) {
+            next = [...previous, ...response.items]
+          } else {
+            next = [...previous]
+            next.splice(start, response.items.length, ...response.items)
+          }
+          writeHeadlinesCache(next, response.hasMore)
+          return next
+        })
+        setArticlesError(null)
+      } catch (error) {
+        console.error("[home] failed to load headlines", error)
+        setArticlesError("最新の審議情報を取得できませんでした。時間をおいて再度お試しください。")
+      } finally {
+        if (start === 0) {
+          setIsLoadingArticles(false)
+        } else {
+          setIsLoadingMoreArticles(false)
+        }
+      }
+    },
+    [],
+  )
+
+  useEffect(() => {
+    void loadArticles()
+  }, [loadArticles])
 
   useEffect(() => {
     try {
@@ -98,7 +183,6 @@ export function HomeClient({ articles }: Props) {
       dateEnd: dateEnd?.toISOString(),
       sortOrder,
     }
-    console.log("[home] saving filters to localStorage")
     localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(payload))
   }, [selectedCategory, selectedHouse, selectedMeeting, selectedPerson, dateStart, dateEnd, sortOrder])
 
@@ -228,7 +312,8 @@ export function HomeClient({ articles }: Props) {
     () => gridArticles.slice(0, gridVisibleCount),
     [gridArticles, gridVisibleCount],
   )
-  const canLoadMore = gridArticles.length > gridVisibleCount
+  const hasLocalMore = gridArticles.length > gridVisibleCount
+  const canLoadMore = hasLocalMore || hasMoreArticles
 
   useEffect(() => {
     setGridVisibleCount(GRID_PAGE_SIZE)
@@ -241,7 +326,6 @@ export function HomeClient({ articles }: Props) {
     dateEnd,
     sortOrder,
     hasActiveFilters,
-    filteredArticles,
   ])
 
   function handleSubmit(event: React.FormEvent) {
@@ -250,6 +334,7 @@ export function HomeClient({ articles }: Props) {
     const normalized = normalizeWords(searchInputValue)
     setSearchInputValue(normalized)
     setSearchTerm(normalized)
+    navigateToSearch(normalized)
   }
 
   function handleSuggestionSelect(value: string) {
@@ -258,6 +343,35 @@ export function HomeClient({ articles }: Props) {
     setSearchInputValue(normalized)
     setSelectedPerson(null)
     setSuggestions([])
+    navigateToSearch(normalized)
+  }
+
+  function navigateToSearch(term: string) {
+    const normalized = normalizeWords(term)
+    if (!normalized) return
+    const params = new URLSearchParams()
+    params.set("words", normalized)
+    if (selectedCategory !== "all") {
+      params.set("categories", selectedCategory)
+    }
+    if (selectedHouse !== "all") {
+      params.set("houses", selectedHouse)
+    }
+    if (selectedMeeting !== "all") {
+      params.set("meetings", selectedMeeting)
+    }
+    if (dateStart) {
+      params.set("dateStart", dateStart.toISOString())
+    }
+    if (dateEnd) {
+      params.set("dateEnd", dateEnd.toISOString())
+    }
+    const safeSort = sortOrder ?? "date_desc"
+    if (safeSort !== "date_desc") {
+      params.set("sort", safeSort)
+    }
+    const query = params.toString()
+    router.push(query ? `/search?${query}` : "/search")
   }
 
   function handleCategoryClick(category: string) {
@@ -307,7 +421,17 @@ export function HomeClient({ articles }: Props) {
   }
 
   function handleLoadMore() {
-    setGridVisibleCount((count) => count + GRID_PAGE_SIZE)
+    if (isLoadingMoreArticles) {
+      return
+    }
+    const nextVisibleCount = gridVisibleCount + GRID_PAGE_SIZE
+    if (gridArticles.length < nextVisibleCount && hasMoreArticles) {
+      loadArticles({ start: articles.length, limit: HEADLINE_PAGE_SIZE }).finally(() => {
+        setGridVisibleCount(nextVisibleCount)
+      })
+      return
+    }
+    setGridVisibleCount(nextVisibleCount)
   }
 
   function handleClearFilters() {
@@ -368,6 +492,20 @@ export function HomeClient({ articles }: Props) {
         onChangeSortOrder={handleSortOrderChange}
       />
 
+      {articlesError && (
+        <div className="px-4 py-4 sm:px-6">
+          <Alert variant="destructive">
+            <AlertTitle>記事を読み込めませんでした</AlertTitle>
+            <AlertDescription className="flex w-full flex-wrap items-center gap-3">
+              <span>{articlesError}</span>
+              <Button variant="outline" size="sm" onClick={() => void loadArticles({ force: true })}>
+                再試行
+              </Button>
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
+
       <div className="flex-1 space-y-12 bg-background py-10">
         <div className="space-y-12 px-4 sm:px-6">
           {hasActiveFilters && (
@@ -426,6 +564,8 @@ export function HomeClient({ articles }: Props) {
             onNavigate={(path) => router.push(path)}
             canLoadMore={canLoadMore}
             onLoadMore={handleLoadMore}
+            isLoading={isLoadingArticles}
+            isLoadingMore={isLoadingMoreArticles}
           />
         </div>
       </div>

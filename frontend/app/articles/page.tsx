@@ -1,15 +1,28 @@
+'use client'
+
 import Link from "next/link"
+import { useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowLeft, MessageSquare } from "lucide-react"
-import { ArticleClient } from "./ArticleClient"
-import { getStaticArticleParams } from "@/lib/static-params"
+import { ArticleClient } from "./article-client"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 
-export function generateStaticParams() {
-  return getStaticArticleParams().map((item) => ({ issueID: item.issueID }))
-}
+export default function ArticlesPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const issueId = searchParams?.get("issueID") ?? undefined
 
-export default function ArticlePage({ params }: { params: { issueID: string } }) {
+  useEffect(() => {
+    if (!issueId) {
+      router.replace("/")
+    }
+  }, [issueId, router])
+
+  if (!issueId) {
+    return null
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 border-b bg-card/50 backdrop-blur-sm">
@@ -30,7 +43,7 @@ export default function ArticlePage({ params }: { params: { issueID: string } })
         </div>
       </header>
       <main className="container mx-auto max-w-4xl px-4 py-10">
-        <ArticleClient issueId={params.issueID} />
+        <ArticleClient issueId={issueId} />
       </main>
     </div>
   )

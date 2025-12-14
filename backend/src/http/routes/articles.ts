@@ -2,8 +2,8 @@ import fp from "fastify-plugin"
 import type { FastifyInstance, FastifyPluginAsync } from "fastify"
 import type { Article, ArticleSummary, SearchFilters } from "@shared/types/article"
 
-type HeadlinesQuery = { limit?: string }
-type HeadlinesResponse = { items: ArticleSummary[]; limit: number }
+type HeadlinesQuery = { limit?: string; start?: string; end?: string }
+type HeadlinesResponse = { items: ArticleSummary[]; limit: number; start: number; end: number; hasMore: boolean }
 
 type SearchQuery = {
   words?: string
@@ -35,9 +35,18 @@ const articlesRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   fastify.get("/healthz", async () => ({ status: "ok" }))
 
   fastify.get<{ Querystring: HeadlinesQuery; Reply: HeadlinesResponse }>("/headlines", async (request) => {
-    const limit = toNumber(request.query.limit, 6)
-    const items = await fastify.articleRepository.getHeadlines(limit)
-    return { items, limit }
+    const start = Math.max(0, Math.trunc(toNumber(request.query.start, 0)))
+    let limit = Math.min(50, Math.max(1, Math.trunc(toNumber(request.query.limit, 6))))
+
+    if (request.query.end !== undefined) {
+      const requestedEnd = Math.max(start, Math.trunc(toNumber(request.query.end, start + limit)))
+      limit = Math.min(50, Math.max(1, requestedEnd - start))
+    }
+
+    const { items, hasMore } = await fastify.articleRepository.getHeadlines(limit, "date_desc", start)
+    const end = start + items.length
+
+    return { items, limit, start, end, hasMore }
   })
 
   fastify.get<{ Querystring: SearchQuery; Reply: SearchResponse }>("/search", async (request) => {

@@ -1,9 +1,11 @@
 region      = "ap-northeast-3"
 environment = "prod"
 
-frontend_bucket        = "politopics-frontend-prod"
-articles_table         = "politopics-prod"
-article_payload_bucket = "politopics-articles-prod"
+frontend_bucket         = "politopics-frontend-prod"
+articles_table          = "politopics-prod"
+article_payload_bucket  = "politopics-articles-prod"
+frontend_public_enabled = true
+frontend_deploy_enabled = true
 
 lambda_name        = "politopics-backend-prod"
 api_name           = "politopics-api-prod"

@@ -1,9 +1,11 @@
 region      = "ap-northeast-3"
 environment = "stage"
 
-frontend_bucket        = "politopics-frontend-stage"
-articles_table         = "politopics-stage"
-article_payload_bucket = "politopics-articles-stage"
+frontend_bucket         = "politopics-frontend-stage"
+articles_table          = "politopics-stage"
+article_payload_bucket  = "politopics-articles-stage"
+frontend_public_enabled = true
+frontend_deploy_enabled = true
 
 lambda_name        = "politopics-backend-stage"
 api_name           = "politopics-api-stage"

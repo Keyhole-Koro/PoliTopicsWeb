@@ -3,6 +3,8 @@ module "s3" {
 
   environment            = var.environment
   frontend_bucket        = var.frontend_bucket
+  frontend_public_enabled = var.frontend_public_enabled
+  frontend_deploy_enabled = var.frontend_deploy_enabled
   article_payload_bucket = var.article_payload_bucket
   is_localstack          = var.is_localstack
 }

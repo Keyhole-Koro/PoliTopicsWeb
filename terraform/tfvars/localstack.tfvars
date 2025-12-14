@@ -1,9 +1,10 @@
 region      = "ap-northeast-3"
 environment = "localstack"
 
-frontend_bucket        = "politopics-frontend-localstack"
-articles_table         = null
-article_payload_bucket = "politopics-articles-local"
+frontend_bucket         = "politopics-frontend-localstack"
+articles_table          = null
+article_payload_bucket  = "politopics-articles-local"
+frontend_deploy_enabled = false
 
 lambda_name        = "politopics-backend-localstack"
 api_name           = "politopics-api-localstack"

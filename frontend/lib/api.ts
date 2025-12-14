@@ -13,8 +13,33 @@ export type SuggestionsResponse = {
   suggestions: string[]
 }
 
-export async function fetchHeadlines(limit = 6) {
-  return apiFetch<{ items: ArticleSummary[] }>(`/headlines?limit=${limit}`)
+export type HeadlinesResponse = {
+  items: ArticleSummary[]
+  limit: number
+  start: number
+  end: number
+  hasMore: boolean
+}
+
+type FetchHeadlinesOptions = {
+  limit?: number
+  start?: number
+  end?: number
+}
+
+export async function fetchHeadlines(options: FetchHeadlinesOptions = {}) {
+  const params = new URLSearchParams()
+  if (options.limit !== undefined) {
+    params.set("limit", String(options.limit))
+  }
+  if (options.start !== undefined) {
+    params.set("start", String(options.start))
+  }
+  if (options.end !== undefined) {
+    params.set("end", String(options.end))
+  }
+  const suffix = params.toString() ? `?${params.toString()}` : ""
+  return apiFetch<HeadlinesResponse>(`/headlines${suffix}`)
 }
 
 export async function fetchSearch(filters: SearchFilters) {

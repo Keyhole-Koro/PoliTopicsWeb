@@ -21,7 +21,10 @@ data "aws_iam_policy_document" "backend_data_access" {
       "dynamodb:Scan"
     ]
 
-    resources = [var.table_arn]
+    resources = [
+      var.table_arn,
+      "${var.table_arn}/index/*"
+    ]
   }
 
   statement {
@@ -65,13 +68,13 @@ resource "aws_lambda_function" "backend" {
   memory_size      = 128
   timeout          = 10
   description      = var.lambda_description
+  architectures    = ["arm64"]
 
   environment {
     variables = {
-      AWS_REGION       = var.region
-      POLITOPICS_TABLE = var.table_name
+      POLITOPICS_TABLE          = var.table_name
       POLITOPICS_ARTICLE_BUCKET = var.payload_bucket_name
-      ENV              = var.environment
+      ENV                       = var.environment
     }
   }
 

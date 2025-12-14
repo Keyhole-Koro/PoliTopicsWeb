@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import type { ArticleSummary, SearchFilters } from "@shared/types/article"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -19,17 +19,23 @@ type StaticFilters = {
   dateEnd?: string
 }
 
+type DerivedFilters = StaticFilters & {
+  sort: SearchFilters["sort"]
+}
+
 type Props = {
   initialWords: string[]
-  initialFilters?: StaticFilters & Pick<SearchFilters, "sort">
 }
 
 const SEARCH_DEBOUNCE_MS = 300
 
-export function SearchClient({ initialWords, initialFilters }: Props) {
+export function SearchClient({ initialWords }: Props) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const searchParamsKey = searchParams?.toString() ?? ""
+  const derivedFilters = useMemo<DerivedFilters>(() => buildFilters(searchParams), [searchParamsKey])
   const [words, setWords] = useState(initialWords)
-  const [sort, setSort] = useState<SearchFilters["sort"]>(initialFilters?.sort ?? "date_desc")
+  const [sort, setSort] = useState<SearchFilters["sort"]>(derivedFilters.sort)
   const [results, setResults] = useState<ArticleSummary[]>([])
   const [query, setQuery] = useState(initialWords.join(","))
   const [debouncedQuery, setDebouncedQuery] = useState(query)
@@ -38,18 +44,18 @@ export function SearchClient({ initialWords, initialFilters }: Props) {
 
   const staticFilters = useMemo<StaticFilters>(
     () => ({
-      categories: initialFilters?.categories ?? [],
-      houses: initialFilters?.houses ?? [],
-      meetings: initialFilters?.meetings ?? [],
-      dateStart: initialFilters?.dateStart,
-      dateEnd: initialFilters?.dateEnd,
+      categories: derivedFilters.categories,
+      houses: derivedFilters.houses,
+      meetings: derivedFilters.meetings,
+      dateStart: derivedFilters.dateStart,
+      dateEnd: derivedFilters.dateEnd,
     }),
-    [initialFilters],
+    [derivedFilters],
   )
 
   useEffect(() => {
-    setSort(initialFilters?.sort ?? "date_desc")
-  }, [initialFilters])
+    setSort(derivedFilters.sort)
+  }, [derivedFilters])
 
   useEffect(() => {
     setLoading(true)
@@ -207,8 +213,12 @@ function splitWords(value: string) {
   return value ? value.split(",") : []
 }
 
-function buildSearchPath(words: string, sort: SearchFilters["sort"], filters: StaticFilters): string {
+function buildSearchPath(words: string, sort: SearchFilters["sort"] | undefined, filters: StaticFilters): string {
   const params = new URLSearchParams()
+  if (words) {
+    params.set("words", words)
+  }
+  const safeSort = sort ?? "date_desc"
   if (filters.categories && filters.categories.length > 0) {
     params.set("categories", filters.categories.join(","))
   }
@@ -224,16 +234,47 @@ function buildSearchPath(words: string, sort: SearchFilters["sort"], filters: St
   if (filters.dateEnd) {
     params.set("dateEnd", filters.dateEnd)
   }
-  if (sort !== "date_desc") {
-    params.set("sort", sort)
+  if (safeSort !== "date_desc") {
+    params.set("sort", safeSort)
   }
   const query = params.toString()
-  const base = `/search/${encodeURIComponent(words)}`
-  return query ? `${base}?${query}` : base
+  return query ? `/search?${query}` : "/search"
 }
 
 function formatDisplayDate(value: string): string {
   const timestamp = Number(new Date(value))
   if (Number.isNaN(timestamp)) return value
   return new Date(timestamp).toLocaleDateString("ja-JP")
+}
+
+function buildFilters(params: ReturnType<typeof useSearchParams>): DerivedFilters {
+  const categories = toList(params?.get("categories"))
+  const houses = toList(params?.get("houses"))
+  const meetings = toList(params?.get("meetings"))
+  const dateStart = toDateValue(params?.get("dateStart"))
+  const dateEnd = toDateValue(params?.get("dateEnd"))
+  const sort = toSort(params?.get("sort"))
+
+  return { categories, houses, meetings, dateStart, dateEnd, sort }
+}
+
+function toList(value?: string | null): string[] {
+  if (!value) return []
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
+function toDateValue(value?: string | null): string | undefined {
+  if (!value) return undefined
+  const timestamp = Number(new Date(value))
+  if (Number.isNaN(timestamp)) {
+    return undefined
+  }
+  return new Date(timestamp).toISOString()
+}
+
+function toSort(value?: string | null): SearchFilters["sort"] {
+  return value === "date_asc" ? "date_asc" : "date_desc"
 }

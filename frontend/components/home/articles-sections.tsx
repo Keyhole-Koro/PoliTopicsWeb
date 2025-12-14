@@ -1,5 +1,5 @@
 import type { ArticleSummary } from "@shared/types/article"
-import { CalendarIcon, Clock, MessageSquare, Search, Target, Users } from "lucide-react"
+import { CalendarIcon, Clock, Loader2, MessageSquare, Search, Target, Users } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -36,7 +36,7 @@ export function FeaturedArticleCard({
       </div>
       <Card
         className="overflow-hidden transition-shadow hover:shadow-lg"
-        onClick={() => onNavigate(`/article/${article.id}`)}
+        onClick={() => onNavigate(`/articles?issueID=${encodeURIComponent(article.id)}`)}
       >
         <div className="md:flex">
           <div className="flex h-48 items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10 md:w-1/3">
@@ -90,7 +90,9 @@ export function FeaturedArticleCard({
               <Button
                 variant="default"
                 size="sm"
-                onClick={(event) => handleEvent(event, () => onNavigate(`/article/${article.id}`))}
+                onClick={(event) =>
+                  handleEvent(event, () => onNavigate(`/articles?issueID=${encodeURIComponent(article.id)}`))
+                }
               >
                 詳細を読む
               </Button>
@@ -119,7 +121,11 @@ export function LatestArticlesRow({ articles, onCategoryClick, onKeywordClick, o
         {articles.map((article) => {
           const category = article.categories?.[0]
           return (
-            <Card key={article.id} className="flex h-full flex-col justify-between" onClick={() => onNavigate(`/article/${article.id}`)}>
+            <Card
+              key={article.id}
+              className="flex h-full flex-col justify-between"
+              onClick={() => onNavigate(`/articles?issueID=${encodeURIComponent(article.id)}`)}
+            >
               <CardHeader>
                 <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
                   {category && (
@@ -156,7 +162,9 @@ export function LatestArticlesRow({ articles, onCategoryClick, onKeywordClick, o
                   variant="ghost"
                   size="sm"
                   className="w-fit"
-                  onClick={(event) => handleEvent(event, () => onNavigate(`/article/${article.id}`))}
+                  onClick={(event) =>
+                    handleEvent(event, () => onNavigate(`/articles?issueID=${encodeURIComponent(article.id)}`))
+                  }
                 >
                   詳細
                 </Button>
@@ -176,6 +184,8 @@ type GridProps = CommonHandlers & {
   onClearFilters: () => void
   canLoadMore: boolean
   onLoadMore: () => void
+  isLoading?: boolean
+  isLoadingMore?: boolean
 }
 
 export function ArticleGridSection({
@@ -191,6 +201,8 @@ export function ArticleGridSection({
   onHouseClick,
   onMeetingClick,
   onNavigate,
+  isLoading = false,
+  isLoadingMore = false,
 }: GridProps) {
   return (
     <section className="space-y-4">
@@ -199,7 +211,14 @@ export function ArticleGridSection({
         <h2 className="text-2xl font-semibold text-foreground">{title}</h2>
       </div>
 
-      {articles.length === 0 ? (
+      {isLoading ? (
+        <Card>
+          <CardContent className="flex flex-col items-center gap-3 py-12 text-center text-muted-foreground">
+            <Loader2 className="h-10 w-10 animate-spin" />
+            <p>最新の審議情報を読み込んでいます...</p>
+          </CardContent>
+        </Card>
+      ) : articles.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-3 py-12 text-center text-muted-foreground">
             <Search className="h-10 w-10" />
@@ -220,7 +239,7 @@ export function ArticleGridSection({
                 <Card
                   key={article.id}
                   className="flex h-full flex-col overflow-hidden transition-shadow hover:shadow-lg"
-                  onClick={() => onNavigate(`/article/${article.id}`)}
+                  onClick={() => onNavigate(`/articles?issueID=${encodeURIComponent(article.id)}`)}
                 >
                   <div className="flex items-center justify-between bg-muted/40 px-4 py-2 text-xs text-muted-foreground">
                     <button
@@ -309,7 +328,9 @@ export function ArticleGridSection({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={(event) => handleEvent(event, () => onNavigate(`/article/${article.id}`))}
+                        onClick={(event) =>
+                          handleEvent(event, () => onNavigate(`/articles?issueID=${encodeURIComponent(article.id)}`))
+                        }
                       >
                         詳細
                       </Button>
@@ -321,8 +342,15 @@ export function ArticleGridSection({
           </div>
           {canLoadMore && (
             <div className="flex justify-center pt-6">
-              <Button variant="outline" size="lg" onClick={onLoadMore}>
-                もっと見る
+              <Button variant="outline" size="lg" onClick={onLoadMore} disabled={isLoadingMore}>
+                {isLoadingMore ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    読み込み中...
+                  </>
+                ) : (
+                  "もっと見る"
+                )}
               </Button>
             </div>
           )}

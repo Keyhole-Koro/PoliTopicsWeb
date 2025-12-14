@@ -21,6 +21,8 @@ module "service" {
   backend_lambda_package = var.backend_lambda_package
 
   frontend_bucket        = local.frontend_bucket
+  frontend_public_enabled = var.frontend_public_enabled
+  frontend_deploy_enabled = var.frontend_deploy_enabled
   articles_table         = local.articles_table
   article_payload_bucket = local.article_payload_bucket
 

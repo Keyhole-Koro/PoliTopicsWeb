@@ -14,7 +14,7 @@ import {
   type ArticlePayloadData,
   type DynamoArticleItem,
 } from "./dynamoArticleMapper";
-import type { ArticleRepository } from "./articleRepository";
+import type { ArticleRepository, HeadlinesResult } from "./articleRepository";
 import type { Article, ArticleSummary, SearchFilters } from "@shared/types/article";
 import type { SdkStreamMixin } from "@aws-sdk/types";
 
@@ -68,7 +68,15 @@ export class DynamoArticleRepository implements ArticleRepository {
     }
   }
 
-  async getHeadlines(limit = 6, sort: SearchFilters["sort"] = "date_desc"): Promise<ArticleSummary[]> {
+  async getHeadlines(
+    limit = 6,
+    sort: SearchFilters["sort"] = "date_desc",
+    offset = 0,
+  ): Promise<HeadlinesResult> {
+    const safeLimit = Number.isFinite(limit) && limit ? Math.max(1, Math.min(Number(limit), 50)) : 6;
+    const safeOffset = Number.isFinite(offset) && offset ? Math.max(0, Number(offset)) : 0;
+    const queryLimit = Math.min(safeLimit + safeOffset, 100);
+
     const response = await this.docClient.send(
       new QueryCommand({
         TableName: this.tableName,
@@ -77,12 +85,18 @@ export class DynamoArticleRepository implements ArticleRepository {
         ExpressionAttributeValues: {
           ":article": "ARTICLE",
         },
-        Limit: limit,
+        Limit: queryLimit,
         ScanIndexForward: sort === "date_asc",
       }),
     );
 
-    return (response.Items ?? []).map(mapArticleToSummary);
+    const items = (response.Items ?? []).map(mapArticleToSummary);
+    const hasMore = Boolean(response.LastEvaluatedKey);
+
+    return {
+      items: items.slice(safeOffset, safeOffset + safeLimit),
+      hasMore,
+    };
   }
 
   async searchArticles(filters: SearchFilters): Promise<ArticleSummary[]> {
