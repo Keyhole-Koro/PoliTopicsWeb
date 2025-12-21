@@ -312,6 +312,7 @@ export class DynamoArticleRepository implements ArticleRepository {
       return JSON.parse(raw) as ArticlePayloadData;
     } catch (error) {
       // eslint-disable-next-line no-console
+      console.log("bucket key", this.payloadBucket, key);
       console.warn("Failed to load payload", { article: item.PK, error });
       return undefined;
     }

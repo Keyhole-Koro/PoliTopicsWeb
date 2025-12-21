@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [ $# -lt 1 ]; then
-  echo "Usage: $0 <localstack|stage|prod>"
+  echo "Usage: $0 <local|stage|prod>"
   exit 1
 fi
 
@@ -11,7 +11,7 @@ REGION="ap-northeast-3"
 AWS_GLOBAL_OPTS=()
 
 case "$ENVIRONMENT" in
-  localstack)
+  local)
     BUCKET="politopics-web-local-state-bucket"
     LOCALSTACK_URL="${LOCALSTACK_URL:-http://localhost:4569}"
     AWS_GLOBAL_OPTS=(--endpoint-url "$LOCALSTACK_URL")
@@ -24,7 +24,7 @@ case "$ENVIRONMENT" in
     ;;
   *)
     echo "Unknown environment: $ENVIRONMENT"
-    echo "Usage: $0 <localstack|stage|prod>"
+    echo "Usage: $0 <local|stage|prod>"
     exit 1
     ;;
 esac
@@ -32,7 +32,7 @@ esac
 echo "Environment : $ENVIRONMENT"
 echo "Bucket      : $BUCKET"
 echo "Region      : $REGION"
-if [ "$ENVIRONMENT" = "localstack" ]; then
+if [ "$ENVIRONMENT" = "local" ]; then
   echo "Endpoint    : $LOCALSTACK_URL"
 fi
 echo

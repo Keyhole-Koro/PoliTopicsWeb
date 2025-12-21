@@ -5,10 +5,6 @@ terraform {
       source  = "hashicorp/aws"
       version = "6.12.0"
     }
-    null = {
-      source  = "hashicorp/null"
-      version = "3.2.2"
-    }
   }
 
   backend "s3" {}

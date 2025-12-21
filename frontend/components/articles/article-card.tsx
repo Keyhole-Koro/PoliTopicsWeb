@@ -16,7 +16,7 @@ export function ArticleCard({ article }: Props) {
           {article.categories[0] ?? "その他"}
         </Badge>
         <CardTitle className="mt-3 text-xl leading-tight">
-          <Link href={`/articles?issueID=${encodeURIComponent(article.id)}`} className="hover:underline">
+          <Link href={`/article/${encodeURIComponent(article.id)}`} className="hover:underline">
             {article.title}
           </Link>
         </CardTitle>

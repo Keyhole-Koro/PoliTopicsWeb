@@ -4,7 +4,7 @@ import repositoryPlugin from "../plugins/repository"
 import articlesRoutes from "./routes/articles"
 
 export async function createApp() {
-  const app = Fastify({ logger: false })
+  const app = Fastify({ logger: true })
 
   await app.register(cors, {
     origin: true,
@@ -19,10 +19,9 @@ export async function createApp() {
     reply.status(404).send({ message: "Not Found" })
   })
 
-  app.setErrorHandler((error, _request, reply) => {
-    // eslint-disable-next-line no-console
-    console.error(error)
-    reply.status(500).send({ message: "Unexpected error" })
+  app.setErrorHandler((error, request, reply) => {
+    request.log.error(error)
+    reply.status(500).send({ message: "Internal error" })
   })
 
   return app

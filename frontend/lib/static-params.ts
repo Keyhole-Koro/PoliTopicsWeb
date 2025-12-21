@@ -1,7 +1,7 @@
 import { articles } from "@shared/article-data"
 
 export function getStaticArticleParams() {
-  return articles.map((article) => ({ issueID: article.id }))
+  return articles.map((article) => ({ id: article.id }))
 }
 
 export function getPopularSearchParams(limit = 12) {

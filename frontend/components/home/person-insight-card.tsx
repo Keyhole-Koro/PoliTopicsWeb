@@ -46,7 +46,7 @@ export function PersonInsightCard({ selectedPerson, insight, onKeywordClick }: P
             <p className="text-sm font-medium text-foreground">{insight.latest.title}</p>
             <p className="mt-2 text-xs text-muted-foreground line-clamp-3">{insight.latest.description}</p>
             <Button variant="ghost" size="sm" className="mt-3" asChild>
-              <Link href={`/articles?issueID=${encodeURIComponent(insight.latest.id)}`}>記事を読む</Link>
+              <Link href={`/article/${encodeURIComponent(insight.latest.id)}`}>記事を読む</Link>
             </Button>
           </div>
         )}

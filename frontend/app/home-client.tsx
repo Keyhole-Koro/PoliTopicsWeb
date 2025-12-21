@@ -27,7 +27,10 @@ import {
 
 const FILTER_STORAGE_KEY = "politopics-home-filters"
 const GRID_PAGE_SIZE = 6
-const HEADLINE_PAGE_SIZE = 6
+const GRID_PAGE_STEPS = [6, 12, 24]
+const GRID_PREFETCH_COUNT = GRID_PAGE_STEPS[GRID_PAGE_STEPS.length - 1]
+const INITIAL_HEADLINE_LIMIT = GRID_PREFETCH_COUNT + 4
+const HEADLINE_BATCH_SIZE = GRID_PREFETCH_COUNT
 const HEADLINE_CACHE_TTL_MS = 5 * 60 * 1000
 
 type HeadlinesCache = {
@@ -76,7 +79,7 @@ export function HomeClient() {
   const loadArticles = useCallback(
     async ({
       start = 0,
-      limit = HEADLINE_PAGE_SIZE,
+      limit = INITIAL_HEADLINE_LIMIT,
       force = false,
     }: { start?: number; limit?: number; force?: boolean } = {}) => {
       if (!force && start === 0) {
@@ -424,14 +427,16 @@ export function HomeClient() {
     if (isLoadingMoreArticles) {
       return
     }
-    const nextVisibleCount = gridVisibleCount + GRID_PAGE_SIZE
-    if (gridArticles.length < nextVisibleCount && hasMoreArticles) {
-      loadArticles({ start: articles.length, limit: HEADLINE_PAGE_SIZE }).finally(() => {
-        setGridVisibleCount(nextVisibleCount)
+    const nextStep =
+      GRID_PAGE_STEPS.find((step) => step > gridVisibleCount) ??
+      gridVisibleCount + GRID_PREFETCH_COUNT
+    if (gridArticles.length < nextStep && hasMoreArticles) {
+      loadArticles({ start: articles.length, limit: HEADLINE_BATCH_SIZE }).finally(() => {
+        setGridVisibleCount(nextStep)
       })
       return
     }
-    setGridVisibleCount(nextVisibleCount)
+    setGridVisibleCount(nextStep)
   }
 
   function handleClearFilters() {

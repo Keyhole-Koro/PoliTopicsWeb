@@ -1,10 +1,30 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-TF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+TFVARS_DIR="$TF_DIR/tfvars"
 
-ENVIRONMENT_NAME="${1:-stage}"
-VAR_FILE_INPUT="$TF_DIR/tfvars/${ENVIRONMENT_NAME}.tfvars"
+if [[ $# -lt 1 ]]; then
+  echo "Usage: $(basename "$0") <environment>" >&2
+  exit 1
+fi
+
+ENVIRONMENT_NAME="$1"
+
+case "$ENVIRONMENT_NAME" in
+  local)
+    VAR_FILE_INPUT="$TFVARS_DIR/localstack.tfvars"
+    ;;
+  stage)
+    VAR_FILE_INPUT="$TFVARS_DIR/stage.tfvars"
+    ;;
+  prod)
+    VAR_FILE_INPUT="$TFVARS_DIR/prod.tfvars"
+    ;;
+  *)
+    VAR_FILE_INPUT="$TFVARS_DIR/${ENVIRONMENT_NAME}.tfvars"
+    ;;
+esac
 
 if [[ ! -f "$VAR_FILE_INPUT" ]]; then
   echo "Variable file not found: $VAR_FILE_INPUT" >&2
@@ -60,6 +80,7 @@ articles_table_raw = extract_raw("articles_table")
 lambda_name_raw = extract_raw("lambda_name")
 create_dynamodb_table_raw = extract_raw("create_dynamodb_table")
 is_localstack_raw = extract_raw("is_localstack")
+frontend_public_enabled_raw = extract_raw("frontend_public_enabled")
 
 environment = parse_string(environment_raw)
 frontend_bucket = parse_string(frontend_bucket_raw)
@@ -79,6 +100,7 @@ def parse_bool(raw, default):
 
 create_dynamodb_table = parse_bool(create_dynamodb_table_raw, "false")
 is_localstack = parse_bool(is_localstack_raw, "false")
+frontend_public_enabled = parse_bool(frontend_public_enabled_raw, "false")
 
 def emit(name, value):
   value = value or ""
@@ -91,6 +113,7 @@ emit("ARTICLES_TABLE", articles_table)
 emit("LAMBDA_NAME", lambda_name)
 emit("CREATE_DYNAMODB_TABLE", create_dynamodb_table)
 emit("IS_LOCALSTACK", is_localstack)
+emit("FRONTEND_PUBLIC_ENABLED", frontend_public_enabled)
 PY
 )"
 
@@ -168,9 +191,13 @@ S3_MOD="module.service.module.s3"
 run_import "$S3_MOD.aws_s3_bucket.frontend"                         "$FRONTEND_BUCKET"
 run_import "$S3_MOD.aws_s3_bucket_public_access_block.frontend"     "$FRONTEND_BUCKET"
 run_import "$S3_MOD.aws_s3_bucket_website_configuration.frontend"   "$FRONTEND_BUCKET"
-run_import "$S3_MOD.aws_s3_bucket_policy.frontend_public"           "$FRONTEND_BUCKET"
+if [[ "$(echo "${FRONTEND_PUBLIC_ENABLED}" | tr '[:upper:]' '[:lower:]')" == "true" ]]; then
+  run_import "$S3_MOD.aws_s3_bucket_policy.frontend_public"           "$FRONTEND_BUCKET"
+fi
 
-if [[ "$IS_LOCALSTACK" == "true" ]]; then
+IS_LOCALSTACK_LOWER="$(echo "${IS_LOCALSTACK}" | tr '[:upper:]' '[:lower:]')"
+
+if [[ "$ENVIRONMENT_NAME" == "local" || "$ENVIRONMENT_NAME" == "localstack" || "$IS_LOCALSTACK_LOWER" == "true" ]]; then
   run_import "$S3_MOD.aws_s3_bucket.article_payload[0]" "$ARTICLE_PAYLOAD_BUCKET"
 fi
 

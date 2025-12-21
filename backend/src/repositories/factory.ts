@@ -13,10 +13,7 @@ export function createArticleRepository(): ArticleRepository {
   if (appConfig.localstackUrl) {
     options.endpoint = appConfig.localstackUrl
     options.s3Endpoint = appConfig.localstackUrl
-    options.credentials = {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID ?? "test",
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? "test",
-    }
+    options.credentials = appConfig.credentials
   }
 
   return new DynamoArticleRepository(options)

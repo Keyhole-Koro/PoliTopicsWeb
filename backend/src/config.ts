@@ -1,8 +1,3 @@
-import path from "node:path"
-import dotenv from "dotenv"
-
-dotenv.config({ path: process.env.ENV_PATH ?? path.resolve(process.cwd(), ".env") })
-
 const DEFAULT_REGION = "ap-northeast-3"
 const VALID_ENVIRONMENTS = ["local", "localstack", "stage", "prod"] as const
 
@@ -13,20 +8,23 @@ type EnvironmentDefaults = {
   articlePayloadBucket: string
   region: string
   localstackUrl?: string
+  credentials?: { accessKeyId: string; secretAccessKey: string }
 }
 
 const ENVIRONMENT_DEFAULTS: Record<AppEnvironment, EnvironmentDefaults> = {
   local: {
-    tableName: "politopics-localstack",
+    tableName: "politopics-local",
     articlePayloadBucket: "politopics-articles-local",
     region: DEFAULT_REGION,
     localstackUrl: "http://localstack:4566",
+    credentials: { accessKeyId: "test", secretAccessKey: "test" },
   },
   localstack: {
-    tableName: "politopics-localstack",
+    tableName: "politopics-local",
     articlePayloadBucket: "politopics-articles-local",
     region: DEFAULT_REGION,
     localstackUrl: "http://localstack:4566",
+    credentials: { accessKeyId: "test", secretAccessKey: "test" },
   },
   stage: {
     tableName: "politopics-stage",
@@ -40,25 +38,42 @@ const ENVIRONMENT_DEFAULTS: Record<AppEnvironment, EnvironmentDefaults> = {
   },
 }
 
-function resolveEnvironment(value: string | undefined): AppEnvironment {
-  if (!value) {
-    return "local"
+const ACTIVE_ENVIRONMENT: AppEnvironment = "local"
+
+const defaults = ENVIRONMENT_DEFAULTS[ACTIVE_ENVIRONMENT]
+
+export type AppConfig = {
+  environment: AppEnvironment
+  port: number
+  tableName: string
+  articlePayloadBucket: string
+  region: string
+  localstackUrl?: string
+  credentials?: { accessKeyId: string; secretAccessKey: string }
+}
+
+export let appConfig: AppConfig = {
+  environment: ACTIVE_ENVIRONMENT,
+  port: 4000,
+  tableName: defaults.tableName,
+  articlePayloadBucket: defaults.articlePayloadBucket,
+  region: defaults.region,
+  localstackUrl: defaults.localstackUrl,
+  credentials: defaults.credentials,
+}
+
+export function setAppEnvironment(environment: AppEnvironment) {
+  if (!VALID_ENVIRONMENTS.includes(environment)) {
+    throw new Error(`Unknown environment: ${environment}`)
   }
-
-  const normalized = value.toLowerCase()
-  return VALID_ENVIRONMENTS.includes(normalized as AppEnvironment) ? (normalized as AppEnvironment) : "local"
+  const envDefaults = ENVIRONMENT_DEFAULTS[environment]
+  appConfig = {
+    environment,
+    port: appConfig.port,
+    tableName: envDefaults.tableName,
+    articlePayloadBucket: envDefaults.articlePayloadBucket,
+    region: envDefaults.region,
+    localstackUrl: envDefaults.localstackUrl,
+    credentials: envDefaults.credentials,
+  }
 }
-
-const environment = resolveEnvironment(process.env.ENV)
-const defaults = ENVIRONMENT_DEFAULTS[environment]
-
-export const appConfig = {
-  environment,
-  port: Number(process.env.PORT ?? 4000),
-  tableName: process.env.POLITOPICS_TABLE ?? defaults.tableName,
-  articlePayloadBucket: process.env.POLITOPICS_ARTICLE_BUCKET ?? defaults.articlePayloadBucket,
-  region: process.env.AWS_REGION ?? defaults.region,
-  localstackUrl: process.env.LOCALSTACK_URL ?? defaults.localstackUrl,
-}
-
-export type AppConfig = typeof appConfig

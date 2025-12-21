@@ -7,19 +7,6 @@ This repository now contains the four pillars requested for integrated developme
 - **infra/** – Docker Compose setup that runs LocalStack plus the backend service for local development. Local mock data can be seeded into DynamoDB for end-to-end testing.
 - **terraform/** – Infrastructure definitions (module-based layout) that provision the frontend SPA bucket, reference the existing DynamoDB table + article payload bucket, and deploy the backend Lambda + HTTP API for a single environment (stage/prod/localstack).
 
-## Quick start
-
-```bash
-# Start LocalStack + backend API
-docker compose up --build
-
-# (Optional) load mock articles into LocalStack DynamoDB + S3 payload bucket
-docker compose exec app npm run seed
-
-# Run the Next.js SPA locally in another terminal
-npm run dev:frontend
-```
-
 ```bash
 node shared/mock/upload_articles.js --endpoint http://localstack:4566 --bucket politopics-articles-local
 ```

@@ -121,75 +121,62 @@ export function ArticleClient({ issueId }: Props) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 font-serif">
             <Users className="h-5 w-5 text-primary" />
-            主要な参加者
+            登場人物
           </CardTitle>
         </CardHeader>
         <CardContent>
           {hasParticipants ? (
-            <div className="grid gap-4 md:grid-cols-2">
-              {participantDetails.map((participant) => {
-                return (
-                  <div key={participant.name} className="rounded-lg bg-muted/40 p-4">
-                    <p className="font-semibold text-foreground">{participant.name}</p>
-                    <p className="text-sm text-muted-foreground">{participant.summary}</p>
-                  </div>
-                )
-              })}
+            <div className="space-y-3">
+              {participantDetails.map((participant) => (
+                <div key={participant.name} className="space-y-1 border-b pb-3 last:border-b-0 last:pb-0">
+                  <p className="font-semibold text-foreground">{participant.name}</p>
+                  {participant.position && <p className="text-xs text-muted-foreground">{participant.position}</p>}
+                  <p className="text-sm text-muted-foreground">{participant.summary}</p>
+                </div>
+              ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">参加者の詳細情報はまだ登録されていません。</p>
+            <p className="text-sm text-muted-foreground">登場人物のデータは準備中です。</p>
           )}
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      {hasKeywords && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 font-serif">
               <Tag className="h-5 w-5 text-primary" />
-              主要なトピック
+              キーワード
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            {hasKeywords ? (
-              <div className="flex flex-wrap gap-2">
-                {article.keywords.map((keyword) => (
-                  <Badge key={keyword.keyword} variant="secondary" className="rounded-full">
-                    {keyword.keyword}
-                  </Badge>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">キーワード情報はまだありません。</p>
-            )}
+          <CardContent className="flex flex-wrap gap-2">
+            {article.keywords.map((keyword) => (
+              <Badge key={keyword.keyword} variant="secondary">
+                #{keyword.keyword}
+              </Badge>
+            ))}
           </CardContent>
         </Card>
+      )}
 
+      {hasTerms && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 font-serif">
               <BookOpen className="h-5 w-5 text-primary" />
-              重要な用語
+              用語集
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            {hasTerms ? (
-              <div className="space-y-3">
-                {article.terms.map((term) => (
-                  <div key={term.term} className="rounded-lg bg-muted/40 p-3">
-                    <p className="text-sm font-semibold text-foreground">{term.term}</p>
-                    {term.definition ? (
-                      <p className="text-xs text-muted-foreground mt-1">{term.definition}</p>
-                    ) : null}
-                  </div>
-                ))}
+          <CardContent className="space-y-3">
+            {article.terms.map((term) => (
+              <div key={term.term} className="space-y-1">
+                <p className="font-semibold text-foreground">{term.term}</p>
+                <p className="text-sm text-muted-foreground">{term.definition}</p>
               </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">関連用語はまだ登録されていません。</p>
-            )}
+            ))}
           </CardContent>
         </Card>
-      </div>
+      )}
     </article>
   )
 }

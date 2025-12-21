@@ -26,7 +26,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DEFAULTS = {
-  tableName: "politopics-localstack",
+  tableName: "politopics-local",
   region: "ap-northeast-3",
   endpoint: "http://localhost:4569",
   s3Endpoint: undefined,
@@ -63,16 +63,16 @@ function parseArgs() {
 }
 
 function loadConfig(cli) {
-  const endpoint = cli.endpoint || process.env.LOCALSTACK_URL || DEFAULTS.endpoint;
-  const s3Endpoint = cli["s3-endpoint"] || process.env.S3_ENDPOINT || endpoint || DEFAULTS.s3Endpoint;
+  const endpoint = cli.endpoint || DEFAULTS.endpoint;
+  const s3Endpoint = cli["s3-endpoint"] || endpoint || DEFAULTS.s3Endpoint;
   return {
-    tableName: 'politopics-localstack',
-    region: 'ap-northeast-3',
+    tableName: "politopics-local",
+    region: "ap-northeast-3",
     endpoint,
     s3Endpoint,
-    bucketName: 'politopics-articles-local',
-    accessKeyId: 'test',
-    secretAccessKey: 'test',
+    bucketName: "politopics-articles-local",
+    accessKeyId: "test",
+    secretAccessKey: "test",
     articlesPath: path.resolve(cli.file || DEFAULTS.articlesPath),
   };
 }

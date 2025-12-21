@@ -2,7 +2,7 @@ region      = "ap-northeast-3"
 environment = "localstack"
 
 frontend_bucket         = "politopics-frontend-localstack"
-articles_table          = null
+articles_table          = "politopics-local"
 article_payload_bucket  = "politopics-articles-local"
 frontend_deploy_enabled = false
 

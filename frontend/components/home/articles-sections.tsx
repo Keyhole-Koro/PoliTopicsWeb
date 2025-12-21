@@ -36,7 +36,7 @@ export function FeaturedArticleCard({
       </div>
       <Card
         className="overflow-hidden transition-shadow hover:shadow-lg"
-        onClick={() => onNavigate(`/articles?issueID=${encodeURIComponent(article.id)}`)}
+        onClick={() => onNavigate(`/article/${encodeURIComponent(article.id)}`)}
       >
         <div className="md:flex">
           <div className="flex h-48 items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10 md:w-1/3">
@@ -91,7 +91,7 @@ export function FeaturedArticleCard({
                 variant="default"
                 size="sm"
                 onClick={(event) =>
-                  handleEvent(event, () => onNavigate(`/articles?issueID=${encodeURIComponent(article.id)}`))
+                  handleEvent(event, () => onNavigate(`/article/${encodeURIComponent(article.id)}`))
                 }
               >
                 詳細を読む
@@ -124,7 +124,7 @@ export function LatestArticlesRow({ articles, onCategoryClick, onKeywordClick, o
             <Card
               key={article.id}
               className="flex h-full flex-col justify-between"
-              onClick={() => onNavigate(`/articles?issueID=${encodeURIComponent(article.id)}`)}
+              onClick={() => onNavigate(`/article/${encodeURIComponent(article.id)}`)}
             >
               <CardHeader>
                 <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
@@ -163,7 +163,7 @@ export function LatestArticlesRow({ articles, onCategoryClick, onKeywordClick, o
                   size="sm"
                   className="w-fit"
                   onClick={(event) =>
-                    handleEvent(event, () => onNavigate(`/articles?issueID=${encodeURIComponent(article.id)}`))
+                    handleEvent(event, () => onNavigate(`/article/${encodeURIComponent(article.id)}`))
                   }
                 >
                   詳細
@@ -239,7 +239,7 @@ export function ArticleGridSection({
                 <Card
                   key={article.id}
                   className="flex h-full flex-col overflow-hidden transition-shadow hover:shadow-lg"
-                  onClick={() => onNavigate(`/articles?issueID=${encodeURIComponent(article.id)}`)}
+                  onClick={() => onNavigate(`/article/${encodeURIComponent(article.id)}`)}
                 >
                   <div className="flex items-center justify-between bg-muted/40 px-4 py-2 text-xs text-muted-foreground">
                     <button
@@ -329,7 +329,7 @@ export function ArticleGridSection({
                         variant="ghost"
                         size="sm"
                         onClick={(event) =>
-                          handleEvent(event, () => onNavigate(`/articles?issueID=${encodeURIComponent(article.id)}`))
+                          handleEvent(event, () => onNavigate(`/article/${encodeURIComponent(article.id)}`))
                         }
                       >
                         詳細
