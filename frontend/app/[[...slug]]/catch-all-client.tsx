@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useMemo, useState } from "react"
-import Link from "next/link"
 import { ArrowLeft, MessageSquare } from "lucide-react"
 import { HomeClient } from "../home-client"
 import { ArticleClient } from "../article/article-client"
@@ -25,6 +24,13 @@ function parsePath(pathname: string): RouteMatch {
   }
 
   return { kind: "not-found" }
+}
+
+function spaNavigate(path: string) {
+  if (typeof window === "undefined") return
+  if (window.location.pathname === path) return
+  window.history.pushState({}, "", path)
+  window.dispatchEvent(new PopStateEvent("popstate"))
 }
 
 export function CatchAllClient() {
@@ -58,11 +64,9 @@ export function CatchAllClient() {
       <div className="min-h-screen bg-background">
         <header className="sticky top-0 z-50 border-b bg-card/50 backdrop-blur-sm">
           <div className="mx-auto flex max-w-4xl items-center gap-4 px-4 py-4">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/" className="flex items-center gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                ニュース一覧に戻る
-              </Link>
+            <Button variant="ghost" size="sm" onClick={() => spaNavigate("/")} className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              ニュース一覧に戻る
             </Button>
             <Separator orientation="vertical" className="h-6" />
             <div className="flex items-center gap-3">
@@ -85,9 +89,7 @@ export function CatchAllClient() {
       <div className="mx-auto flex max-w-3xl flex-col items-start gap-4 px-4 py-16">
         <h1 className="text-2xl font-semibold">ページが見つかりませんでした</h1>
         <p className="text-sm text-muted-foreground">URLを確認してもう一度お試しください。</p>
-        <Button asChild>
-          <Link href="/">トップに戻る</Link>
-        </Button>
+        <Button onClick={() => spaNavigate("/")}>トップに戻る</Button>
       </div>
     </main>
   )
