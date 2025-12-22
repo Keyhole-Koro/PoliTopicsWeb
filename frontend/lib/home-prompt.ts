@@ -10,7 +10,7 @@ export const HOME_PROMPT = `以下の会話内容をもとに、次の形式で�
 2. **全体の要約（Summary）**  
 　会議全体の要点や結論を簡潔にまとめてください。発言者の言い回しや口調に近い文体で書いてください。
 
-3. **やさしい要約（SoftSummary）**  
+3. **やさしい要約（SoftLanguageSummary）**  
 　政治や専門用語に馴染みのない読者向けに、背景や文脈も含めてわかりやすく丁寧に説明してください。  
 　難解な表現や専門用語はできるだけ避け、必要に応じて補足をつけてください。
 
@@ -21,7 +21,7 @@ export const HOME_PROMPT = `以下の会話内容をもとに、次の形式で�
 　各発言について、以下の情報を含めて記述してください：
 
 　- \`summary\`: その発言の主旨を簡潔に要約してください。  
-　- \`soft_summary\`: 一般読者にも伝わるように、やさしく丁寧に言い換えてください。話者の意図や背景も補足すると親切です。  
+　- \`soft_language\`: 一般読者にも伝わるように、やさしく丁寧に言い換えてください。話者の意図や背景も補足すると親切です。  
 　- \`order\`, \`speaker\`, \`speaker_group\`, \`speaker_position\`, \`speaker_role\`：それぞれの発言者情報を記載してください。  
 　- \`response_to\`: この発言がどの発言に対する反応かを明示してください（例：質問、賛同、反論など）。
 
@@ -54,7 +54,7 @@ export const HOME_PROMPT = `以下の会話内容をもとに、次の形式で�
     "summary": "会話全体の要約をここに記載",
     "figure": "Markdown形式で図や補足を記載（任意）"
   },
-  "soft_summary": {
+  "soft_language_summary": {
     "id": 1,
     "summary": "政治に詳しくない人でも分かるように、丁寧でわかりやすく説明した要約"
   },
@@ -73,7 +73,7 @@ export const HOME_PROMPT = `以下の会話内容をもとに、次の形式で�
       "speaker_position": "役職",
       "speaker_role": "役割",
       "summary": "発言内容の要約",
-      "soft_summary": "発言の内容を、政治に詳しくない人でも理解できるように説明した文章",
+      "soft_language": "発言の内容を、政治に詳しくない人でも理解できるように説明した文章",
       "response_to": [
         {
           "id": 発言ID,

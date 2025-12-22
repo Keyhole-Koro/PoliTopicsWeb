@@ -21,13 +21,6 @@
       ],
       "summary": "冬季の再エネ確保策とピークカット支援の即応計画を取りまとめへ。"
     },
-    "soft_summary": {
-      "based_on_orders": [
-        1,
-        2
-      ],
-      "summary": "冬の電力需給に備えて再エネ導入と節電キャンペーンを議論。"
-    },
     "middle_summary": [],
     "dialogs": [
       {
@@ -91,7 +84,14 @@
         "term": "越冬需要対策計画",
         "definition": "越冬需要対策計画"
       }
-    ]
+    ],
+    "soft_language_summary": {
+      "based_on_orders": [
+        1,
+        2
+      ],
+      "summary": "冬の電力需給に備えて再エネ導入と節電キャンペーンを議論。"
+    }
   },
   {
     "id": "issue-011",
@@ -114,13 +114,6 @@
         3
       ],
       "summary": "霞が関—筑波ルートを常時計測し、量子鍵配送の運用基準を年度内に一本化する方針が示された。"
-    },
-    "soft_summary": {
-      "based_on_orders": [
-        1,
-        2
-      ],
-      "summary": "量子暗号通信の実証を本格運用へ移行。運用マニュアルを共有することで自治体にも展開する。"
     },
     "middle_summary": [],
     "dialogs": [
@@ -181,7 +174,14 @@
         "term": "量子暗号通信網",
         "definition": "量子鍵配送を用いた耐量子的通信基盤"
       }
-    ]
+    ],
+    "soft_language_summary": {
+      "based_on_orders": [
+        1,
+        2
+      ],
+      "summary": "量子暗号通信の実証を本格運用へ移行。運用マニュアルを共有することで自治体にも展開する。"
+    }
   },
   {
     "id": "issue-012",
@@ -204,13 +204,6 @@
         3
       ],
       "summary": "10県で共同調達した排水ポンプ更新費を基金が7割補助する案を了承。"
-    },
-    "soft_summary": {
-      "based_on_orders": [
-        1,
-        2
-      ],
-      "summary": "豪雨常襲地向けの基金拡充案。保険料との二重負担を減らす。"
     },
     "middle_summary": [],
     "dialogs": [
@@ -271,7 +264,14 @@
         "term": "地方気候レジリエンス基金",
         "definition": "豪雨対策を支援するインフラ基金"
       }
-    ]
+    ],
+    "soft_language_summary": {
+      "based_on_orders": [
+        1,
+        2
+      ],
+      "summary": "豪雨常襲地向けの基金拡充案。保険料との二重負担を減らす。"
+    }
   },
   {
     "id": "issue-013",
@@ -294,13 +294,6 @@
         3
       ],
       "summary": "全国50病院を先行接続するパイロットを7月に開始。年度末に全国展開を決定。"
-    },
-    "soft_summary": {
-      "based_on_orders": [
-        1,
-        2
-      ],
-      "summary": "救急カルテの即時共有APIを公開。自治体クラウドで共通運用を進める。"
     },
     "middle_summary": [],
     "dialogs": [
@@ -361,7 +354,14 @@
         "term": "救急カルテ連携API",
         "definition": "救急搬送時の電子カルテを共有する標準仕様"
       }
-    ]
+    ],
+    "soft_language_summary": {
+      "based_on_orders": [
+        1,
+        2
+      ],
+      "summary": "救急カルテの即時共有APIを公開。自治体クラウドで共通運用を進める。"
+    }
   },
   {
     "id": "issue-014",
@@ -384,13 +384,6 @@
         3
       ],
       "summary": "主要12港で監視データを共有し、海保・自治体間の除去対応手順を標準化する。"
-    },
-    "soft_summary": {
-      "based_on_orders": [
-        1,
-        2
-      ],
-      "summary": "ドローン監視網を常時運用し、港湾事務所の除去体制を1時間以内へ短縮する。"
     },
     "middle_summary": [],
     "dialogs": [
@@ -451,7 +444,14 @@
         "term": "港湾ドローン監視網",
         "definition": "港内の浮遊ごみを監視する常時運用ドローン網"
       }
-    ]
+    ],
+    "soft_language_summary": {
+      "based_on_orders": [
+        1,
+        2
+      ],
+      "summary": "ドローン監視網を常時運用し、港湾事務所の除去体制を1時間以内へ短縮する。"
+    }
   },
   {
     "id": "issue-015",
@@ -474,13 +474,6 @@
         3
       ],
       "summary": "全国6都市で夜間シャトルの実証を補助金対象にし、交通事業者のデータ連携を義務付けへ。"
-    },
-    "soft_summary": {
-      "based_on_orders": [
-        1,
-        2
-      ],
-      "summary": "夜間観光バスの連携システムを国が支援。運行データを共通化する。"
     },
     "middle_summary": [],
     "dialogs": [
@@ -537,7 +530,14 @@
         "term": "ナイトタイム交通実証補助",
         "definition": "夜間観光交通を支援する国の補助枠"
       }
-    ]
+    ],
+    "soft_language_summary": {
+      "based_on_orders": [
+        1,
+        2
+      ],
+      "summary": "夜間観光バスの連携システムを国が支援。運行データを共通化する。"
+    }
   },
   {
     "id": "issue-002",
@@ -560,13 +560,6 @@
         3
       ],
       "summary": "年間5,200億円規模の財源を国・地方折半で確保する案が大勢となった。"
-    },
-    "soft_summary": {
-      "based_on_orders": [
-        1,
-        2
-      ],
-      "summary": "給食無償化へ向け国と自治体が費用負担の目安を共有。"
     },
     "middle_summary": [],
     "dialogs": [
@@ -623,7 +616,14 @@
         "term": "学校給食法改正案",
         "definition": "学校給食法改正案"
       }
-    ]
+    ],
+    "soft_language_summary": {
+      "based_on_orders": [
+        1,
+        2
+      ],
+      "summary": "給食無償化へ向け国と自治体が費用負担の目安を共有。"
+    }
   },
   {
     "id": "issue-003",
@@ -646,13 +646,6 @@
         3
       ],
       "summary": "赤字路線の統合とデマンド交通の同時実証で利用者情報の一元管理を進める。"
-    },
-    "soft_summary": {
-      "based_on_orders": [
-        1,
-        2
-      ],
-      "summary": "バス再編とMaaSアプリを組み合わせた全国支援枠を創設。"
     },
     "middle_summary": [],
     "dialogs": [
@@ -709,7 +702,14 @@
         "term": "地域交通維持法案",
         "definition": "地域交通維持法案"
       }
-    ]
+    ],
+    "soft_language_summary": {
+      "based_on_orders": [
+        1,
+        2
+      ],
+      "summary": "バス再編とMaaSアプリを組み合わせた全国支援枠を創設。"
+    }
   },
   {
     "id": "issue-004",
@@ -732,13 +732,6 @@
         3
       ],
       "summary": "AI洪水予測ツールを関東5水系に展開し、避難判断ラインを共通化する。"
-    },
-    "soft_summary": {
-      "based_on_orders": [
-        1,
-        2
-      ],
-      "summary": "リアルタイム水位とAI予測を組み合わせる新システムを拡張。"
     },
     "middle_summary": [],
     "dialogs": [
@@ -795,7 +788,14 @@
         "term": "水防法改正案",
         "definition": "水防法改正案"
       }
-    ]
+    ],
+    "soft_language_summary": {
+      "based_on_orders": [
+        1,
+        2
+      ],
+      "summary": "リアルタイム水位とAI予測を組み合わせる新システムを拡張。"
+    }
   },
   {
     "id": "issue-005",
@@ -818,13 +818,6 @@
         3
       ],
       "summary": "量子暗号衛星に防衛通信を段階移行しつつ、民間利用も想定した費用便益を精査。"
-    },
-    "soft_summary": {
-      "based_on_orders": [
-        1,
-        2
-      ],
-      "summary": "量子暗号衛星プロジェクトへの参加方針を了承。"
     },
     "middle_summary": [],
     "dialogs": [
@@ -881,7 +874,14 @@
         "term": "安全保障協力協定改正案",
         "definition": "安全保障協力協定改正案"
       }
-    ]
+    ],
+    "soft_language_summary": {
+      "based_on_orders": [
+        1,
+        2
+      ],
+      "summary": "量子暗号衛星プロジェクトへの参加方針を了承。"
+    }
   },
   {
     "id": "issue-006",
@@ -904,13 +904,6 @@
         3
       ],
       "summary": "導入費補助率を最大3分の2へ引き上げ、データ共有要件で介護DXを後押し。"
-    },
-    "soft_summary": {
-      "based_on_orders": [
-        1,
-        2
-      ],
-      "summary": "介護ロボット導入交付金を恒常化し補助率を拡大。"
     },
     "middle_summary": [],
     "dialogs": [
@@ -967,7 +960,14 @@
         "term": "介護保険法改正案",
         "definition": "介護保険法改正案"
       }
-    ]
+    ],
+    "soft_language_summary": {
+      "based_on_orders": [
+        1,
+        2
+      ],
+      "summary": "介護ロボット導入交付金を恒常化し補助率を拡大。"
+    }
   },
   {
     "id": "issue-007",
@@ -990,13 +990,6 @@
         3
       ],
       "summary": "自治体標準APIと通知系APIを横断検索できる公開カタログをリリース。"
-    },
-    "soft_summary": {
-      "based_on_orders": [
-        1,
-        2
-      ],
-      "summary": "行政APIの横断検索ポータルを夏に公開。"
     },
     "middle_summary": [],
     "dialogs": [
@@ -1053,7 +1046,14 @@
         "term": "デジタル社会形成基本法改正案",
         "definition": "デジタル社会形成基本法改正案"
       }
-    ]
+    ],
+    "soft_language_summary": {
+      "based_on_orders": [
+        1,
+        2
+      ],
+      "summary": "行政APIの横断検索ポータルを夏に公開。"
+    }
   },
   {
     "id": "issue-008",
@@ -1076,13 +1076,6 @@
         3
       ],
       "summary": "国内2拠点での次世代蓄電池工場建設に官民で9,000億円を投入する。"
-    },
-    "soft_summary": {
-      "based_on_orders": [
-        1,
-        2
-      ],
-      "summary": "次世代蓄電池工場への官民投資枠を創設。"
     },
     "middle_summary": [],
     "dialogs": [
@@ -1139,7 +1132,14 @@
         "term": "産業競争力強化法改正案",
         "definition": "産業競争力強化法改正案"
       }
-    ]
+    ],
+    "soft_language_summary": {
+      "based_on_orders": [
+        1,
+        2
+      ],
+      "summary": "次世代蓄電池工場への官民投資枠を創設。"
+    }
   },
   {
     "id": "issue-009",
@@ -1162,13 +1162,6 @@
         3
       ],
       "summary": "フェイク検知AIの検証データ整備と著作権クリアランスの標準を示す。"
-    },
-    "soft_summary": {
-      "based_on_orders": [
-        1,
-        2
-      ],
-      "summary": "地域メディア向け生成AIガイドラインを策定へ。"
     },
     "middle_summary": [],
     "dialogs": [
@@ -1225,7 +1218,14 @@
         "term": "放送法改正案",
         "definition": "放送法改正案"
       }
-    ]
+    ],
+    "soft_language_summary": {
+      "based_on_orders": [
+        1,
+        2
+      ],
+      "summary": "地域メディア向け生成AIガイドラインを策定へ。"
+    }
   },
   {
     "id": "issue-010",
@@ -1248,13 +1248,6 @@
         3
       ],
       "summary": "穀物備蓄を1.5倍へ引き上げ、新規就農者向け基金を創設する。"
-    },
-    "soft_summary": {
-      "based_on_orders": [
-        1,
-        2
-      ],
-      "summary": "食料安定供給特別措置法が衆院本会議で可決。"
     },
     "middle_summary": [],
     "dialogs": [
@@ -1311,6 +1304,13 @@
         "term": "食料安定供給特別措置法",
         "definition": "食料安定供給特別措置法"
       }
-    ]
+    ],
+    "soft_language_summary": {
+      "based_on_orders": [
+        1,
+        2
+      ],
+      "summary": "食料安定供給特別措置法が衆院本会議で可決。"
+    }
   }
 ]

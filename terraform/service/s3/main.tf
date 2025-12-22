@@ -45,6 +45,24 @@ resource "aws_s3_bucket_policy" "frontend_public" {
   })
 }
 
+locals {
+  frontend_patterns = [
+    "app/**/*",
+    "components/**/*",
+    "hooks/**/*",
+    "lib/**/*",
+    "public/**/*",
+    "styles/**/*",
+    "*.json",
+    "*.mjs",
+    "*.ts",
+    "*.d.ts"
+  ]
+  frontend_files = flatten([
+    for pattern in local.frontend_patterns : fileset("${path.module}/../../../frontend", pattern)
+  ])
+}
+
 resource "null_resource" "build_frontend" {
   for_each = var.frontend_deploy_enabled ? { current = var.frontend_bucket } : {}
 
@@ -57,6 +75,7 @@ resource "null_resource" "build_frontend" {
   triggers = {
     bucket      = each.value
     environment = var.environment
+    src_hash    = sha1(join("", [for f in local.frontend_files : filesha1("${path.module}/../../../frontend/${f}")]))
   }
 }
 
@@ -77,6 +96,7 @@ resource "null_resource" "upload_frontend" {
   triggers = {
     bucket      = each.value
     environment = var.environment
+    build_id    = null_resource.build_frontend["current"].id
   }
 }
 

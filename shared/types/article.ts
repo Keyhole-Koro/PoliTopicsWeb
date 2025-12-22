@@ -4,7 +4,7 @@ export type BaseSummary = {
 }
 
 export type Summary = BaseSummary
-export type SoftSummary = BaseSummary
+export type SoftLanguageSummary = BaseSummary
 export type MiddleSummary = BaseSummary
 
 export type Reaction = "賛成" | "反対" | "質問" | "回答" | "中立"
@@ -57,7 +57,7 @@ export type ArticleSummary = {
 
 export default interface Article extends ArticleSummary {
   summary: Summary
-  soft_summary: SoftSummary
+  soft_language_summary: SoftLanguageSummary
   middle_summary: MiddleSummary[]
   dialogs: Dialog[]
   participants: Participant[]

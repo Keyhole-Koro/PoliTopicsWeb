@@ -233,7 +233,7 @@ function buildPayloadUrl({ bucket, key, endpoint, region }) {
 function buildArticlePayload(article) {
   return {
     summary: article.summary,
-    soft_summary: article.soft_summary,
+    soft_language_summary: article.soft_language_summary,
     middle_summary: article.middle_summary,
     dialogs: article.dialogs,
   };

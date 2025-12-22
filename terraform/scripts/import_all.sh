@@ -181,7 +181,20 @@ run_import() {
   fi
 
   echo "import -> $address :: $identifier"
-  "${TF_CMD[@]}" import "-var-file=$VAR_FILE" -no-color "$address" "$identifier"
+  set +e
+  import_output="$("${TF_CMD[@]}" import "-var-file=$VAR_FILE" -no-color "$address" "$identifier" 2>&1)"
+  import_status=$?
+  set -e
+
+  if [[ $import_status -ne 0 ]]; then
+    if echo "$import_output" | grep -q "Cannot import non-existent remote object"; then
+      echo "skip   -> $address (missing remote object)"
+      return
+    fi
+    echo "$import_output" >&2
+    exit "$import_status"
+  fi
+  echo "$import_output"
 }
 
 echo "Importing existing frontend bucket resources for ${ENVIRONMENT}..."

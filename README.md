@@ -11,7 +11,7 @@ This repository now contains the four pillars requested for integrated developme
 node shared/mock/upload_articles.js --endpoint http://localstack:4566 --bucket politopics-articles-local
 ```
 
-The seed script now stores the large article payload fields (`summary`, `soft_summary`, `middle_summary`,
+The seed script now stores the large article payload fields (`summary`, `soft_language_summary`, `middle_summary`,
 `dialogs`) as JSON blobs in the `POLITOPICS_ARTICLE_BUCKET` (defaults to
 `politopics-articles-local` when using LocalStack) and only keeps references in DynamoDB via `payload_url`.
 

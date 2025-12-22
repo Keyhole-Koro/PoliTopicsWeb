@@ -198,8 +198,8 @@ function buildLongSummary(article) {
   };
 }
 
-function buildSoftSummary(article) {
-  const base = normalizeSummary(article.soft_summary);
+function buildSoftLanguageSummary(article) {
+  const base = normalizeSummary(article.soft_language_summary);
   const short = [
     base.summary,
     `${article.title || "議題"}の要点を短く整理し、結論と次のアクションを示す。`,
@@ -282,7 +282,7 @@ function buildTerms(article) {
 function buildPayload(article, extraDialogs) {
   return {
     summary: buildLongSummary(article),
-    soft_summary: buildSoftSummary(article),
+    soft_language_summary: buildSoftLanguageSummary(article),
     middle_summary: buildMiddleSummaries(article),
     dialogs: buildExtraDialogs(article, extraDialogs),
   };

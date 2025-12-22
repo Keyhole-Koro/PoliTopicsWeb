@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "next build",
+    "build:local": "NEXT_PUBLIC_APP_ENV=local next build",
     "build:stage": "NEXT_PUBLIC_APP_ENV=stage NEXT_PUBLIC_APP_ENV=stage dotenv -e .env.stage -- next build",
-    "dev": "NEXT_PUBLIC_APP_ENV=local next dev -p 3333",
+    "dev:local": "NEXT_PUBLIC_APP_ENV=local next dev -p 3333",
     "dev:stage": "NEXT_PUBLIC_APP_ENV=stage dotenv -e .env.stage -- next dev -p 3333",
     "lint": "eslint .",
     "start": "next start -p 3333"

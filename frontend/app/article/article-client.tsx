@@ -70,8 +70,8 @@ export function ArticleClient({ issueId }: Props) {
       ? article.summary.summary
       : "詳細要約はまだ登録されていません。"
   const softSummaryText =
-    article.soft_summary?.summary?.trim() && article.soft_summary.summary.length > 0
-      ? article.soft_summary.summary
+    article.soft_language_summary?.summary?.trim() && article.soft_language_summary.summary.length > 0
+      ? article.soft_language_summary.summary
       : "簡潔な要約は準備中です。"
   const participantDetails = article.participants ?? []
   const hasParticipants = participantDetails.length > 0
@@ -147,16 +147,22 @@ export function ArticleClient({ issueId }: Props) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 font-serif">
-              <Tag className="h-5 w-5 text-primary" />
-              キーワード
+              <Tag className="w-5 h-5 text-primary" />
+              主要なトピック
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-wrap gap-2">
-            {keywordDetails.map((keyword) => (
-              <Badge key={keyword.keyword} variant="secondary">
-                #{keyword.keyword}
-              </Badge>
-            ))}
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {keywordDetails.map((keyword) => (
+                <Badge
+                  key={keyword.keyword}
+                  variant={keyword.priority === "high" ? "default" : "secondary"}
+                  className={keyword.priority === "high" ? "bg-primary text-primary-foreground" : ""}
+                >
+                  {keyword.keyword}
+                </Badge>
+              ))}
+            </div>
           </CardContent>
         </Card>
       )}

@@ -8,7 +8,7 @@ import type {
   Term,
   ArticleImageKind,
   MiddleSummary,
-  SoftSummary,
+  SoftLanguageSummary,
 } from "@shared/types/article";
 
 export type DynamoArticleItem = {
@@ -27,7 +27,7 @@ export type DynamoArticleItem = {
   nameOfMeeting?: string;
   terms?: Term[] | string[];
   summary?: Summary | string;
-  soft_summary?: SoftSummary | string;
+  soft_language_summary?: SoftLanguageSummary | string;
   middle_summary?: MiddleSummary[];
   dialogs?: Dialog[];
   payload_key?: string;
@@ -52,7 +52,7 @@ export type DynamoIndexItem = {
 
 export type ArticlePayloadData = {
   summary?: Summary | string;
-  soft_summary?: SoftSummary | string;
+  soft_language_summary?: SoftLanguageSummary | string;
   middle_summary?: MiddleSummary[];
   dialogs?: Dialog[];
 };
@@ -78,7 +78,7 @@ export function mapItemToArticle(item: DynamoArticleItem, payload?: ArticlePaylo
     nameOfHouse: item.nameOfHouse ?? "",
     nameOfMeeting: item.nameOfMeeting ?? "",
     summary: normalizeSummary(payload?.summary ?? item.summary),
-    soft_summary: normalizeSummary(payload?.soft_summary ?? item.soft_summary),
+    soft_language_summary: normalizeSummary(payload?.soft_language_summary ?? item.soft_language_summary),
     middle_summary: normalizeMiddleSummaries(payload?.middle_summary ?? item.middle_summary),
     dialogs: normalizeDialogs(payload?.dialogs ?? item.dialogs),
     terms: normalizeTerms(item.terms),
@@ -231,11 +231,14 @@ export function normalizeDialogs(source: unknown): Dialog[] {
       if (Number.isNaN(order)) {
         return null;
       }
+      const rawOriginalText = (dialog as { original_text?: unknown }).original_text;
+      const rawOriginalTextCamel = (dialog as { originalText?: unknown }).originalText;
+
       const originalText =
-        typeof (dialog as { original_text?: unknown }).original_text === "string"
-          ? (dialog as { original_text?: string }).original_text
-          : typeof (dialog as { originalText?: unknown }).originalText === "string"
-            ? (dialog as { originalText?: string }).originalText
+        typeof rawOriginalText === "string"
+          ? rawOriginalText
+          : typeof rawOriginalTextCamel === "string"
+            ? rawOriginalTextCamel
             : dialog.summary;
       return {
         order,

@@ -138,7 +138,7 @@ function highlightTerms(text: string, terms: Term[] = []): JSX.Element {
                   {match[1]}
                 </span>
               </TooltipTrigger>
-              <TooltipContent className="max-w-xs">
+              <TooltipContent side="right" align="center" sideOffset={12} className="max-w-xs">
                 <p className="font-semibold">{term.term}</p>
                 <p className="text-sm">{term.definition}</p>
               </TooltipContent>
