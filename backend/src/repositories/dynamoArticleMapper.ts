@@ -231,11 +231,18 @@ export function normalizeDialogs(source: unknown): Dialog[] {
       if (Number.isNaN(order)) {
         return null;
       }
+      const originalText =
+        typeof (dialog as { original_text?: unknown }).original_text === "string"
+          ? (dialog as { original_text?: string }).original_text
+          : typeof (dialog as { originalText?: unknown }).originalText === "string"
+            ? (dialog as { originalText?: string }).originalText
+            : dialog.summary;
       return {
         order,
         summary: dialog.summary,
         soft_language: typeof dialog.soft_language === "string" ? dialog.soft_language : "",
         reaction: (dialog.reaction as Dialog["reaction"]) ?? "中立",
+        original_text: originalText,
         speaker: dialog.speaker,
         position: dialog.position,
       };

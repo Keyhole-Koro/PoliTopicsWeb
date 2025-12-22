@@ -9,6 +9,7 @@ shared/**/*.js
 backend/.env
 backend/.env.local
 frontend/.env.local
+frontend/.env.stage
 
 terraform.tfstate
 terraform.tfstate.backup

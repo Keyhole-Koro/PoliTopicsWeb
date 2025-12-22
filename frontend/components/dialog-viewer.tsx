@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import type { Reaction as ArticleReaction } from "@shared/types/article"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -14,8 +14,6 @@ import {
   Search,
   Filter,
   MessageSquare,
-  Clock,
-  Users,
   ChevronDown,
   ChevronUp,
   FileText,
@@ -26,6 +24,8 @@ import type { JSX } from "react/jsx-runtime"
 
 type ViewerReaction = ArticleReaction
 
+const VIEW_MODE_STORAGE_KEY = "politopics_dialog_view_mode"
+
 export interface Dialog {
   order: number
   speaker: string
@@ -33,7 +33,7 @@ export interface Dialog {
   speaker_position: string
   speaker_role: string
   summary: string
-  original_text?: string
+  original_text: string
   soft_summary: string
   reaction?: ViewerReaction
   response_to: ResponseTo[]
@@ -164,10 +164,34 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
   const [selectedSpeaker, setSelectedSpeaker] = useState<string>("all")
   const [selectedGroup, setSelectedGroup] = useState<string>("all")
   const [selectedReaction, setSelectedReaction] = useState<ViewerReaction | "all">("all")
-  const [viewMode, setViewMode] = useState<"timeline" | "summary">("timeline")
+  const [viewMode, setViewMode] = useState<"original" | "soft_summary" | "summary">("soft_summary")
   const [expandedDialogs, setExpandedDialogs] = useState<Set<number>>(new Set())
-  const [textMode, setTextMode] = useState<"original" | "soft_summary" | "summary">("soft_summary")
+  const [hasHydrated, setHasHydrated] = useState(false)
   const [originalTextVisible, setOriginalTextVisible] = useState<Set<number>>(new Set())
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(VIEW_MODE_STORAGE_KEY)
+      if (stored === "original" || stored === "soft_summary" || stored === "summary") {
+        setViewMode(stored)
+      }
+    } catch {
+      // Ignore storage access errors (e.g. private mode).
+    } finally {
+      setHasHydrated(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!hasHydrated) {
+      return
+    }
+    try {
+      localStorage.setItem(VIEW_MODE_STORAGE_KEY, viewMode)
+    } catch {
+      // Ignore storage access errors (e.g. private mode).
+    }
+  }, [hasHydrated, viewMode])
 
   const speakers = useMemo(() => {
     const uniqueSpeakers = Array.from(new Set(dialogs.map((d) => d.speaker)))
@@ -188,7 +212,7 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
         dialog.summary.toLowerCase().includes(normalizedSearch) ||
         dialog.speaker.toLowerCase().includes(normalizedSearch) ||
         dialog.soft_summary.toLowerCase().includes(normalizedSearch) ||
-        (dialog.original_text ?? "").toLowerCase().includes(normalizedSearch)
+        dialog.original_text.toLowerCase().includes(normalizedSearch)
 
       const matchesSpeaker = selectedSpeaker === "all" || dialog.speaker === selectedSpeaker
 
@@ -229,6 +253,95 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
     setSelectedGroup("all")
     setSelectedReaction("all")
   }
+
+  const summaryContent = (
+    <div className="grid gap-4">
+      {filteredDialogs.map((dialog) => {
+        const isOriginalVisible = originalTextVisible.has(dialog.order)
+        const originalText = dialog.original_text
+        const displayText =
+          viewMode === "original"
+            ? dialog.original_text
+            : viewMode === "soft_summary"
+              ? dialog.soft_summary
+              : dialog.summary
+
+        return (
+          <Card key={dialog.order} className="hover:shadow-md transition-shadow overflow-hidden">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-4 min-w-0">
+                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-xs font-semibold text-primary">{dialog.order}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <h4 className="font-semibold text-foreground truncate">{dialog.speaker}</h4>
+                    <Badge variant="outline" className="text-xs">
+                      {dialog.speaker_group}
+                    </Badge>
+                    <Badge variant="secondary" className="text-xs">
+                      {viewMode === "original" ? "原文" : viewMode === "soft_summary" ? "やさしい" : "詳細"}
+                    </Badge>
+                  </div>
+                  <div className="text-sm text-muted-foreground leading-relaxed break-words">
+                    {highlightTerms(displayText, terms)}
+                  </div>
+                  {isOriginalVisible && viewMode !== "original" && (
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <div className="flex items-center gap-2 mb-2">
+                        <FileText className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-xs font-medium text-muted-foreground">原文</span>
+                      </div>
+                      <div className="text-sm text-foreground leading-relaxed bg-muted/30 p-3 rounded-md">
+                        {highlightTerms(originalText, terms)}
+                      </div>
+                    </div>
+                  )}
+                  {viewMode !== "original" && (
+                    <div className="flex justify-start pt-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleOriginalText(dialog.order)}
+                        className="flex items-center gap-1 text-xs"
+                      >
+                        {isOriginalVisible ? (
+                          <>
+                            <ChevronUp className="w-4 h-4" />
+                            原文を隠す
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="w-4 h-4" />
+                            原文を表示
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
+                  {dialog.response_to.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t">
+                      {dialog.response_to.map((response, index) => (
+                        <span
+                          key={index}
+                          className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${getReactionColor(
+                            response.reaction,
+                          )}`}
+                        >
+                          <span>{getReactionIcon(response.reaction)}</span>
+                          <span>#{response.dialog_id}</span>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )
+      })}
+    </div>
+  )
 
   return (
     <TooltipProvider>
@@ -303,10 +416,7 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
                   </SelectContent>
                 </Select>
 
-                <Select
-                  value={textMode}
-                  onValueChange={(value) => setTextMode(value as "original" | "soft_summary" | "summary")}
-                >
+                <Select value={viewMode} onValueChange={(value) => setViewMode(value as "original" | "soft_summary" | "summary")}>
                   <SelectTrigger>
                     <SelectValue placeholder="表示モード" />
                   </SelectTrigger>
@@ -320,7 +430,7 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
                     <SelectItem value="soft_summary">
                       <div className="flex items-center gap-2">
                         <Zap className="w-4 h-4" />
-                        簡潔要約
+                        やさしい言葉
                       </div>
                     </SelectItem>
                     <SelectItem value="summary">
@@ -342,19 +452,23 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
         </Card>
 
         {/* View Mode Tabs */}
-        <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "timeline" | "summary")}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="timeline" className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              時系列表示
+        <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "original" | "soft_summary" | "summary")}>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="original" className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              原文表示
+            </TabsTrigger>
+            <TabsTrigger value="soft_summary" className="flex items-center gap-2">
+              <Zap className="w-4 h-4" />
+              やさしい言葉
             </TabsTrigger>
             <TabsTrigger value="summary" className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              要約表示
+              <BookOpen className="w-4 h-4" />
+              詳細要約
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="timeline" className="space-y-4">
+          <TabsContent value="original" className="space-y-4">
             {filteredDialogs.length === 0 ? (
               <Card>
                 <CardContent className="pt-6 text-center">
@@ -373,12 +487,12 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
                 {filteredDialogs.map((dialog, index) => {
                   const isExpanded = expandedDialogs.has(dialog.order)
                   const isOriginalVisible = originalTextVisible.has(dialog.order)
-                  const originalText = dialog.original_text ?? dialog.summary
+                  const originalText = dialog.original_text
 
                   const displayText =
-                    textMode === "original"
-                      ? originalText
-                      : textMode === "soft_summary"
+                    viewMode === "original"
+                      ? dialog.original_text
+                      : viewMode === "soft_summary"
                         ? dialog.soft_summary
                         : dialog.summary
 
@@ -412,7 +526,7 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
 
                               <div className="flex items-center gap-2">
                                 <Badge variant="secondary" className="text-xs">
-                                  {textMode === "original" ? "原文" : textMode === "soft_summary" ? "簡潔" : "詳細"}
+                                  {viewMode === "original" ? "原文" : viewMode === "soft_summary" ? "やさしい" : "詳細"}
                                 </Badge>
                               </div>
                             </div>
@@ -420,13 +534,10 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
                             {/* Dialog content */}
                             <div className="space-y-2">
                               <div className="text-sm text-muted-foreground leading-relaxed">
-                                {highlightTerms(
-                                  displayText.length > 150 ? displayText.substring(0, 150) + "..." : displayText,
-                                  terms,
-                                )}
+                                {highlightTerms(displayText, terms)}
                               </div>
 
-                              {isOriginalVisible && textMode !== "original" && (
+                              {isOriginalVisible && viewMode !== "original" && (
                                 <div className="mt-4 pt-4 border-t border-border">
                                   <div className="flex items-center gap-2 mb-2">
                                     <FileText className="w-4 h-4 text-muted-foreground" />
@@ -439,7 +550,7 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
                               )}
 
                               <div className="flex justify-start pt-2">
-                                {textMode !== "original" && (
+                                {viewMode !== "original" && (
                                   <Button
                                     variant="ghost"
                                     size="sm"
@@ -492,93 +603,12 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
             )}
           </TabsContent>
 
-          <TabsContent value="summary" className="space-y-4">
-            <div className="grid gap-4">
-              {filteredDialogs.map((dialog) => {
-                const isOriginalVisible = originalTextVisible.has(dialog.order)
-                const originalText = dialog.original_text ?? dialog.summary
-                const displayText =
-                  textMode === "original"
-                    ? originalText
-                    : textMode === "soft_summary"
-                      ? dialog.soft_summary
-                      : dialog.summary
+          <TabsContent value="soft_summary" className="space-y-4">
+            {summaryContent}
+          </TabsContent>
 
-                return (
-                  <Card key={dialog.order} className="hover:shadow-md transition-shadow overflow-hidden">
-                    <CardContent className="pt-6">
-                      <div className="flex items-start gap-4 min-w-0">
-                        <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-xs font-semibold text-primary">{dialog.order}</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex flex-wrap items-center gap-2 mb-2">
-                            <h4 className="font-semibold text-foreground truncate">{dialog.speaker}</h4>
-                            <Badge variant="outline" className="text-xs">
-                              {dialog.speaker_group}
-                            </Badge>
-                            <Badge variant="secondary" className="text-xs">
-                              {textMode === "original" ? "原文" : textMode === "soft_summary" ? "簡潔" : "詳細"}
-                            </Badge>
-                          </div>
-                          <div className="text-sm text-muted-foreground leading-relaxed break-words">
-                            {highlightTerms(displayText, terms)}
-                          </div>
-                          {isOriginalVisible && textMode !== "original" && (
-                            <div className="mt-4 pt-4 border-t border-border">
-                              <div className="flex items-center gap-2 mb-2">
-                                <FileText className="w-4 h-4 text-muted-foreground" />
-                                <span className="text-xs font-medium text-muted-foreground">原文</span>
-                              </div>
-                              <div className="text-sm text-foreground leading-relaxed bg-muted/30 p-3 rounded-md">
-                                {highlightTerms(originalText, terms)}
-                              </div>
-                            </div>
-                          )}
-                          {textMode !== "original" && (
-                            <div className="flex justify-start pt-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => toggleOriginalText(dialog.order)}
-                                className="flex items-center gap-1 text-xs"
-                              >
-                                {isOriginalVisible ? (
-                                  <>
-                                    <ChevronUp className="w-4 h-4" />
-                                    原文を隠す
-                                  </>
-                                ) : (
-                                  <>
-                                    <ChevronDown className="w-4 h-4" />
-                                    原文を表示
-                                  </>
-                                )}
-                              </Button>
-                            </div>
-                          )}
-                          {dialog.response_to.length > 0 && (
-                            <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t">
-                              {dialog.response_to.map((response, index) => (
-                                <span
-                                  key={index}
-                                  className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${getReactionColor(
-                                    response.reaction,
-                                  )}`}
-                                >
-                                  <span>{getReactionIcon(response.reaction)}</span>
-                                  <span>#{response.dialog_id}</span>
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </div>
+          <TabsContent value="summary" className="space-y-4">
+            {summaryContent}
           </TabsContent>
         </Tabs>
       </div>

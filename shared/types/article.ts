@@ -14,6 +14,7 @@ export type Dialog = {
   summary: string
   soft_language: string
   reaction: Reaction
+  original_text: string
   speaker?: string
   position?: string
 }

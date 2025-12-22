@@ -58,8 +58,8 @@ export function ArticleClient({ issueId }: Props) {
     speaker_position: dialog.position ?? "所属情報未設定",
     speaker_role: dialog.position ?? "発言者",
     summary: dialog.summary,
-    original_text: dialog.summary,
-    soft_summary: dialog.soft_language ?? dialog.summary,
+    original_text: dialog.original_text,
+    soft_summary: dialog.soft_language,
     reaction: dialog.reaction,
     response_to: [],
   }))
@@ -75,8 +75,10 @@ export function ArticleClient({ issueId }: Props) {
       : "簡潔な要約は準備中です。"
   const participantDetails = article.participants ?? []
   const hasParticipants = participantDetails.length > 0
-  const hasKeywords = article.keywords.length > 0
-  const hasTerms = article.terms.length > 0
+  const keywordDetails = article.keywords ?? []
+  const termDetails = article.terms ?? []
+  const hasKeywords = keywordDetails.length > 0
+  const hasTerms = termDetails.length > 0
 
   return (
     <article className="space-y-10">
@@ -150,7 +152,7 @@ export function ArticleClient({ issueId }: Props) {
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
-            {article.keywords.map((keyword) => (
+            {keywordDetails.map((keyword) => (
               <Badge key={keyword.keyword} variant="secondary">
                 #{keyword.keyword}
               </Badge>
@@ -167,11 +169,11 @@ export function ArticleClient({ issueId }: Props) {
               用語集
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {article.terms.map((term) => (
+          <CardContent className="grid gap-3 sm:grid-cols-2">
+            {termDetails.map((term) => (
               <div key={term.term} className="space-y-1">
-                <p className="font-semibold text-foreground">{term.term}</p>
-                <p className="text-sm text-muted-foreground">{term.definition}</p>
+                <p className="text-sm font-semibold text-foreground">{term.term}</p>
+                <p className="text-xs leading-snug text-muted-foreground">{term.definition}</p>
               </div>
             ))}
           </CardContent>

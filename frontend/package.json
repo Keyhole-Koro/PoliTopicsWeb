@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "dev": "next dev -p 3333",
+    "build:stage": "NEXT_PUBLIC_APP_ENV=stage NEXT_PUBLIC_APP_ENV=stage dotenv -e .env.stage -- next build",
+    "dev": "NEXT_PUBLIC_APP_ENV=local next dev -p 3333",
+    "dev:stage": "NEXT_PUBLIC_APP_ENV=stage dotenv -e .env.stage -- next dev -p 3333",
     "lint": "eslint .",
     "start": "next start -p 3333"
   },
@@ -61,6 +63,7 @@
     "zod": "3.25.76"
   },
   "devDependencies": {
+    "dotenv-cli": "^7.4.4",
     "@tailwindcss/postcss": "^4.1.9",
     "@types/node": "^22",
     "@types/react": "^19",

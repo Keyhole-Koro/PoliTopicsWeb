@@ -227,7 +227,11 @@ function buildMiddleSummaries(article) {
 
 function buildExtraDialogs(article, extraCount) {
   const existing = Array.isArray(article.dialogs) ? article.dialogs : [];
-  const maxOrder = existing.reduce((max, dialog) => Math.max(max, dialog.order ?? 0), 0);
+  const normalizedExisting = existing.map((dialog) => ({
+    ...dialog,
+    original_text: toColloquial(dialog.original_text ?? dialog.summary ?? dialog.soft_language ?? ""),
+  }));
+  const maxOrder = normalizedExisting.reduce((max, dialog) => Math.max(max, dialog.order ?? 0), 0);
   const speakers = (article.participants ?? [])
     .map((participant) => ({
       name: participant.name ?? participant,
@@ -247,13 +251,21 @@ function buildExtraDialogs(article, extraCount) {
       order: maxOrder + i + 1,
       summary: `${baseLine} 具体策や実務面の課題も提示した。`,
       soft_language: `${baseLine} 実行上のポイントも共有。`,
+      original_text: toColloquial(`${baseLine} 実行面の論点と背景を詳述した。`),
       reaction: reactions[i % reactions.length],
       speaker: speaker.name,
       position: speaker.position,
     });
   }
 
-  return existing.concat(extraDialogs);
+  return normalizedExisting.concat(extraDialogs);
+}
+
+function toColloquial(text) {
+  const trimmed = String(text || "").trim();
+  if (!trimmed) return "って感じだったよ。";
+  const base = trimmed.replace(/。+$/g, "");
+  return `${base}って感じだったよ。`;
 }
 
 function buildTerms(article) {

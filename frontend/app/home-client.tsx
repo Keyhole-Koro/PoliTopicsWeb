@@ -1,7 +1,6 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
 import type { ArticleSummary, SearchFilters } from "@shared/types/article"
 import { fetchHeadlines, fetchSuggestions } from "@/lib/api"
 import { HomeHeader } from "@/components/home/home-header"
@@ -33,6 +32,13 @@ const INITIAL_HEADLINE_LIMIT = GRID_PREFETCH_COUNT + 4
 const HEADLINE_BATCH_SIZE = GRID_PREFETCH_COUNT
 const HEADLINE_CACHE_TTL_MS = 5 * 60 * 1000
 
+function spaNavigate(path: string) {
+  if (typeof window === "undefined") return
+  if (window.location.pathname === path) return
+  window.history.pushState({}, "", path)
+  window.dispatchEvent(new PopStateEvent("popstate"))
+}
+
 type HeadlinesCache = {
   items: ArticleSummary[]
   hasMore: boolean
@@ -55,7 +61,6 @@ function writeHeadlinesCache(items: ArticleSummary[], hasMore: boolean) {
 }
 
 export function HomeClient() {
-  const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
   const [searchInputValue, setSearchInputValue] = useState("")
   const [suggestions, setSuggestions] = useState<string[]>([])
@@ -350,31 +355,7 @@ export function HomeClient() {
   }
 
   function navigateToSearch(term: string) {
-    const normalized = normalizeWords(term)
-    if (!normalized) return
-    const params = new URLSearchParams()
-    params.set("words", normalized)
-    if (selectedCategory !== "all") {
-      params.set("categories", selectedCategory)
-    }
-    if (selectedHouse !== "all") {
-      params.set("houses", selectedHouse)
-    }
-    if (selectedMeeting !== "all") {
-      params.set("meetings", selectedMeeting)
-    }
-    if (dateStart) {
-      params.set("dateStart", dateStart.toISOString())
-    }
-    if (dateEnd) {
-      params.set("dateEnd", dateEnd.toISOString())
-    }
-    const safeSort = sortOrder ?? "date_desc"
-    if (safeSort !== "date_desc") {
-      params.set("sort", safeSort)
-    }
-    const query = params.toString()
-    router.push(query ? `/search?${query}` : "/search")
+    void term
   }
 
   function handleCategoryClick(category: string) {
@@ -536,7 +517,7 @@ export function HomeClient() {
             onKeywordClick={handleKeywordClick}
             onHouseClick={handleHouseClick}
             onMeetingClick={handleMeetingClick}
-            onNavigate={(path) => router.push(path)}
+            onNavigate={spaNavigate}
           />
 
           <LatestArticlesRow
@@ -546,7 +527,7 @@ export function HomeClient() {
             onKeywordClick={handleKeywordClick}
             onHouseClick={handleHouseClick}
             onMeetingClick={handleMeetingClick}
-            onNavigate={(path) => router.push(path)}
+            onNavigate={spaNavigate}
           />
 
           {!searchTerm && !hasActiveFilters && (
@@ -566,7 +547,7 @@ export function HomeClient() {
             onKeywordClick={handleKeywordClick}
             onHouseClick={handleHouseClick}
             onMeetingClick={handleMeetingClick}
-            onNavigate={(path) => router.push(path)}
+            onNavigate={spaNavigate}
             canLoadMore={canLoadMore}
             onLoadMore={handleLoadMore}
             isLoading={isLoadingArticles}

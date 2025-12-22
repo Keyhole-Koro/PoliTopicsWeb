@@ -16,5 +16,7 @@ if [ ! -d "$BUILD_DIR" ]; then
   exit 1
 fi
 
+echo "[upload-frontend] Tip: if this fails against real AWS, try unsetting AWS_ENDPOINT_URL first."
+
 echo "[upload-frontend] Syncing $BUILD_DIR to s3://$BUCKET"
 aws s3 sync "$BUILD_DIR" "s3://$BUCKET" --delete

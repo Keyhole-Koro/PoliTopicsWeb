@@ -1,19 +1,16 @@
 'use client'
 
-import { Suspense, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
 import { ArrowLeft, MessageSquare } from "lucide-react"
 import { HomeClient } from "../home-client"
 import { ArticleClient } from "../article/article-client"
-import { SearchPageClient } from "../search/search-page-client"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 
 type RouteMatch =
   | { kind: "home" }
   | { kind: "article"; id: string }
-  | { kind: "search" }
   | { kind: "not-found" }
 
 function parsePath(pathname: string): RouteMatch {
@@ -27,15 +24,25 @@ function parsePath(pathname: string): RouteMatch {
     return { kind: "article", id: segments[1] }
   }
 
-  if (segments[0] === "search" && segments.length === 1) {
-    return { kind: "search" }
-  }
-
   return { kind: "not-found" }
 }
 
 export function CatchAllClient() {
-  const pathname = usePathname() ?? "/"
+  const [pathname, setPathname] = useState(() => {
+    if (typeof window === "undefined") return "/"
+    return window.location.pathname || "/"
+  })
+
+  useEffect(() => {
+    const handleChange = () => {
+      setPathname(window.location.pathname || "/")
+    }
+    window.addEventListener("popstate", handleChange)
+    return () => {
+      window.removeEventListener("popstate", handleChange)
+    }
+  }, [])
+
   const match = useMemo(() => parsePath(pathname), [pathname])
 
   if (match.kind === "home") {
@@ -70,21 +77,6 @@ export function CatchAllClient() {
           <ArticleClient issueId={match.id} />
         </main>
       </div>
-    )
-  }
-
-  if (match.kind === "search") {
-    return (
-      <main className="min-h-screen bg-background">
-        <div className="mx-auto max-w-5xl px-4 py-10">
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold">記事検索</h1>
-          </div>
-          <Suspense fallback={null}>
-            <SearchPageClient />
-          </Suspense>
-        </div>
-      </main>
     )
   }
 

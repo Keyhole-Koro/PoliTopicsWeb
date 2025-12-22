@@ -10,12 +10,14 @@ type Props = {
 export function ArticleMeta({ article }: Props) {
   const meetingType = article.imageKind
 
+  const categories = article.categories ?? []
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
         <div className="flex flex-wrap gap-2">
-          {article.categories.length > 0 ? (
-            article.categories.map((category) => (
+          {categories.length > 0 ? (
+            categories.map((category) => (
               <Badge key={category} className="bg-primary/10 text-primary">
                 {category}
               </Badge>
