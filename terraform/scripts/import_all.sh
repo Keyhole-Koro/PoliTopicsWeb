@@ -75,7 +75,7 @@ def parse_string(raw):
 
 environment_raw = extract_raw("environment")
 frontend_bucket_raw = extract_raw("frontend_bucket")
-article_payload_bucket_raw = extract_raw("article_payload_bucket")
+article_asset_url_bucket_raw = extract_raw("article_asset_url_bucket")
 articles_table_raw = extract_raw("articles_table")
 lambda_name_raw = extract_raw("lambda_name")
 create_dynamodb_table_raw = extract_raw("create_dynamodb_table")
@@ -84,7 +84,7 @@ frontend_public_enabled_raw = extract_raw("frontend_public_enabled")
 
 environment = parse_string(environment_raw)
 frontend_bucket = parse_string(frontend_bucket_raw)
-article_payload_bucket = parse_string(article_payload_bucket_raw)
+article_asset_url_bucket = parse_string(article_asset_url_bucket_raw)
 articles_table = parse_string(articles_table_raw)
 lambda_name = parse_string(lambda_name_raw)
 
@@ -108,7 +108,7 @@ def emit(name, value):
 
 emit("ENVIRONMENT", environment)
 emit("FRONTEND_BUCKET", frontend_bucket)
-emit("ARTICLE_PAYLOAD_BUCKET", article_payload_bucket)
+emit("ARTICLE_ASSET_URL_BUCKET", article_asset_url_bucket)
 emit("ARTICLES_TABLE", articles_table)
 emit("LAMBDA_NAME", lambda_name)
 emit("CREATE_DYNAMODB_TABLE", create_dynamodb_table)
@@ -117,7 +117,7 @@ emit("FRONTEND_PUBLIC_ENABLED", frontend_public_enabled)
 PY
 )"
 
-for required in ENVIRONMENT FRONTEND_BUCKET ARTICLE_PAYLOAD_BUCKET ARTICLES_TABLE LAMBDA_NAME; do
+for required in ENVIRONMENT FRONTEND_BUCKET ARTICLE_ASSET_URL_BUCKET ARTICLES_TABLE LAMBDA_NAME; do
   if [[ -z "${!required:-}" ]]; then
     echo "Missing required value for $required (check $VAR_FILE)" >&2
     exit 1
@@ -211,7 +211,7 @@ fi
 IS_LOCALSTACK_LOWER="$(echo "${IS_LOCALSTACK}" | tr '[:upper:]' '[:lower:]')"
 
 if [[ "$ENVIRONMENT_NAME" == "local" || "$ENVIRONMENT_NAME" == "localstack" || "$IS_LOCALSTACK_LOWER" == "true" ]]; then
-  run_import "$S3_MOD.aws_s3_bucket.article_payload[0]" "$ARTICLE_PAYLOAD_BUCKET"
+  run_import "$S3_MOD.aws_s3_bucket.article_asset_url[0]" "$ARTICLE_ASSET_URL_BUCKET"
 fi
 
 echo "Importing DynamoDB resources for ${ARTICLES_TABLE}..."

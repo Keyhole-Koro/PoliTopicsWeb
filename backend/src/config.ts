@@ -5,7 +5,7 @@ type AppEnvironment = (typeof VALID_ENVIRONMENTS)[number]
 
 type EnvironmentDefaults = {
   tableName: string
-  articlePayloadBucket: string
+  articleAssetBucket: string
   region: string
   localstackUrl?: string
   credentials?: { accessKeyId: string; secretAccessKey: string }
@@ -14,26 +14,26 @@ type EnvironmentDefaults = {
 const ENVIRONMENT_DEFAULTS: Record<AppEnvironment, EnvironmentDefaults> = {
   local: {
     tableName: "politopics-local",
-    articlePayloadBucket: "politopics-articles-local",
+    articleAssetBucket: "politopics-articles-local",
     region: DEFAULT_REGION,
     localstackUrl: "http://localstack:4566",
     credentials: { accessKeyId: "test", secretAccessKey: "test" },
   },
   localstack: {
     tableName: "politopics-local",
-    articlePayloadBucket: "politopics-articles-local",
+    articleAssetBucket: "politopics-articles-local",
     region: DEFAULT_REGION,
     localstackUrl: "http://localstack:4566",
     credentials: { accessKeyId: "test", secretAccessKey: "test" },
   },
   stage: {
     tableName: "politopics-stage",
-    articlePayloadBucket: "politopics-articles-stage",
+    articleAssetBucket: "politopics-articles-stage",
     region: DEFAULT_REGION,
   },
   prod: {
     tableName: "politopics-prod",
-    articlePayloadBucket: "politopics-articles-prod",
+    articleAssetBucket: "politopics-articles-prod",
     region: DEFAULT_REGION,
   },
 }
@@ -46,7 +46,7 @@ export type AppConfig = {
   environment: AppEnvironment
   port: number
   tableName: string
-  articlePayloadBucket: string
+  articleAssetBucket: string
   region: string
   localstackUrl?: string
   credentials?: { accessKeyId: string; secretAccessKey: string }
@@ -56,7 +56,7 @@ export let appConfig: AppConfig = {
   environment: ACTIVE_ENVIRONMENT,
   port: 4000,
   tableName: defaults.tableName,
-  articlePayloadBucket: defaults.articlePayloadBucket,
+  articleAssetBucket: defaults.articleAssetBucket,
   region: defaults.region,
   localstackUrl: defaults.localstackUrl,
   credentials: defaults.credentials,
@@ -71,7 +71,7 @@ export function setAppEnvironment(environment: AppEnvironment) {
     environment,
     port: appConfig.port,
     tableName: envDefaults.tableName,
-    articlePayloadBucket: envDefaults.articlePayloadBucket,
+    articleAssetBucket: envDefaults.articleAssetBucket,
     region: envDefaults.region,
     localstackUrl: envDefaults.localstackUrl,
     credentials: envDefaults.credentials,

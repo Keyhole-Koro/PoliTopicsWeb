@@ -30,8 +30,8 @@ export type DynamoArticleItem = {
   soft_language_summary?: SoftLanguageSummary | string;
   middle_summary?: MiddleSummary[];
   dialogs?: Dialog[];
-  payload_key?: string;
-  payload_url?: string;
+  asset_key?: string;
+  asset_url?: string;
 };
 
 export type DynamoIndexItem = {
@@ -50,7 +50,7 @@ export type DynamoIndexItem = {
   nameOfMeeting?: string;
 };
 
-export type ArticlePayloadData = {
+export type ArticleAssetData = {
   summary?: Summary | string;
   soft_language_summary?: SoftLanguageSummary | string;
   middle_summary?: MiddleSummary[];
@@ -62,7 +62,7 @@ export function mapArticleToSummary(item: Record<string, unknown>): ArticleSumma
   return toSummary(article);
 }
 
-export function mapItemToArticle(item: DynamoArticleItem, payload?: ArticlePayloadData): Article {
+export function mapItemToArticle(item: DynamoArticleItem, asset?: ArticleAssetData): Article {
   const id = item.PK.replace("A#", "");
   return {
     id,
@@ -77,10 +77,10 @@ export function mapItemToArticle(item: DynamoArticleItem, payload?: ArticlePaylo
     session: typeof item.session === "number" ? item.session : Number(item.session) || 0,
     nameOfHouse: item.nameOfHouse ?? "",
     nameOfMeeting: item.nameOfMeeting ?? "",
-    summary: normalizeSummary(payload?.summary ?? item.summary),
-    soft_language_summary: normalizeSummary(payload?.soft_language_summary ?? item.soft_language_summary),
-    middle_summary: normalizeMiddleSummaries(payload?.middle_summary ?? item.middle_summary),
-    dialogs: normalizeDialogs(payload?.dialogs ?? item.dialogs),
+    summary: normalizeSummary(asset?.summary ?? item.summary),
+    soft_language_summary: normalizeSummary(asset?.soft_language_summary ?? item.soft_language_summary),
+    middle_summary: normalizeMiddleSummaries(asset?.middle_summary ?? item.middle_summary),
+    dialogs: normalizeDialogs(asset?.dialogs ?? item.dialogs),
     terms: normalizeTerms(item.terms),
   };
 }

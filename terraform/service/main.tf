@@ -5,7 +5,7 @@ module "s3" {
   frontend_bucket        = var.frontend_bucket
   frontend_public_enabled = var.frontend_public_enabled
   frontend_deploy_enabled = var.frontend_deploy_enabled
-  article_payload_bucket = var.article_payload_bucket
+  article_asset_url_bucket = var.article_asset_url_bucket
   is_localstack          = var.is_localstack
 }
 
@@ -33,6 +33,6 @@ module "lambda" {
   table_name = module.dynamodb.table.name
   table_arn  = module.dynamodb.table.arn
 
-  payload_bucket_name = module.s3.article_payload_bucket.name
-  payload_bucket_arn  = module.s3.article_payload_bucket.arn
+  asset_url_bucket_name = module.s3.article_asset_url_bucket.name
+  asset_url_bucket_arn  = module.s3.article_asset_url_bucket.arn
 }

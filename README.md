@@ -13,7 +13,7 @@ node shared/mock/upload_articles.js --endpoint http://localstack:4566 --bucket p
 
 The seed script now stores the large article payload fields (`summary`, `soft_language_summary`, `middle_summary`,
 `dialogs`) as JSON blobs in the `POLITOPICS_ARTICLE_BUCKET` (defaults to
-`politopics-articles-local` when using LocalStack) and only keeps references in DynamoDB via `payload_url`.
+`politopics-articles-local` when using LocalStack) and only keeps references in DynamoDB via `asset_url`.
 
 The frontend is served on http://localhost:3333 and expects the backend on http://localhost:4000. Configure other environments with `NEXT_PUBLIC_API_BASE_URL`.
 

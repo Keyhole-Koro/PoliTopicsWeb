@@ -8,9 +8,9 @@ output "article_table" {
   value       = module.service.article_table
 }
 
-output "article_payload_bucket" {
-  description = "Referenced S3 payload bucket"
-  value       = module.service.article_payload_bucket
+output "article_asset_url_bucket" {
+  description = "Referenced S3 asset URL bucket"
+  value       = module.service.article_asset_url_bucket
 }
 
 output "backend_api_url" {

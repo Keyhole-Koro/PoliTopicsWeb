@@ -66,7 +66,7 @@ function loadConfig(cli) {
   const s3Endpoint = cli["s3-endpoint"] || endpoint || DEFAULTS.s3Endpoint;
   const copies = Number(cli.copies ?? DEFAULTS.copies);
   const extraDialogs = Number(cli["extra-dialogs"] ?? DEFAULTS.extraDialogs);
-  const payloadPrefix = cli["payload-prefix"] ?? DEFAULTS.payloadPrefix;
+  const assetPrefix = cli["payload-prefix"] ?? DEFAULTS.payloadPrefix;
 
   return {
     tableName: cli.table || DEFAULTS.tableName,
@@ -79,7 +79,7 @@ function loadConfig(cli) {
     articlesPath: path.resolve(cli.file || DEFAULTS.articlesPath),
     copies: Number.isNaN(copies) || copies < 1 ? DEFAULTS.copies : Math.floor(copies),
     extraDialogs: Number.isNaN(extraDialogs) || extraDialogs < 0 ? DEFAULTS.extraDialogs : Math.floor(extraDialogs),
-    payloadPrefix: payloadPrefix.replace(/^\/+|\/+$/g, ""),
+    assetPrefix: payloadPrefix.replace(/^\/+|\/+$/g, ""),
     skipCreateTable: Boolean(cli["skip-create-table"]),
     skipCreateBucket: Boolean(cli["skip-create-bucket"]),
   };
@@ -288,12 +288,12 @@ function buildPayload(article, extraDialogs) {
   };
 }
 
-function buildPayloadKey(articleId, prefix) {
+function buildAssetKey(articleId, prefix) {
   const key = `${articleId}/payload.json`;
   return prefix ? `${prefix}/${key}` : key;
 }
 
-function buildPayloadUrl({ bucket, key, endpoint, region }) {
+function buildAssetUrl({ bucket, key, endpoint, region }) {
   if (endpoint) {
     const normalized = endpoint.replace(/\/$/, "");
     return `${normalized}/${bucket}/${key}`;
@@ -301,7 +301,7 @@ function buildPayloadUrl({ bucket, key, endpoint, region }) {
   return `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
 }
 
-function buildArticleItem(article, payloadKey, payloadUrl) {
+function buildArticleItem(article, assetKey, assetUrl) {
   return {
     PK: `A#${article.id}`,
     SK: "META",
@@ -318,8 +318,8 @@ function buildArticleItem(article, payloadKey, payloadUrl) {
     nameOfHouse: article.nameOfHouse,
     nameOfMeeting: article.nameOfMeeting,
     terms: buildTerms(article),
-    payload_key: payloadKey,
-    payload_url: payloadUrl,
+    asset_key: assetKey,
+    asset_url: assetUrl,
     GSI1PK: "ARTICLE",
     GSI1SK: article.date,
     GSI2PK: `Y#${article.month.replace("-", "#M#")}`,
@@ -390,18 +390,18 @@ async function uploadPayload(s3Client, bucketName, key, payload) {
   );
 }
 
-async function putItems(docClient, tableName, articles, s3Client, bucketName, payloadUrlOptions, extraDialogs) {
+async function putItems(docClient, tableName, articles, s3Client, bucketName, assetUrlOptions, extraDialogs) {
   let count = 0;
   for (const article of articles) {
-    const payloadKey = buildPayloadKey(article.id, payloadUrlOptions.prefix);
-    const payloadUrl = buildPayloadUrl({ ...payloadUrlOptions, key: payloadKey });
+    const assetKey = buildAssetKey(article.id, assetUrlOptions.prefix);
+    const assetUrl = buildAssetUrl({ ...assetUrlOptions, key: assetKey });
     const payload = buildPayload(article, extraDialogs);
 
     await uploadPayload(s3Client, bucketName, payloadKey, payload);
     await docClient.send(
       new PutCommand({
         TableName: tableName,
-        Item: buildArticleItem(article, payloadKey, payloadUrl),
+        Item: buildArticleItem(article, assetKey, assetUrl),
       }),
     );
     count += 1;
@@ -518,7 +518,7 @@ async function main() {
       bucket: config.bucketName,
       endpoint: config.s3Endpoint,
       region: config.region,
-      prefix: config.payloadPrefix,
+      prefix: config.assetPrefix,
     },
     config.extraDialogs,
   );

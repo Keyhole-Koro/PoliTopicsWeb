@@ -3,7 +3,7 @@ environment = "localstack"
 
 frontend_bucket         = "politopics-frontend-localstack"
 articles_table          = "politopics-local"
-article_payload_bucket  = "politopics-articles-local"
+article_asset_url_bucket  = "politopics-articles-local"
 frontend_deploy_enabled = false
 
 lambda_name        = "politopics-backend-localstack"

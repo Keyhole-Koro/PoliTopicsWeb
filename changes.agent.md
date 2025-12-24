@@ -21,3 +21,23 @@ Details:
   - `terraform/service/s3/main.tf`
   - `terraform/scripts/create-state-bucket.sh`
   - `terraform/scripts/import_all.sh`
+
+Agent: Gemini
+Date/Time: 2025-12-23 00:00 UTC
+Keywords: payload, asset, naming convention
+Topic: Rename 'payload' to 'asset' in relevant contexts
+Details:
+- In `backend/src/config.ts`, renamed `articlePayloadBucket` to `articleAssetBucket`.
+- In `backend/src/repositories/dynamoArticleMapper.ts`:
+    - Changed `payload_key` to `asset_key`.
+    - Renamed type `ArticlePayloadData` to `ArticleAssetData`.
+    - Updated function signature `mapItemToArticle` to use `asset` and `ArticleAssetData`.
+    - Changed `payload?.` to `asset?.` within the function.
+- In `backend/src/repositories/factory.ts`, changed `payloadBucket` to `assetBucket`.
+- In `backend/src/repositories/dynamoArticleRepository.ts`:
+    - Changed imported type `ArticlePayloadData` to `ArticleAssetData`.
+    - Changed `payloadBucket` to `assetBucket` everywhere.
+    - Renamed `payload` variable to `asset` and `loadPayload` function to `loadAsset`.
+    - Updated `mapItemToArticle` call to use `asset`.
+    - Changed return type cast to `ArticleAssetData`.
+    - Updated log message from "Failed to load payload" to "Failed to load asset".

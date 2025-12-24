@@ -1,7 +1,7 @@
 locals {
   frontend_bucket        = coalesce(var.frontend_bucket, "politopics-frontend-${var.environment}")
   articles_table         = coalesce(var.articles_table, "politopics-${var.environment}")
-  article_payload_bucket = coalesce(var.article_payload_bucket, "politopics-articles-${var.environment}")
+  article_asset_url_bucket = coalesce(var.article_asset_url_bucket, "politopics-articles-${var.environment}")
 
   lambda_name        = coalesce(var.lambda_name, "politopics-backend-${var.environment}")
   api_name           = coalesce(var.api_name, "politopics-api-${var.environment}")
@@ -24,7 +24,7 @@ module "service" {
   frontend_public_enabled = var.frontend_public_enabled
   frontend_deploy_enabled = var.frontend_deploy_enabled
   articles_table         = local.articles_table
-  article_payload_bucket = local.article_payload_bucket
+  article_asset_url_bucket = local.article_asset_url_bucket
 
   lambda_name        = local.lambda_name
   api_name           = local.api_name

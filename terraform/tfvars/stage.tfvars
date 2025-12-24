@@ -3,7 +3,7 @@ environment = "stage"
 
 frontend_bucket         = "politopics-frontend-stage"
 articles_table          = "politopics-stage"
-article_payload_bucket  = "politopics-articles-stage"
+article_asset_url_bucket  = "politopics-articles-stage"
 frontend_public_enabled = true
 frontend_deploy_enabled = true
 

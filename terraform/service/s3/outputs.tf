@@ -5,6 +5,6 @@ output "frontend_bucket" {
   }
 }
 
-output "article_payload_bucket" {
-  value = local.article_payload_bucket
+output "article_asset_url_bucket" {
+  value = local.article_asset_url_bucket
 }

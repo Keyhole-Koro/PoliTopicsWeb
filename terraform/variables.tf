@@ -40,8 +40,8 @@ variable "articles_table" {
   default     = null
 }
 
-variable "article_payload_bucket" {
-  description = "Existing S3 bucket with article payloads for this environment"
+variable "article_asset_url_bucket" {
+  description = "Existing S3 bucket with article assets for this environment"
   type        = string
   default     = null
 }

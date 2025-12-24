@@ -20,8 +20,8 @@ variable "frontend_deploy_enabled" {
   default     = false
 }
 
-variable "article_payload_bucket" {
-  description = "Existing S3 bucket with article payloads"
+variable "article_asset_url_bucket" {
+  description = "Existing S3 bucket with article assets"
   type        = string
 }
 

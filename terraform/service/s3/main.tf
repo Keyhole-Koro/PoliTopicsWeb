@@ -100,9 +100,9 @@ resource "null_resource" "upload_frontend" {
   }
 }
 
-resource "aws_s3_bucket" "article_payload" {
+resource "aws_s3_bucket" "article_asset_url" {
   count  = var.is_localstack ? 1 : 0
-  bucket = var.article_payload_bucket
+  bucket = var.article_asset_url_bucket
 
   tags = {
     Environment = var.environment
@@ -110,13 +110,13 @@ resource "aws_s3_bucket" "article_payload" {
 }
 
 locals {
-  article_payload_bucket = var.is_localstack ? {
-    name = aws_s3_bucket.article_payload[0].bucket
-    arn  = aws_s3_bucket.article_payload[0].arn
-    id   = aws_s3_bucket.article_payload[0].id
+  article_asset_url_bucket = var.is_localstack ? {
+    name = aws_s3_bucket.article_asset_url[0].bucket
+    arn  = aws_s3_bucket.article_asset_url[0].arn
+    id   = aws_s3_bucket.article_asset_url[0].id
   } : {
-    name = var.article_payload_bucket
-    arn  = "arn:aws:s3:::${var.article_payload_bucket}"
-    id   = var.article_payload_bucket
+    name = var.article_asset_url_bucket
+    arn  = "arn:aws:s3:::${var.article_asset_url_bucket}"
+    id   = var.article_asset_url_bucket
   }
 }

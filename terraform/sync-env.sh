@@ -97,15 +97,15 @@ def infer_environment(api_url, table_name):
 
 
 table_block = read_output("article_table")
-payload_block = read_output("article_payload_bucket")
+asset_url_block = read_output("article_asset_url_bucket")
 frontend_block = read_output("frontend_bucket")
 api_url = read_output("backend_api_url")
 
 table_name = extract_name(table_block)
-payload_bucket = extract_name(payload_block)
+asset_url_bucket = extract_name(asset_url_block)
 frontend_bucket = extract_name(frontend_block)
 table_arn = extract_attr(table_block, "arn")
-payload_arn = extract_attr(payload_block, "arn")
+asset_url_arn = extract_attr(asset_url_block, "arn")
 frontend_website = extract_attr(frontend_block, "website")
 
 region = parse_region_from_arn(table_arn) or "ap-northeast-3"
@@ -122,7 +122,7 @@ def render_lines():
   backend_lines = [
     f'ENV="{escape_value(environment)}"',
     f'POLITOPICS_TABLE="{escape_value(table_name)}"',
-    f'POLITOPICS_ARTICLE_BUCKET="{escape_value(payload_bucket)}"',
+    f'POLITOPICS_ARTICLE_ASSET_URL_BUCKET="{escape_value(asset_url_bucket)}"',
     f'AWS_REGION="{escape_value(region)}"',
   ]
   if environment == "localstack":
@@ -131,7 +131,7 @@ def render_lines():
     [
       "",
       f"# Article table ARN: {table_arn or 'n/a'}",
-      f"# Article payload bucket ARN: {payload_arn or 'n/a'}",
+      f"# Article asset URL bucket ARN: {asset_url_arn or 'n/a'}",
     ]
   )
 

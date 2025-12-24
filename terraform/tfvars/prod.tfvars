@@ -3,7 +3,7 @@ environment = "prod"
 
 frontend_bucket         = "politopics-frontend-prod"
 articles_table          = "politopics-prod"
-article_payload_bucket  = "politopics-articles-prod"
+article_asset_url_bucket  = "politopics-articles-prod"
 frontend_public_enabled = true
 frontend_deploy_enabled = true
 

@@ -2,8 +2,8 @@ output "frontend_bucket" {
   value = module.s3.frontend_bucket
 }
 
-output "article_payload_bucket" {
-  value = module.s3.article_payload_bucket
+output "article_asset_url_bucket" {
+  value = module.s3.article_asset_url_bucket
 }
 
 output "article_table" {

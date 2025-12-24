@@ -154,7 +154,7 @@ function loadArticles(filePath) {
   return JSON.parse(raw);
 }
 
-function buildArticleItem(article, payloadKey, payloadUrl) {
+function buildArticleItem(article, assetKey, assetUrl) {
   return {
     PK: `A#${article.id}`,
     SK: "META",
@@ -171,8 +171,8 @@ function buildArticleItem(article, payloadKey, payloadUrl) {
     nameOfHouse: article.nameOfHouse,
     nameOfMeeting: article.nameOfMeeting,
     terms: article.terms,
-    payload_key: payloadKey,
-    payload_url: payloadUrl,
+    asset_key: assetKey,
+    asset_url: assetUrl,
     GSI1PK: "ARTICLE",
     GSI1SK: article.date,
     GSI2PK: `Y#${article.month.replace("-", "#M#")}`,
@@ -217,11 +217,11 @@ function buildThinIndexSk(dateStr, articleId) {
   return `Y#${yyyy}#M#${mm}#D#${isoTimestamp}#A#${articleId}`;
 }
 
-function buildPayloadKey(articleId) {
+function buildAssetKey(articleId) {
   return `articles/${articleId}.json`;
 }
 
-function buildPayloadUrl({ bucket, key, endpoint, region }) {
+function buildAssetUrl({ bucket, key, endpoint, region }) {
   if (endpoint) {
     const normalized = endpoint.replace(/\/$/, "");
     return `${normalized}/${bucket}/${key}`;
@@ -230,7 +230,7 @@ function buildPayloadUrl({ bucket, key, endpoint, region }) {
   return `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
 }
 
-function buildArticlePayload(article) {
+function buildArticleAsset(article) {
   return {
     summary: article.summary,
     soft_language_summary: article.soft_language_summary,
@@ -239,8 +239,8 @@ function buildArticlePayload(article) {
   };
 }
 
-async function uploadPayload(s3Client, bucketName, key, article) {
-  const payload = JSON.stringify(buildArticlePayload(article));
+async function uploadPayload(s3Client, bucketName, key, asset) {
+  const payload = JSON.stringify(buildArticleAsset(asset));
   await s3Client.send(
     new PutObjectCommand({
       Bucket: bucketName,
@@ -251,16 +251,16 @@ async function uploadPayload(s3Client, bucketName, key, article) {
   );
 }
 
-async function putItems(docClient, tableName, articles, s3Client, bucketName, payloadUrlOptions) {
+async function putItems(docClient, tableName, articles, s3Client, bucketName, assetUrlOptions) {
   let count = 0;
   for (const article of articles) {
-    const payloadKey = buildPayloadKey(article.id);
-    await uploadPayload(s3Client, bucketName, payloadKey, article);
-    const payloadUrl = buildPayloadUrl({ ...payloadUrlOptions, key: payloadKey });
+    const assetKey = buildAssetKey(article.id);
+    await uploadPayload(s3Client, bucketName, assetKey, article);
+    const assetUrl = buildAssetUrl({ ...assetUrlOptions, key: assetKey });
     await docClient.send(
       new PutCommand({
         TableName: tableName,
-        Item: buildArticleItem(article, payloadKey, payloadUrl),
+        Item: buildArticleItem(article, assetKey, assetUrl),
       }),
     );
     count += 1;

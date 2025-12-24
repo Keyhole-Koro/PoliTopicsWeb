@@ -7,7 +7,7 @@ export function createArticleRepository(): ArticleRepository {
   const options: DynamoRepositoryOptions = {
     tableName: appConfig.tableName,
     region: appConfig.region,
-    payloadBucket: appConfig.articlePayloadBucket,
+    assetBucket: appConfig.articleAssetBucket,
   }
 
   if (appConfig.localstackUrl) {

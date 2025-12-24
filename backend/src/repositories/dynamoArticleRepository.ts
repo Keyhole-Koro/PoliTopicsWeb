@@ -11,7 +11,7 @@ import {
   mapArticleToSummary,
   mapIndexToSummary,
   mapItemToArticle,
-  type ArticlePayloadData,
+  type ArticleAssetData,
   type DynamoArticleItem,
 } from "./dynamoArticleMapper";
 import type { ArticleRepository, HeadlinesResult } from "./articleRepository";
@@ -23,7 +23,7 @@ export type DynamoRepositoryOptions = {
   region: string;
   endpoint?: string;
   credentials?: DynamoDBClientConfig["credentials"];
-  payloadBucket?: string;
+  assetBucket?: string;
   s3Endpoint?: string;
 };
 
@@ -31,7 +31,7 @@ export class DynamoArticleRepository implements ArticleRepository {
   private readonly docClient: DynamoDBDocumentClient;
   private readonly tableName: string;
   private readonly s3Client?: S3Client;
-  private readonly payloadBucket?: string;
+  private readonly assetBucket?: string;
 
   constructor(options: DynamoRepositoryOptions) {
     const client = new DynamoDBClient({
@@ -45,8 +45,8 @@ export class DynamoArticleRepository implements ArticleRepository {
     });
     this.tableName = options.tableName;
 
-    if (options.payloadBucket) {
-      this.payloadBucket = options.payloadBucket;
+    if (options.assetBucket) {
+      this.assetBucket = options.assetBucket;
       this.s3Client = new S3Client({
         region: options.region,
         endpoint: options.s3Endpoint ?? options.endpoint,
@@ -188,8 +188,8 @@ export class DynamoArticleRepository implements ArticleRepository {
     }
 
     const item = response.Item as DynamoArticleItem;
-    const payload = await this.loadPayload(item);
-    return mapItemToArticle(item, payload);
+    const asset = await this.loadAsset(item);
+    return mapItemToArticle(item, asset);
   }
 
   private filterArticles(
@@ -292,15 +292,15 @@ export class DynamoArticleRepository implements ArticleRepository {
     return Array.from(suggestions).slice(0, limit);
   }
 
-  private async loadPayload(item: DynamoArticleItem): Promise<ArticlePayloadData | undefined> {
-    if (!this.s3Client || !this.payloadBucket) return undefined;
-    const key = item.payload_key ?? this.extractKeyFromUrl(item.payload_url);
+  private async loadAsset(item: DynamoArticleItem): Promise<ArticleAssetData | undefined> {
+    if (!this.s3Client || !this.assetBucket) return undefined;
+    const key = item.asset_key ?? this.extractKeyFromUrl(item.asset_url);
     if (!key) return undefined;
 
     try {
       const response = await this.s3Client.send(
         new GetObjectCommand({
-          Bucket: this.payloadBucket,
+          Bucket: this.assetBucket,
           Key: key,
         }),
       );
@@ -309,19 +309,19 @@ export class DynamoArticleRepository implements ArticleRepository {
       }
       const raw = await streamToString(response.Body);
       if (!raw) return undefined;
-      return JSON.parse(raw) as ArticlePayloadData;
+      return JSON.parse(raw) as ArticleAssetData;
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.log("bucket key", this.payloadBucket, key);
-      console.warn("Failed to load payload", { article: item.PK, error });
+      console.log("bucket key", this.assetBucket, key);
+      console.warn("Failed to load asset", { article: item.PK, error });
       return undefined;
     }
   }
 
-  private extractKeyFromUrl(payloadUrl?: string): string | undefined {
-    if (!payloadUrl) return undefined;
+  private extractKeyFromUrl(assetUrl?: string): string | undefined {
+    if (!assetUrl) return undefined;
     try {
-      const parsed = new URL(payloadUrl);
+      const parsed = new URL(assetUrl);
       const pathname = parsed.pathname.replace(/^\/+/, "");
       if (!pathname) return undefined;
 
@@ -332,7 +332,7 @@ export class DynamoArticleRepository implements ArticleRepository {
 
       const [bucketFromPath, ...rest] = pathname.split("/");
       if (rest.length === 0) return undefined;
-      if (this.payloadBucket && bucketFromPath === this.payloadBucket) {
+      if (this.assetBucket && bucketFromPath === this.assetBucket) {
         return rest.join("/");
       }
       return rest.join("/");
