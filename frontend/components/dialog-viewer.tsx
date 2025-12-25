@@ -164,7 +164,7 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
   const [selectedSpeaker, setSelectedSpeaker] = useState<string>("all")
   const [selectedGroup, setSelectedGroup] = useState<string>("all")
   const [selectedReaction, setSelectedReaction] = useState<ViewerReaction | "all">("all")
-  const [viewMode, setViewMode] = useState<"original" | "soft_summary" | "summary">("soft_summary")
+  const [viewMode, setViewMode] = useState<"original" | "soft_summary" | "summary">("summary")
   const [expandedDialogs, setExpandedDialogs] = useState<Set<number>>(new Set())
   const [hasHydrated, setHasHydrated] = useState(false)
   const [originalTextVisible, setOriginalTextVisible] = useState<Set<number>>(new Set())
