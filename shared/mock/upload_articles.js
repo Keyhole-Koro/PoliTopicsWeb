@@ -10,17 +10,18 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  CreateTableCommand,
-  DescribeTableCommand,
   DynamoDBClient,
 } from "@aws-sdk/client-dynamodb";
 import {
-  CreateBucketCommand,
-  HeadBucketCommand,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
-import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  BatchWriteCommand,
+  DynamoDBDocumentClient,
+  PutCommand,
+  ScanCommand,
+} from "@aws-sdk/lib-dynamodb";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,7 +29,7 @@ const __dirname = path.dirname(__filename);
 const DEFAULTS = {
   tableName: "politopics-local",
   region: "ap-northeast-3",
-  endpoint: "http://localhost:4569",
+  endpoint: "http://localstack:4566",
   s3Endpoint: undefined,
   bucketName: "politopics-articles-local",
   accessKeyId: "test",
@@ -75,78 +76,6 @@ function loadConfig(cli) {
     secretAccessKey: "test",
     articlesPath: path.resolve(cli.file || DEFAULTS.articlesPath),
   };
-}
-
-async function ensureTable(client, tableName) {
-  try {
-    await client.send(new DescribeTableCommand({ TableName: tableName }));
-    return;
-  } catch (error) {
-    if (error?.name !== "ResourceNotFoundException") {
-      throw error;
-    }
-  }
-
-  await client.send(
-    new CreateTableCommand({
-      TableName: tableName,
-      BillingMode: "PAY_PER_REQUEST",
-      AttributeDefinitions: [
-        { AttributeName: "PK", AttributeType: "S" },
-        { AttributeName: "SK", AttributeType: "S" },
-        { AttributeName: "GSI1PK", AttributeType: "S" },
-        { AttributeName: "GSI1SK", AttributeType: "S" },
-        { AttributeName: "GSI2PK", AttributeType: "S" },
-        { AttributeName: "GSI2SK", AttributeType: "S" },
-      ],
-      KeySchema: [
-        { AttributeName: "PK", KeyType: "HASH" },
-        { AttributeName: "SK", KeyType: "RANGE" },
-      ],
-      GlobalSecondaryIndexes: [
-        {
-          IndexName: "ArticleByDate",
-          KeySchema: [
-            { AttributeName: "GSI1PK", KeyType: "HASH" },
-            { AttributeName: "GSI1SK", KeyType: "RANGE" },
-          ],
-          Projection: { ProjectionType: "ALL" },
-        },
-        {
-          IndexName: "MonthDateIndex",
-          KeySchema: [
-            { AttributeName: "GSI2PK", KeyType: "HASH" },
-            { AttributeName: "GSI2SK", KeyType: "RANGE" },
-          ],
-          Projection: { ProjectionType: "ALL" },
-        },
-      ],
-    }),
-  );
-  await waitForTable(client, tableName);
-}
-
-async function ensureBucket(s3Client, bucket, region) {
-  try {
-    await s3Client.send(
-      new HeadBucketCommand({
-        Bucket: bucket,
-      }),
-    );
-    return;
-  } catch (error) {
-    const statusCode = error?.$metadata?.httpStatusCode;
-    if (statusCode && statusCode !== 404) {
-      throw error;
-    }
-  }
-
-  await s3Client.send(
-    new CreateBucketCommand({
-      Bucket: bucket,
-      ...(region === "us-east-1" ? {} : { CreateBucketConfiguration: { LocationConstraint: region } }),
-    }),
-  );
 }
 
 function loadArticles(filePath) {
@@ -276,6 +205,53 @@ async function putItems(docClient, tableName, articles, s3Client, bucketName, as
   return count;
 }
 
+function chunkItems(items, size) {
+  const batches = [];
+  for (let i = 0; i < items.length; i += size) {
+    batches.push(items.slice(i, i + size));
+  }
+  return batches;
+}
+
+async function deleteAllItems(docClient, tableName) {
+  let deleted = 0;
+  let lastKey = undefined;
+
+  do {
+    const response = await docClient.send(
+      new ScanCommand({
+        TableName: tableName,
+        ProjectionExpression: "PK, SK",
+        ExclusiveStartKey: lastKey,
+      }),
+    );
+
+    const keys = (response.Items ?? []).map((item) => ({
+      DeleteRequest: {
+        Key: {
+          PK: item.PK,
+          SK: item.SK,
+        },
+      },
+    }));
+
+    for (const batch of chunkItems(keys, 25)) {
+      await docClient.send(
+        new BatchWriteCommand({
+          RequestItems: {
+            [tableName]: batch,
+          },
+        }),
+      );
+      deleted += batch.length;
+    }
+
+    lastKey = response.LastEvaluatedKey;
+  } while (lastKey);
+
+  console.log(`Deleted ${deleted} items from ${tableName}.`);
+}
+
 async function main() {
   const cli = parseArgs();
   const config = loadConfig(cli);
@@ -302,8 +278,8 @@ async function main() {
     },
   });
 
-  await ensureTable(client, config.tableName);
-  await ensureBucket(s3Client, config.bucketName, config.region);
+  await deleteAllItems(docClient, config.tableName);
+
   const articles = loadArticles(config.articlesPath);
   const total = await putItems(docClient, config.tableName, articles, s3Client, config.bucketName, {
     bucket: config.bucketName,
