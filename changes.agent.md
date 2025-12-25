@@ -41,3 +41,14 @@ Details:
     - Updated `mapItemToArticle` call to use `asset`.
     - Changed return type cast to `ArticleAssetData`.
     - Updated log message from "Failed to load payload" to "Failed to load asset".
+
+Agent: Gemini
+Date/Time: 2025-12-24 12:10 JST
+Keywords: terraform, variable-renaming, payload, asset
+Topic: Rename payload bucket variables to asset url bucket in Terraform
+Details:
+- Renamed `payload_bucket_name` to `asset_url_bucket_name` and `payload_bucket_arn` to `asset_url_bucket_arn` in `terraform/service/lambda/variables.tf`.
+- Updated references in `terraform/service/lambda/main.tf` to use the new variable names.
+- Files changed:
+  - `terraform/service/lambda/variables.tf`
+  - `terraform/service/lambda/main.tf`

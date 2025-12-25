@@ -5,7 +5,7 @@
   "workspaces": ["frontend", "backend"],
   "scripts": {
     "dev": "bash -c 'npm run dev:backend & npm run dev:frontend'",
-    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:frontend": "npm --prefix frontend run dev:local",
     "build:frontend": "npm --prefix frontend run build",
     "lint:frontend": "npm --prefix frontend run lint",
     "dev:backend": "npm --prefix backend run dev",

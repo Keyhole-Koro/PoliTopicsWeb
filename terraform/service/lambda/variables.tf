@@ -44,12 +44,12 @@ variable "table_arn" {
   type        = string
 }
 
-variable "payload_bucket_name" {
+variable "asset_url_bucket_name" {
   description = "Article payload bucket name"
   type        = string
 }
 
-variable "payload_bucket_arn" {
+variable "asset_url_bucket_arn" {
   description = "Article payload bucket ARN"
   type        = string
 }

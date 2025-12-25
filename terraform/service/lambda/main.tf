@@ -34,7 +34,7 @@ data "aws_iam_policy_document" "backend_data_access" {
       "s3:GetObject"
     ]
 
-    resources = ["${var.payload_bucket_arn}/*"]
+    resources = ["${var.asset_url_bucket_arn}/*"]
   }
 }
 
@@ -73,7 +73,7 @@ resource "aws_lambda_function" "backend" {
   environment {
     variables = {
       POLITOPICS_TABLE          = var.table_name
-      POLITOPICS_ARTICLE_BUCKET = var.payload_bucket_name
+      POLITOPICS_ARTICLE_BUCKET = var.asset_url_bucket_name
       ENV                       = var.environment
     }
   }
