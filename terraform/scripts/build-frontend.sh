@@ -9,5 +9,19 @@ cd "$REPO_ROOT"
 echo "[build-frontend] Cleaning previous Next.js output"
 rm -rf frontend/.next frontend/out
 
-echo "[build-frontend] Running npm run build:frontend from $REPO_ROOT"
-npm run build:frontend
+TARGET_ENV="${FRONTEND_BUILD_ENV:-localstack}"
+if [[ "$TARGET_ENV" == "localstack" ]]; then
+  TARGET_ENV="local"
+fi
+
+case "$TARGET_ENV" in
+  local|stage|prod)
+    ;;
+  *)
+    echo "[build-frontend] Unknown FRONTEND_BUILD_ENV: $TARGET_ENV" >&2
+    exit 1
+    ;;
+esac
+
+echo "[build-frontend] Running npm --prefix frontend run build:${TARGET_ENV} from $REPO_ROOT"
+npm --prefix frontend run "build:${TARGET_ENV}"

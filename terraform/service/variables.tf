@@ -55,6 +55,18 @@ variable "lambda_description" {
   type        = string
 }
 
+variable "api_custom_domain_name" {
+  description = "Custom domain name for the API Gateway (e.g. api.example.com)"
+  type        = string
+  default     = null
+}
+
+variable "api_custom_domain_certificate_arn" {
+  description = "ACM certificate ARN for the API Gateway custom domain"
+  type        = string
+  default     = null
+}
+
 variable "use_http_api" {
   description = "Toggle between API Gateway HTTP API and REST API resources"
   type        = bool

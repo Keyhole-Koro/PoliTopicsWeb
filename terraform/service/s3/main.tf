@@ -70,6 +70,9 @@ resource "null_resource" "build_frontend" {
     command     = "${path.module}/../../scripts/build-frontend.sh"
     working_dir = "${path.module}/../.."
     interpreter = ["/bin/bash", "-c"]
+    environment = {
+      FRONTEND_BUILD_ENV = var.environment
+    }
   }
 
   triggers = {

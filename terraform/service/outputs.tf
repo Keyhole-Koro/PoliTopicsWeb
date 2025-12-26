@@ -16,3 +16,7 @@ output "article_table" {
 output "backend_api_url" {
   value = module.lambda.api_url
 }
+
+output "backend_api_custom_domain_name" {
+  value = module.lambda.api_custom_domain_name
+}

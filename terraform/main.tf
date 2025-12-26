@@ -29,6 +29,8 @@ module "service" {
   lambda_name        = local.lambda_name
   api_name           = local.api_name
   lambda_description = local.lambda_description
+  api_custom_domain_name = var.api_custom_domain_name
+  api_custom_domain_certificate_arn = var.api_custom_domain_certificate_arn
 
   use_http_api = var.use_http_api
 

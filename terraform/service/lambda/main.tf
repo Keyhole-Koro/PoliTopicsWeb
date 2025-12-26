@@ -38,6 +38,12 @@ data "aws_iam_policy_document" "backend_data_access" {
   }
 }
 
+locals {
+  enable_custom_domain       = var.api_custom_domain_name != null && var.api_custom_domain_name != "" && var.api_custom_domain_certificate_arn != null && var.api_custom_domain_certificate_arn != ""
+  rest_api_enabled           = var.use_http_api ? {} : { current = true }
+  rest_custom_domain_enabled = (!var.use_http_api && local.enable_custom_domain) ? { current = true } : {}
+}
+
 resource "aws_iam_role" "backend_lambda" {
   name               = "${var.lambda_name}-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
@@ -128,9 +134,30 @@ resource "aws_apigatewayv2_stage" "backend" {
   }
 }
 
+resource "aws_apigatewayv2_domain_name" "backend" {
+  count       = var.use_http_api && local.enable_custom_domain ? 1 : 0
+  domain_name = var.api_custom_domain_name
+
+  domain_name_configuration {
+    certificate_arn = var.api_custom_domain_certificate_arn
+    endpoint_type   = "REGIONAL"
+    security_policy = "TLS_1_2"
+  }
+
+  tags = {
+    Environment = var.environment
+  }
+}
+
+resource "aws_apigatewayv2_api_mapping" "backend" {
+  count       = var.use_http_api && local.enable_custom_domain ? 1 : 0
+  api_id      = aws_apigatewayv2_api.backend[0].id
+  domain_name = aws_apigatewayv2_domain_name.backend[0].id
+  stage       = aws_apigatewayv2_stage.backend[0].name
+}
+
 resource "aws_api_gateway_rest_api" "backend" {
-  # use api gateway v1 instead of v2 because of free tier limitations
-  count       = var.use_http_api ? 0 : 1
+  for_each    = local.rest_api_enabled
   name        = var.api_name
   description = var.lambda_description
 
@@ -144,56 +171,56 @@ resource "aws_api_gateway_rest_api" "backend" {
 }
 
 resource "aws_api_gateway_method" "backend_root" {
-  count         = var.use_http_api ? 0 : 1
-  rest_api_id   = aws_api_gateway_rest_api.backend[0].id
-  resource_id   = aws_api_gateway_rest_api.backend[0].root_resource_id
+  for_each      = local.rest_api_enabled
+  rest_api_id   = aws_api_gateway_rest_api.backend[each.key].id
+  resource_id   = aws_api_gateway_rest_api.backend[each.key].root_resource_id
   http_method   = "ANY"
   authorization = "NONE"
 }
 
 resource "aws_api_gateway_integration" "backend_root" {
-  count                   = var.use_http_api ? 0 : 1
-  rest_api_id             = aws_api_gateway_rest_api.backend[0].id
-  resource_id             = aws_api_gateway_rest_api.backend[0].root_resource_id
-  http_method             = aws_api_gateway_method.backend_root[0].http_method
+  for_each                = local.rest_api_enabled
+  rest_api_id             = aws_api_gateway_rest_api.backend[each.key].id
+  resource_id             = aws_api_gateway_rest_api.backend[each.key].root_resource_id
+  http_method             = aws_api_gateway_method.backend_root[each.key].http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${aws_lambda_function.backend.arn}/invocations"
 }
 
 resource "aws_api_gateway_resource" "backend_proxy" {
-  count       = var.use_http_api ? 0 : 1
-  rest_api_id = aws_api_gateway_rest_api.backend[0].id
-  parent_id   = aws_api_gateway_rest_api.backend[0].root_resource_id
+  for_each    = local.rest_api_enabled
+  rest_api_id = aws_api_gateway_rest_api.backend[each.key].id
+  parent_id   = aws_api_gateway_rest_api.backend[each.key].root_resource_id
   path_part   = "{proxy+}"
 }
 
 resource "aws_api_gateway_method" "backend_proxy" {
-  count         = var.use_http_api ? 0 : 1
-  rest_api_id   = aws_api_gateway_rest_api.backend[0].id
-  resource_id   = aws_api_gateway_resource.backend_proxy[0].id
+  for_each      = local.rest_api_enabled
+  rest_api_id   = aws_api_gateway_rest_api.backend[each.key].id
+  resource_id   = aws_api_gateway_resource.backend_proxy[each.key].id
   http_method   = "ANY"
   authorization = "NONE"
 }
 
 resource "aws_api_gateway_integration" "backend_proxy" {
-  count                   = var.use_http_api ? 0 : 1
-  rest_api_id             = aws_api_gateway_rest_api.backend[0].id
-  resource_id             = aws_api_gateway_resource.backend_proxy[0].id
-  http_method             = aws_api_gateway_method.backend_proxy[0].http_method
+  for_each                = local.rest_api_enabled
+  rest_api_id             = aws_api_gateway_rest_api.backend[each.key].id
+  resource_id             = aws_api_gateway_resource.backend_proxy[each.key].id
+  http_method             = aws_api_gateway_method.backend_proxy[each.key].http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${aws_lambda_function.backend.arn}/invocations"
 }
 
 resource "aws_api_gateway_deployment" "backend" {
-  count       = var.use_http_api ? 0 : 1
-  rest_api_id = aws_api_gateway_rest_api.backend[0].id
+  for_each    = local.rest_api_enabled
+  rest_api_id = aws_api_gateway_rest_api.backend[each.key].id
 
   triggers = {
     redeployment = sha1(jsonencode({
-      root_integration  = aws_api_gateway_integration.backend_root[0].id
-      proxy_integration = aws_api_gateway_integration.backend_proxy[0].id
+      root_integration  = aws_api_gateway_integration.backend_root[each.key].id
+      proxy_integration = aws_api_gateway_integration.backend_proxy[each.key].id
     }))
   }
 
@@ -204,14 +231,37 @@ resource "aws_api_gateway_deployment" "backend" {
 }
 
 resource "aws_api_gateway_stage" "backend" {
-  count         = var.use_http_api ? 0 : 1
-  rest_api_id   = aws_api_gateway_rest_api.backend[0].id
-  deployment_id = aws_api_gateway_deployment.backend[0].id
+  for_each      = local.rest_api_enabled
+  rest_api_id   = aws_api_gateway_rest_api.backend[each.key].id
+  deployment_id = aws_api_gateway_deployment.backend[each.key].id
   stage_name    = var.environment
 
   tags = {
     Environment = var.environment
   }
+}
+
+resource "aws_api_gateway_domain_name" "backend" {
+  for_each    = local.rest_custom_domain_enabled
+  domain_name = var.api_custom_domain_name
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+
+  regional_certificate_arn = var.api_custom_domain_certificate_arn
+  security_policy          = "TLS_1_2"
+
+  tags = {
+    Environment = var.environment
+  }
+}
+
+resource "aws_api_gateway_base_path_mapping" "backend" {
+  for_each    = local.rest_custom_domain_enabled
+  api_id      = aws_api_gateway_rest_api.backend[each.key].id
+  stage_name  = aws_api_gateway_stage.backend[each.key].stage_name
+  domain_name = aws_api_gateway_domain_name.backend[each.key].domain_name
 }
 
 resource "aws_lambda_permission" "backend_invoke_http" {
@@ -224,10 +274,10 @@ resource "aws_lambda_permission" "backend_invoke_http" {
 }
 
 resource "aws_lambda_permission" "backend_invoke_rest" {
-  count         = var.use_http_api ? 0 : 1
+  for_each      = local.rest_api_enabled
   statement_id  = "AllowExecutionFromRestApi-${var.environment}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.backend.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.backend[0].execution_arn}/*/*"
+  source_arn    = "${aws_api_gateway_rest_api.backend[each.key].execution_arn}/*/*"
 }

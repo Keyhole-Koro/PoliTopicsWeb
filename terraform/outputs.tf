@@ -17,3 +17,8 @@ output "backend_api_url" {
   description = "Invoke URL for the backend HTTP API"
   value       = module.service.backend_api_url
 }
+
+output "backend_api_custom_domain_name" {
+  description = "Custom domain name for the backend API (when configured)"
+  value       = module.service.backend_api_custom_domain_name
+}

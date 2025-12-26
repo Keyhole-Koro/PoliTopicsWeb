@@ -191,6 +191,14 @@ run_import() {
       echo "skip   -> $address (missing remote object)"
       return
     fi
+    if echo "$import_output" | grep -q "Configuration for import target does not exist"; then
+      echo "skip   -> $address (missing configuration)"
+      return
+    fi
+    if echo "$import_output" | grep -q "couldn't find resource"; then
+      echo "skip   -> $address (missing resource)"
+      return
+    fi
     echo "$import_output" >&2
     exit "$import_status"
   fi
@@ -216,7 +224,7 @@ fi
 
 echo "Importing DynamoDB resources for ${ARTICLES_TABLE}..."
 DDB_MOD="module.service.module.dynamodb"
-run_import "$DDB_MOD.aws_dynamodb_table.politopics[0]" "$ARTICLES_TABLE"
+run_import "$DDB_MOD.aws_dynamodb_table.politopics" "$ARTICLES_TABLE"
 
 echo "Importing Lambda IAM role and policies for ${LAMBDA_NAME}..."
 LAMBDA_MOD="module.service.module.lambda"

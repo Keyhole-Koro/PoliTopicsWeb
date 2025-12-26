@@ -28,6 +28,8 @@ module "lambda" {
   lambda_name        = var.lambda_name
   api_name           = var.api_name
   lambda_description = var.lambda_description
+  api_custom_domain_name = var.api_custom_domain_name
+  api_custom_domain_certificate_arn = var.api_custom_domain_certificate_arn
   use_http_api       = var.use_http_api
 
   table_name = module.dynamodb.table.name

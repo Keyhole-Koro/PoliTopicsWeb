@@ -3,7 +3,6 @@ locals {
 }
 
 resource "aws_dynamodb_table" "politopics" {
-  count        = var.create_dynamodb_table ? 1 : 0
   name         = var.table_name
   billing_mode = "PAY_PER_REQUEST"
 
@@ -55,10 +54,4 @@ resource "aws_dynamodb_table" "politopics" {
   }
 
   tags = local.tags
-}
-
-data "aws_dynamodb_table" "politopics" {
-  count      = var.create_dynamodb_table ? 0 : 1
-  name       = var.table_name
-  depends_on = [aws_dynamodb_table.politopics]
 }
