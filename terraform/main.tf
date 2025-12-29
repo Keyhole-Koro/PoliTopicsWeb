@@ -23,6 +23,10 @@ module "service" {
   frontend_bucket        = local.frontend_bucket
   frontend_public_enabled = var.frontend_public_enabled
   frontend_deploy_enabled = var.frontend_deploy_enabled
+  frontend_r2_endpoint_url = var.frontend_r2_endpoint_url
+  frontend_r2_region       = var.frontend_r2_region
+  frontend_r2_access_key_id = var.frontend_r2_access_key_id
+  frontend_r2_secret_access_key = var.frontend_r2_secret_access_key
   articles_table         = local.articles_table
   article_asset_url_bucket = local.article_asset_url_bucket
 

@@ -108,3 +108,57 @@ Details:
   - `PoliTopicsWeb/terraform/scripts/build-frontend.sh`
   - `PoliTopicsWeb/terraform/service/s3/main.tf`
   - `PoliTopicsWeb/frontend/package.json`
+
+Agent: Codex
+Date/Time: 2025-12-26 11:34 JST
+Keywords: terraform, r2, frontend
+Topic: Route SPA storage/uploads to Cloudflare R2
+Details:
+- Added R2 configuration options and wiring for the frontend SPA bucket.
+- Skipped AWS S3 frontend bucket resources and imports when R2 is enabled.
+- Added R2-aware endpoint usage for frontend uploads.
+- Files changed:
+  - `PoliTopicsWeb/terraform/variables.tf`
+  - `PoliTopicsWeb/terraform/main.tf`
+  - `PoliTopicsWeb/terraform/service/variables.tf`
+  - `PoliTopicsWeb/terraform/service/main.tf`
+  - `PoliTopicsWeb/terraform/service/s3/variables.tf`
+  - `PoliTopicsWeb/terraform/service/s3/main.tf`
+  - `PoliTopicsWeb/terraform/service/s3/outputs.tf`
+  - `PoliTopicsWeb/terraform/scripts/import_all.sh`
+  - `PoliTopicsWeb/terraform/scripts/upload-frontend.sh`
+  - `PoliTopicsWeb/terraform/tfvars/prod.tfvars`
+
+### Changes After Review
+- Removed the R2 toggle and always use R2 for frontend uploads.
+- Set the prod frontend bucket to `politopics.net`.
+- Updated import/upload scripts for R2-only behavior.
+- Files changed:
+  - `PoliTopicsWeb/terraform/variables.tf`
+  - `PoliTopicsWeb/terraform/main.tf`
+  - `PoliTopicsWeb/terraform/service/variables.tf`
+  - `PoliTopicsWeb/terraform/service/main.tf`
+  - `PoliTopicsWeb/terraform/service/s3/variables.tf`
+  - `PoliTopicsWeb/terraform/service/s3/main.tf`
+  - `PoliTopicsWeb/terraform/service/s3/outputs.tf`
+  - `PoliTopicsWeb/terraform/scripts/import_all.sh`
+  - `PoliTopicsWeb/terraform/scripts/upload-frontend.sh`
+  - `PoliTopicsWeb/terraform/tfvars/prod.tfvars`
+
+Agent: Codex
+Date/Time: 2025-12-28 08:37 UTC
+Keywords: frontend, terraform, cloudflare r2, github actions, api base url
+Topic: Frontend hosting split (LocalStack S3 vs R2) and CI workflow
+Details:
+- Limited Terraform-driven SPA upload to local/localstack only; stage/prod no longer deploy via Terraform and will use Cloudflare R2.
+- Added GitHub Actions workflow `deploy-frontend.yml` to build frontend with `NEXT_PUBLIC_API_BASE_URL` from Terraform output and sync to R2 (secrets required).
+- Updated tfvars to disable frontend deploy in stage/prod and enable for localstack; created local S3 bucket when hosting locally.
+- Updated root README with hosting/deploy notes and workflow pointer.
+- Files changed:
+  - `.github/workflows/deploy-frontend.yml`
+  - `PoliTopicsWeb/terraform/service/s3/main.tf`
+  - `PoliTopicsWeb/terraform/service/s3/outputs.tf`
+  - `PoliTopicsWeb/terraform/tfvars/localstack.tfvars`
+  - `PoliTopicsWeb/terraform/tfvars/stage.tfvars`
+  - `PoliTopicsWeb/terraform/tfvars/prod.tfvars`
+  - `README.md`

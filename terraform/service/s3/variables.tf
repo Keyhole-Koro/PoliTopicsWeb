@@ -20,6 +20,32 @@ variable "frontend_deploy_enabled" {
   default     = false
 }
 
+variable "frontend_r2_endpoint_url" {
+  description = "Cloudflare R2 S3-compatible endpoint"
+  type        = string
+  default     = null
+}
+
+variable "frontend_r2_region" {
+  description = "Region for R2 S3-compatible API"
+  type        = string
+  default     = "auto"
+}
+
+variable "frontend_r2_access_key_id" {
+  description = "R2 access key ID used for uploads"
+  type        = string
+  default     = null
+  sensitive   = true
+}
+
+variable "frontend_r2_secret_access_key" {
+  description = "R2 secret access key used for uploads"
+  type        = string
+  default     = null
+  sensitive   = true
+}
+
 variable "article_asset_url_bucket" {
   description = "Existing S3 bucket with article assets"
   type        = string

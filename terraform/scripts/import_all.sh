@@ -205,21 +205,13 @@ run_import() {
   echo "$import_output"
 }
 
-echo "Importing existing frontend bucket resources for ${ENVIRONMENT}..."
-
+echo "Skipping frontend S3 imports (frontend uses R2)."
 S3_MOD="module.service.module.s3"
-
-run_import "$S3_MOD.aws_s3_bucket.frontend"                         "$FRONTEND_BUCKET"
-run_import "$S3_MOD.aws_s3_bucket_public_access_block.frontend"     "$FRONTEND_BUCKET"
-run_import "$S3_MOD.aws_s3_bucket_website_configuration.frontend"   "$FRONTEND_BUCKET"
-if [[ "$(echo "${FRONTEND_PUBLIC_ENABLED}" | tr '[:upper:]' '[:lower:]')" == "true" ]]; then
-  run_import "$S3_MOD.aws_s3_bucket_policy.frontend_public"           "$FRONTEND_BUCKET"
-fi
 
 IS_LOCALSTACK_LOWER="$(echo "${IS_LOCALSTACK}" | tr '[:upper:]' '[:lower:]')"
 
 if [[ "$ENVIRONMENT_NAME" == "local" || "$ENVIRONMENT_NAME" == "localstack" || "$IS_LOCALSTACK_LOWER" == "true" ]]; then
-  run_import "$S3_MOD.aws_s3_bucket.article_asset_url[0]" "$ARTICLE_ASSET_URL_BUCKET"
+  run_import "$S3_MOD.aws_s3_bucket.article_asset_url[\"current\"]" "$ARTICLE_ASSET_URL_BUCKET"
 fi
 
 echo "Importing DynamoDB resources for ${ARTICLES_TABLE}..."

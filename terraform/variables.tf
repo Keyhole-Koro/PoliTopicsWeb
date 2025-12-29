@@ -34,6 +34,37 @@ variable "frontend_deploy_enabled" {
   default     = false
 }
 
+variable "frontend_r2_endpoint_url" {
+  description = "Cloudflare R2 S3-compatible endpoint (e.g. https://<accountid>.r2.cloudflarestorage.com)"
+  type        = string
+  default     = null
+
+  validation {
+    condition     = !var.frontend_deploy_enabled || (var.frontend_r2_endpoint_url != null && var.frontend_r2_endpoint_url != "")
+    error_message = "frontend_r2_endpoint_url must be set when frontend_deploy_enabled is true."
+  }
+}
+
+variable "frontend_r2_region" {
+  description = "Region for R2 S3-compatible API (use \"auto\" unless you have a specific requirement)"
+  type        = string
+  default     = "auto"
+}
+
+variable "frontend_r2_access_key_id" {
+  description = "R2 access key ID used for uploads"
+  type        = string
+  default     = null
+  sensitive   = true
+}
+
+variable "frontend_r2_secret_access_key" {
+  description = "R2 secret access key used for uploads"
+  type        = string
+  default     = null
+  sensitive   = true
+}
+
 variable "articles_table" {
   description = "Existing DynamoDB table backing this environment"
   type        = string

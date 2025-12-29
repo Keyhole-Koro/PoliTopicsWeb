@@ -5,7 +5,7 @@ frontend_bucket         = "politopics-frontend-stage"
 articles_table          = "politopics-stage"
 article_asset_url_bucket  = "politopics-articles-stage"
 frontend_public_enabled = true
-frontend_deploy_enabled = true
+frontend_deploy_enabled = false
 
 lambda_name        = "politopics-backend-stage"
 api_name           = "politopics-api-stage"

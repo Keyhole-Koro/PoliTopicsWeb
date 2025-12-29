@@ -1,8 +1,5 @@
 output "frontend_bucket" {
-  value = {
-    name    = aws_s3_bucket.frontend.bucket
-    website = aws_s3_bucket_website_configuration.frontend.website_endpoint
-  }
+  value = local.frontend_bucket_output
 }
 
 output "article_asset_url_bucket" {

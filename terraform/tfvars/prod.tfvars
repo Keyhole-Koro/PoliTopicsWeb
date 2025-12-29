@@ -1,11 +1,12 @@
 region      = "ap-northeast-3"
 environment = "prod"
 
-frontend_bucket          = "politopics-frontend-prod"
+frontend_bucket          = "politopics.net"
 articles_table           = "politopics-prod"
 article_asset_url_bucket = "politopics-articles-prod"
 frontend_public_enabled  = true
-frontend_deploy_enabled  = true
+frontend_deploy_enabled  = false
+frontend_r2_endpoint_url = "https://REPLACE_WITH_ACCOUNT_ID.r2.cloudflarestorage.com"
 
 lambda_name                       = "politopics-backend-prod"
 api_name                          = "politopics-api-prod"

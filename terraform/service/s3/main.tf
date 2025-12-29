@@ -1,48 +1,20 @@
-resource "aws_s3_bucket" "frontend" {
-  bucket = var.frontend_bucket
-
-  tags = {
-    Environment = var.environment
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "frontend" {
-  bucket = aws_s3_bucket.frontend.id
-
-  block_public_acls       = var.frontend_public_enabled ? false : true
-  block_public_policy     = var.frontend_public_enabled ? false : true
-  ignore_public_acls      = var.frontend_public_enabled ? false : true
-  restrict_public_buckets = var.frontend_public_enabled ? false : true
-}
-
-resource "aws_s3_bucket_website_configuration" "frontend" {
-  bucket = aws_s3_bucket.frontend.id
-
-  index_document {
-    suffix = "index.html"
-  }
-
-  error_document {
-    key = "index.html"
-  }
-}
-
-resource "aws_s3_bucket_policy" "frontend_public" {
-  count  = var.frontend_public_enabled ? 1 : 0
-  bucket = aws_s3_bucket.frontend.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid       = "AllowPublicRead"
-        Effect    = "Allow"
-        Principal = "*"
-        Action    = "s3:GetObject"
-        Resource  = "${aws_s3_bucket.frontend.arn}/*"
-      }
-    ]
-  })
+locals {
+  article_asset_enabled   = var.is_localstack ? { current = true } : {}
+  frontend_hosting_local  = var.is_localstack || var.environment == "local" || var.environment == "localstack"
+  frontend_upload_env = merge(
+    (var.frontend_r2_endpoint_url != null && var.frontend_r2_endpoint_url != "") ? {
+      FRONTEND_S3_ENDPOINT_URL = var.frontend_r2_endpoint_url
+    } : {},
+    (var.frontend_r2_region != null && var.frontend_r2_region != "") ? {
+      FRONTEND_S3_REGION = var.frontend_r2_region
+    } : {},
+    (var.frontend_r2_access_key_id != null && var.frontend_r2_access_key_id != "") ? {
+      AWS_ACCESS_KEY_ID = var.frontend_r2_access_key_id
+    } : {},
+    (var.frontend_r2_secret_access_key != null && var.frontend_r2_secret_access_key != "") ? {
+      AWS_SECRET_ACCESS_KEY = var.frontend_r2_secret_access_key
+    } : {}
+  )
 }
 
 locals {
@@ -64,7 +36,7 @@ locals {
 }
 
 resource "null_resource" "build_frontend" {
-  for_each = var.frontend_deploy_enabled ? { current = var.frontend_bucket } : {}
+  for_each = (var.frontend_deploy_enabled && local.frontend_hosting_local) ? { current = var.frontend_bucket } : {}
 
   provisioner "local-exec" {
     command     = "${path.module}/../../scripts/build-frontend.sh"
@@ -83,17 +55,14 @@ resource "null_resource" "build_frontend" {
 }
 
 resource "null_resource" "upload_frontend" {
-  for_each = var.frontend_deploy_enabled ? { current = var.frontend_bucket } : {}
-
-  depends_on = [
-    aws_s3_bucket.frontend,
-    null_resource.build_frontend["current"]
-  ]
+  for_each  = (var.frontend_deploy_enabled && local.frontend_hosting_local) ? { current = var.frontend_bucket } : {}
+  depends_on = [null_resource.build_frontend["current"]]
 
   provisioner "local-exec" {
     command     = "${path.module}/../../scripts/upload-frontend.sh ${each.value}"
     working_dir = "${path.module}/../.."
     interpreter = ["/bin/bash", "-c"]
+    environment = local.frontend_upload_env
   }
 
   triggers = {
@@ -104,8 +73,18 @@ resource "null_resource" "upload_frontend" {
 }
 
 resource "aws_s3_bucket" "article_asset_url" {
-  count  = var.is_localstack ? 1 : 0
-  bucket = var.article_asset_url_bucket
+  for_each = local.article_asset_enabled
+  bucket   = var.article_asset_url_bucket
+
+  tags = {
+    Environment = var.environment
+  }
+}
+
+resource "aws_s3_bucket" "frontend" {
+  count         = local.frontend_hosting_local ? 1 : 0
+  bucket        = var.frontend_bucket
+  force_destroy = true
 
   tags = {
     Environment = var.environment
@@ -113,10 +92,20 @@ resource "aws_s3_bucket" "article_asset_url" {
 }
 
 locals {
+  frontend_bucket_output = local.frontend_hosting_local && length(aws_s3_bucket.frontend) > 0 ? {
+    name    = aws_s3_bucket.frontend[0].bucket
+    website = null
+  } : {
+    name    = var.frontend_bucket
+    website = null
+  }
+}
+
+locals {
   article_asset_url_bucket = var.is_localstack ? {
-    name = aws_s3_bucket.article_asset_url[0].bucket
-    arn  = aws_s3_bucket.article_asset_url[0].arn
-    id   = aws_s3_bucket.article_asset_url[0].id
+    name = aws_s3_bucket.article_asset_url["current"].bucket
+    arn  = aws_s3_bucket.article_asset_url["current"].arn
+    id   = aws_s3_bucket.article_asset_url["current"].id
   } : {
     name = var.article_asset_url_bucket
     arn  = "arn:aws:s3:::${var.article_asset_url_bucket}"
