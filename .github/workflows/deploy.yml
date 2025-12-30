@@ -16,15 +16,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment:
-      name: ${{ startsWith(github.ref, 'refs/heads/prod') && 'production' || 'stage' }}
+      name: ${{ startsWith(github.ref, 'refs/heads/prod') && 'prod' || 'stage' }}
     permissions:
       contents: read
       id-token: write
     env:
       AWS_REGION: ${{ vars.AWS_REGION || 'ap-northeast-3' }}
       AWS_ROLE_TO_ASSUME: ${{ startsWith(github.ref, 'refs/heads/prod') && secrets.PROD_ROLE_TO_ASSUME || secrets.STAGE_ROLE_TO_ASSUME }}
-      TF_VARS_FILE: ${{ startsWith(github.ref, 'refs/heads/prod') && 'production.tfvars' || 'stage.tfvars' }}
-      TF_BACKEND_FILE: ${{ startsWith(github.ref, 'refs/heads/prod') && 'production.hcl' || 'stage.hcl' }}
+      TF_VARS_FILE: ${{ startsWith(github.ref, 'refs/heads/prod') && 'prod.tfvars' || 'stage.tfvars' }}
+      TF_BACKEND_FILE: ${{ startsWith(github.ref, 'refs/heads/prod') && 'prod.hcl' || 'stage.hcl' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
