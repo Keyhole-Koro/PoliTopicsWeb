@@ -63,10 +63,7 @@ You must specify the variable file (`.tfvars`) corresponding to the environment 
 **For Stage:**
 
 ```sh
-# See the execution plan
 terraform plan -var-file=tfvars/stage.tfvars -out=tfplan
-
-# Apply the changes
 terraform apply "tfplan"
 ```
 

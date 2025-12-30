@@ -1,13 +1,11 @@
 name: Deploy Frontend to R2
 
 on:
+  push:
+    branches:
+      - stage
+      - prod
   workflow_dispatch:
-    inputs:
-      environment:
-        description: "Deployment environment"
-        required: true
-        type: choice
-        options: [stage, prod]
 
 jobs:
   deploy:
