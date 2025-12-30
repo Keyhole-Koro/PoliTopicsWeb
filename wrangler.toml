@@ -10,5 +10,5 @@ r2_buckets = [{ binding = "ASSETS", bucket_name = "politopics-frontend-stage" }]
 name = "politopics-frontend-prod"
 r2_buckets = [{ binding = "ASSETS", bucket_name = "politopics-frontend-prod" }]
 routes = [
-    { pattern = "politopics.net/*", custom_domain = true}
+    { pattern = "politopics.net", custom_domain = true}
 ]
