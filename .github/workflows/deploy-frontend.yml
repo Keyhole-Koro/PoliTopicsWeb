@@ -11,7 +11,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      ENV: ${{ inputs.environment }}
+      ENV: ${{ startsWith(github.ref, 'refs/heads/prod') && 'prod' || 'stage' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
