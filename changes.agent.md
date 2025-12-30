@@ -162,3 +162,12 @@ Details:
   - `PoliTopicsWeb/terraform/tfvars/stage.tfvars`
   - `PoliTopicsWeb/terraform/tfvars/prod.tfvars`
   - `README.md`
+
+Agent: Codex
+Date/Time: 2025-12-29 12:58 JST
+Keywords: github-actions, frontend, paths
+Topic: Update frontend deploy workflow paths after move
+Details:
+- Updated workflow paths to be relative to the PoliTopicsWeb repo root after moving the workflow.
+- Files changed:
+  - `PoliTopicsWeb/.github/workflows/deploy-frontend.yml`
