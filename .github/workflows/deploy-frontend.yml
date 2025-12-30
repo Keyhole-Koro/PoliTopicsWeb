@@ -63,9 +63,6 @@ jobs:
             npm run build:prod --workspace frontend
           fi
 
-      - name: Ensure AWS CLI
-        run: sudo apt-get update && sudo apt-get install -y awscli
-
       - name: Deploy to Cloudflare R2
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
