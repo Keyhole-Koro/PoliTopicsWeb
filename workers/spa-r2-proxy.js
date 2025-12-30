@@ -1,15 +1,20 @@
 const SPA_FALLBACK = "index.html";
 
-const isHtmlPath = (path) =>
-  path.endsWith(".html") || path === "" || path === "/" || path === SPA_FALLBACK;
-
 const normalizeKey = (pathname) => {
   let key = decodeURIComponent(pathname).replace(/^\/+/, "");
-  if (!key || key.endsWith("/")) {
-    key += "index.html";
-  }
+  if (!key || key.endsWith("/")) key += "index.html";
   key = key.replace(/\.\.+/g, "");
   return key;
+};
+
+const shouldSpaFallback = (request, pathname) => {
+  if (pathname.startsWith("/_next/")) return false;
+
+  const last = pathname.split("/").pop() || "";
+  if (last.includes(".") && !last.endsWith(".html")) return false;
+
+  const accept = request.headers.get("accept") || "";
+  return accept.includes("text/html");
 };
 
 const toResponse = (object, request, pathKey, isFallback) => {
@@ -17,14 +22,13 @@ const toResponse = (object, request, pathKey, isFallback) => {
   object.writeHttpMetadata(headers);
   headers.set("etag", object.httpEtag);
 
-  if (!headers.has("content-type") && (isFallback || isHtmlPath(pathKey))) {
+  if (!headers.has("content-type") && (isFallback || pathKey.endsWith(".html"))) {
     headers.set("content-type", "text/html; charset=utf-8");
   }
 
-  const cacheControl = headers.get("cache-control");
-  if (!cacheControl) {
-    const contentType = headers.get("content-type") || "";
-    const isHtml = contentType.includes("text/html");
+  if (!headers.has("cache-control")) {
+    const ct = headers.get("content-type") || "";
+    const isHtml = ct.includes("text/html");
     headers.set(
       "cache-control",
       isHtml ? "public, max-age=0, must-revalidate" : "public, max-age=31536000, immutable"
@@ -47,14 +51,12 @@ export default {
     let object = await env.ASSETS.get(key);
     let fallback = false;
 
-    if (!object && key !== SPA_FALLBACK) {
+    if (!object && key !== SPA_FALLBACK && shouldSpaFallback(request, url.pathname)) {
       object = await env.ASSETS.get(SPA_FALLBACK);
       fallback = !!object;
     }
 
-    if (!object) {
-      return new Response("Not found", { status: 404 });
-    }
+    if (!object) return new Response("Not found", { status: 404 });
 
     return toResponse(object, request, key, fallback);
   },
