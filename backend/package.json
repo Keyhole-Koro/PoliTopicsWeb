@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
-    "build": "tsc -p tsconfig.json && node scripts/zip.mjs",
+    "build": "tsc -p tsconfig.json && node scripts/prepare-local-dist.mjs && node scripts/zip.mjs",
     "build:local": "tsc -p tsconfig.json && node scripts/prepare-local-dist.mjs && node scripts/zip.mjs",
     "seed": "ts-node src/scripts/seed-localstack.ts",
     "bootstrap:localstack": "npm run build:local && npm --prefix ../../shared/mock install && node ../../shared/mock/upload_articles.js --endpoint http://localstack:4566 --bucket politopics-articles-local"

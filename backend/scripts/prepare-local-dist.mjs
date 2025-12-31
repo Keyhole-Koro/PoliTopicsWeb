@@ -31,7 +31,7 @@ if (fs.existsSync(DIST_NODE_MODULES)) {
 }
 
 console.log("Installing production dependencies into backend/dist...")
-execSync("npm install --omit=dev --ignore-scripts --no-audit --no-fund", {
+execSync("npm ci --omit=dev --ignore-scripts --no-audit --no-fund", {
   cwd: DIST_DIR,
   stdio: "inherit",
 })
