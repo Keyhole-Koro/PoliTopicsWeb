@@ -81,6 +81,7 @@ resource "aws_lambda_function" "backend" {
       POLITOPICS_TABLE          = var.table_name
       POLITOPICS_ARTICLE_BUCKET = var.asset_url_bucket_name
       ENV                       = var.environment
+      ACTIVE_ENVIRONMENT        = var.environment
     }
   }
 

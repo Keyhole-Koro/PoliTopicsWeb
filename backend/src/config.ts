@@ -31,7 +31,14 @@ const ENVIRONMENT_DEFAULTS: Record<AppEnvironment, EnvironmentDefaults> = {
   },
 }
 
-const ACTIVE_ENVIRONMENT: AppEnvironment = "local"
+const rawEnv = process.env.ACTIVE_ENVIRONMENT
+if (!rawEnv) {
+  throw new Error("APP_ENV is not set")
+}
+if (!(VALID_ENVIRONMENTS as readonly string[]).includes(rawEnv)) {
+  throw new Error(`Invalid APP_ENV "${rawEnv}". Must be one of: ${VALID_ENVIRONMENTS.join(", ")}`)
+}
+const ACTIVE_ENVIRONMENT = rawEnv as AppEnvironment
 
 const defaults = ENVIRONMENT_DEFAULTS[ACTIVE_ENVIRONMENT]
 
