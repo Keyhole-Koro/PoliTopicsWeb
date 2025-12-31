@@ -1,77 +1,71 @@
-const SPA_FALLBACK = "index.html";
-
-const normalizeKey = (pathname) => {
-  let key = decodeURIComponent(pathname).replace(/^\/+/, "");
-  if (!key || key.endsWith("/")) key += "index.html";
-  key = key.replace(/\.\.+/g, "");
-  return key;
-};
-
-const shouldSpaFallback = (request, pathname) => {
-  if (pathname.startsWith("/_next/")) return false;
-
-  const last = pathname.split("/").pop() || "";
-  if (last.includes(".") && !last.endsWith(".html")) return false;
-
-  const accept = request.headers.get("accept") || "";
-  return accept.includes("text/html");
-};
-
-const toResponse = (object, request, pathKey, isFallback) => {
-  const headers = new Headers();
-  object.writeHttpMetadata(headers);
-  headers.set("etag", object.httpEtag);
-
-  if (!headers.has("content-type") && (isFallback || pathKey.endsWith(".html"))) {
-    headers.set("content-type", "text/html; charset=utf-8");
-  }
-
-  if (!headers.has("cache-control")) {
-    const ct = headers.get("content-type") || "";
-    const isHtml = ct.includes("text/html");
-    headers.set(
-      "cache-control",
-      isHtml ? "public, max-age=0, must-revalidate" : "public, max-age=31536000, immutable"
-    );
-  }
-
-  const body = request.method === "HEAD" ? null : object.body;
-  return new Response(body, { status: 200, headers });
-};
-
 export default {
   async fetch(request, env) {
-    if (request.method !== "GET" && request.method !== "HEAD") {
-      return new Response("Method Not Allowed", { status: 405, headers: { allow: "GET, HEAD" } });
+    const { method, url } = request;
+
+    // 1. Method Check
+    if (method !== "GET" && method !== "HEAD") {
+      return new Response("Method Not Allowed", {
+        status: 405,
+        headers: { "Allow": "GET, HEAD" },
+      });
     }
 
-    const url = new URL(request.url);
+    const parsedUrl = new URL(url);
+    const pathname = decodeURIComponent(parsedUrl.pathname);
 
-    const decodedKey = normalizeKey(url.pathname);
+    // 2. Key Normalization
+    // Remove leading slash. If root or directory, append index.html
+    let key = pathname.startsWith("/") ? pathname.slice(1) : pathname;
+    if (key === "" || key.endsWith("/")) {
+      key += "index.html";
+    }
 
-    let object = await env.ASSETS.get(decodedKey);
-    let fallback = false;
+    // 3. Fetch from R2
+    let object = await env.ASSETS.get(key);
 
+    // 4. SPA Fallback Handling
     if (!object) {
-      const encodedPath = url.pathname
-        .split("/")
-        .map((seg) => encodeURIComponent(decodeURIComponent(seg)))
-        .join("/");
-      const encodedKey = normalizeKey(encodedPath);
-      if (encodedKey !== decodedKey) {
-        object = await env.ASSETS.get(encodedKey);
+      // Avoid fallback for:
+      // - Next.js build chunks (/_next/...)
+      // - Static files with extensions (e.g. .js, .css, .png)
+      // This fixes the "SyntaxError: Unexpected token '<'" when JS chunks are missing.
+      const isNextAsset = pathname.startsWith("/_next/");
+      const hasExtension = /\.[a-zA-Z0-9]+$/.test(pathname);
+
+      if (isNextAsset || (hasExtension && !pathname.endsWith(".html"))) {
+        return new Response("Not Found", { status: 404 });
+      }
+
+      // Serve index.html for unknown routes (Client-side routing)
+      object = await env.ASSETS.get("index.html");
+
+      if (!object) {
+        return new Response("Not Found", { status: 404 });
       }
     }
 
-    if (!object && decodedKey !== "index.html") {
-      object = await env.ASSETS.get("index.html");
-      fallback = !!object;
+    // 5. Construct Response
+    const headers = new Headers();
+    object.writeHttpMetadata(headers);
+    headers.set("ETag", object.httpEtag);
+
+    // 6. Enforce Cache-Control
+    // Next.js hashed assets -> Immutable (1 year)
+    // HTML / Fallback -> No-cache (Always revalidate)
+    if (pathname.startsWith("/_next/")) {
+      headers.set("Cache-Control", "public, max-age=31536000, immutable");
+    } else {
+      headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
     }
 
-    if (!object) {
-      return new Response("Not found", { status: 404, headers: { "cache-control": "no-store" } });
+    // Ensure Content-Type for index.html (especially during fallback)
+    if (!headers.has("Content-Type") && object.key.endsWith("index.html")) {
+      headers.set("Content-Type", "text/html; charset=utf-8");
     }
 
-    return toResponse(object, request, decodedKey, fallback);
+    return new Response(object.body, {
+      headers,
+      status: 200,
+    });
   },
 };
