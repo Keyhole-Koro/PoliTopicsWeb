@@ -33,7 +33,7 @@ const ENVIRONMENT_DEFAULTS: Record<AppEnvironment, EnvironmentDefaults> = {
 
 const rawEnv = process.env.ACTIVE_ENVIRONMENT
 if (!rawEnv) {
-  throw new Error("APP_ENV is not set")
+  throw new Error("ACTIVE_ENVIRONMENT is not set")
 }
 if (!(VALID_ENVIRONMENTS as readonly string[]).includes(rawEnv)) {
   throw new Error(`Invalid APP_ENV "${rawEnv}". Must be one of: ${VALID_ENVIRONMENTS.join(", ")}`)

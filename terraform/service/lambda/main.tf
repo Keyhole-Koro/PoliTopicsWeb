@@ -31,10 +31,14 @@ data "aws_iam_policy_document" "backend_data_access" {
     sid = "AllowArticlePayloadRead"
 
     actions = [
-      "s3:GetObject"
+      "s3:GetObject",
+      "s3:ListBucket"
     ]
 
-    resources = ["${var.asset_url_bucket_arn}/*"]
+    resources = [
+      var.asset_url_bucket_arn,
+      "${var.asset_url_bucket_arn}/*"
+    ]
   }
 }
 
