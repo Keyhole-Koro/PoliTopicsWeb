@@ -325,6 +325,10 @@ export class DynamoArticleRepository implements ArticleRepository {
       const pathname = parsed.pathname.replace(/^\/+/, "");
       if (!pathname) return undefined;
 
+      if (parsed.protocol === "s3:") {
+        return pathname;
+      }
+
       const hostParts = parsed.hostname.split(".");
       if (hostParts.length >= 3 && hostParts[1] === "s3") {
         return pathname;
