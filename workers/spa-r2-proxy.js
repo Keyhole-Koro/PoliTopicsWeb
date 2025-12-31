@@ -46,18 +46,32 @@ export default {
     }
 
     const url = new URL(request.url);
-    const key = normalizeKey(url.pathname);
 
-    let object = await env.ASSETS.get(key);
+    const decodedKey = normalizeKey(url.pathname);
+
+    let object = await env.ASSETS.get(decodedKey);
     let fallback = false;
 
-    if (!object && key !== SPA_FALLBACK && shouldSpaFallback(request, url.pathname)) {
-      object = await env.ASSETS.get(SPA_FALLBACK);
+    if (!object) {
+      const encodedPath = url.pathname
+        .split("/")
+        .map((seg) => encodeURIComponent(decodeURIComponent(seg)))
+        .join("/");
+      const encodedKey = normalizeKey(encodedPath);
+      if (encodedKey !== decodedKey) {
+        object = await env.ASSETS.get(encodedKey);
+      }
+    }
+
+    if (!object && decodedKey !== "index.html") {
+      object = await env.ASSETS.get("index.html");
       fallback = !!object;
     }
 
-    if (!object) return new Response("Not found", { status: 404 });
+    if (!object) {
+      return new Response("Not found", { status: 404, headers: { "cache-control": "no-store" } });
+    }
 
-    return toResponse(object, request, key, fallback);
+    return toResponse(object, request, decodedKey, fallback);
   },
 };
