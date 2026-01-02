@@ -50,6 +50,11 @@ export type AppConfig = {
   region: string
   localstackUrl?: string
   credentials?: { accessKeyId: string; secretAccessKey: string }
+  notifications: {
+    errorWebhook?: string
+    warnWebhook?: string
+    accessWebhook?: string
+  }
 }
 
 export let appConfig: AppConfig = {
@@ -60,6 +65,7 @@ export let appConfig: AppConfig = {
   region: defaults.region,
   localstackUrl: defaults.localstackUrl,
   credentials: defaults.credentials,
+  notifications: buildNotifications(),
 }
 
 export function setAppEnvironment(environment: AppEnvironment) {
@@ -75,5 +81,20 @@ export function setAppEnvironment(environment: AppEnvironment) {
     region: envDefaults.region,
     localstackUrl: envDefaults.localstackUrl,
     credentials: envDefaults.credentials,
+    notifications: buildNotifications(),
+  }
+}
+
+function optionalEnv(name: string): string | undefined {
+  const value = process.env[name]
+  if (!value || value.trim() === "") return undefined
+  return value
+}
+
+function buildNotifications() {
+  return {
+    errorWebhook: optionalEnv("DISCORD_WEBHOOK_ERROR"),
+    warnWebhook: optionalEnv("DISCORD_WEBHOOK_WARN"),
+    accessWebhook: optionalEnv("DISCORD_WEBHOOK_ACCESS"),
   }
 }

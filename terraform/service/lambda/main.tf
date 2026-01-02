@@ -86,6 +86,9 @@ resource "aws_lambda_function" "backend" {
       POLITOPICS_ARTICLE_BUCKET = var.asset_url_bucket_name
       ENV                       = var.environment
       ACTIVE_ENVIRONMENT        = var.environment
+      DISCORD_WEBHOOK_ERROR     = var.discord_webhook_error
+      DISCORD_WEBHOOK_WARN      = var.discord_webhook_warn
+      DISCORD_WEBHOOK_ACCESS    = var.discord_webhook_access
     }
   }
 

@@ -19,6 +19,9 @@ module "service" {
   region                 = var.region
   environment            = var.environment
   backend_lambda_package = var.backend_lambda_package
+  discord_webhook_error  = var.discord_webhook_error
+  discord_webhook_warn   = var.discord_webhook_warn
+  discord_webhook_access = var.discord_webhook_access
 
   frontend_bucket               = local.frontend_bucket
   frontend_public_enabled       = var.frontend_public_enabled

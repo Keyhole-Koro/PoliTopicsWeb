@@ -12,11 +12,17 @@
     "strict": true,
     "skipLibCheck": true,
     "types": ["node"],
+    "declaration": true,
+    "composite": true,
     "paths": {
       "@shared/*": ["../shared/*"],
-      "@data/*": ["../data/*"]
+      "@data/*": ["../data/*"],
+      "@common/*": ["../../common/src/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "../shared/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "../shared/**/*.ts", "../../common/src/**/*"],
+  "references": [
+    { "path": "../../common" }
+  ],
   "exclude": ["node_modules", "dist"]
 }

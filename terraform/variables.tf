@@ -130,3 +130,24 @@ variable "localstack_url" {
   type        = string
   default     = "http://localstack:4566"
 }
+
+variable "discord_webhook_error" {
+  description = "Discord webhook URL for #error notifications"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "discord_webhook_warn" {
+  description = "Discord webhook URL for #warn notifications"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "discord_webhook_access" {
+  description = "Discord webhook URL for #access aggregated logs"
+  type        = string
+  sensitive   = true
+  default     = ""
+}

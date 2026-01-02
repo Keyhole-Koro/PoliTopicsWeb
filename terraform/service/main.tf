@@ -41,4 +41,7 @@ module "lambda" {
 
   asset_url_bucket_name = module.s3.article_asset_url_bucket.name
   asset_url_bucket_arn  = module.s3.article_asset_url_bucket.arn
+  discord_webhook_error  = var.discord_webhook_error
+  discord_webhook_warn   = var.discord_webhook_warn
+  discord_webhook_access = var.discord_webhook_access
 }
