@@ -25,7 +25,7 @@ jobs:
       AWS_ROLE_TO_ASSUME: ${{ startsWith(github.ref, 'refs/heads/prod') && secrets.PROD_ROLE_TO_ASSUME || secrets.STAGE_ROLE_TO_ASSUME }}
       TF_VARS_FILE: ${{ startsWith(github.ref, 'refs/heads/prod') && 'prod.tfvars' || 'stage.tfvars' }}
       TF_BACKEND_FILE: ${{ startsWith(github.ref, 'refs/heads/prod') && 'prod.hcl' || 'stage.hcl' }}
-      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
