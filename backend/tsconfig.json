@@ -17,12 +17,9 @@
     "paths": {
       "@shared/*": ["../shared/*"],
       "@data/*": ["../data/*"],
-      "@common/*": ["../../common/src/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "../shared/**/*.ts", "../../common/src/**/*"],
-  "references": [
-    { "path": "../../common" }
-  ],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "../shared/**/*.ts"],
+  "references": [],
   "exclude": ["node_modules", "dist"]
 }

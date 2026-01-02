@@ -17,6 +17,7 @@
     "@aws-sdk/lib-dynamodb": "^3.679.0",
     "@fastify/aws-lambda": "^6.1.1",
     "@fastify/cors": "^10.1.0",
+    "@keyhole-koro/politopics-notification": "latest",
     "dotenv": "^16.4.7",
     "fastify": "^5.6.2",
     "fastify-plugin": "^5.0.0",

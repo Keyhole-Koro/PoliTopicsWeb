@@ -1,5 +1,5 @@
+import { DISCORD_COLORS, sendNotification, type DiscordField } from "@keyhole-koro/politopics-notification"
 import { appConfig } from "./config"
-import { DISCORD_COLORS, sendNotification, type DiscordField } from "@common/index"
 
 type RequestContext = {
   requestId: string
