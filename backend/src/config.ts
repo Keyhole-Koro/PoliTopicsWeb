@@ -51,9 +51,9 @@ export type AppConfig = {
   localstackUrl?: string
   credentials?: { accessKeyId: string; secretAccessKey: string }
   notifications: {
-    errorWebhook?: string
-    warnWebhook?: string
-    accessWebhook?: string
+    errorWebhook: string
+    warnWebhook: string
+    accessWebhook: string
   }
 }
 
@@ -85,16 +85,18 @@ export function setAppEnvironment(environment: AppEnvironment) {
   }
 }
 
-function optionalEnv(name: string): string | undefined {
+function requireEnv(name: string): string {
   const value = process.env[name]
-  if (!value || value.trim() === "") return undefined
+  if (!value || value.trim() === "") {
+    throw new Error(`Environment variable ${name} is required`)
+  }
   return value
 }
 
 function buildNotifications() {
   return {
-    errorWebhook: optionalEnv("DISCORD_WEBHOOK_ERROR"),
-    warnWebhook: optionalEnv("DISCORD_WEBHOOK_WARN"),
-    accessWebhook: optionalEnv("DISCORD_WEBHOOK_ACCESS"),
+    errorWebhook: requireEnv("DISCORD_WEBHOOK_ERROR"),
+    warnWebhook: requireEnv("DISCORD_WEBHOOK_WARN"),
+    accessWebhook: requireEnv("DISCORD_WEBHOOK_ACCESS"),
   }
 }

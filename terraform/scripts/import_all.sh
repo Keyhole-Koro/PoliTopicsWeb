@@ -205,13 +205,14 @@ run_import() {
   echo "$import_output"
 }
 
-echo "Skipping frontend S3 imports (frontend uses R2)."
+echo "Skipping frontend S3 imports (frontend uses R2) unless localstack."
 S3_MOD="module.service.module.s3"
 
 IS_LOCALSTACK_LOWER="$(echo "${IS_LOCALSTACK}" | tr '[:upper:]' '[:lower:]')"
 
 if [[ "$ENVIRONMENT_NAME" == "local" || "$ENVIRONMENT_NAME" == "localstack" || "$IS_LOCALSTACK_LOWER" == "true" ]]; then
   run_import "$S3_MOD.aws_s3_bucket.article_asset_url[\"current\"]" "$ARTICLE_ASSET_URL_BUCKET"
+  run_import "$S3_MOD.aws_s3_bucket.frontend[0]" "$FRONTEND_BUCKET"
 fi
 
 echo "Importing DynamoDB resources for ${ARTICLES_TABLE}..."

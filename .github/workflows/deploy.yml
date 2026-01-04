@@ -25,6 +25,9 @@ jobs:
       AWS_ROLE_TO_ASSUME: ${{ startsWith(github.ref, 'refs/heads/prod') && secrets.PROD_ROLE_TO_ASSUME || secrets.STAGE_ROLE_TO_ASSUME }}
       TF_VARS_FILE: ${{ startsWith(github.ref, 'refs/heads/prod') && 'prod.tfvars' || 'stage.tfvars' }}
       TF_BACKEND_FILE: ${{ startsWith(github.ref, 'refs/heads/prod') && 'prod.hcl' || 'stage.hcl' }}
+      TF_VAR_discord_webhook_error: ${{ secrets.DISCORD_WEBHOOK_ERROR }}
+      TF_VAR_discord_webhook_warn: ${{ secrets.DISCORD_WEBHOOK_WARN }}
+      TF_VAR_discord_webhook_access: ${{ secrets.DISCORD_WEBHOOK_ACCESS }}
       NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
     steps:
       - name: Checkout
