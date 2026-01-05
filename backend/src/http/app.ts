@@ -1,5 +1,8 @@
 import Fastify from "fastify"
 import cors from "@fastify/cors"
+import swagger from "@fastify/swagger"
+import swaggerUi from "@fastify/swagger-ui"
+import { jsonSchemaTransform, serializerCompiler, validatorCompiler } from "fastify-type-provider-zod"
 import repositoryPlugin from "../plugins/repository"
 import articlesRoutes from "./routes/articles"
 import { notifyAccessLog, notifyServerError } from "../notifications"
@@ -16,6 +19,25 @@ export async function createApp() {
     origin: true,
     methods: ["GET", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
+  })
+
+  app.setValidatorCompiler(validatorCompiler)
+  app.setSerializerCompiler(serializerCompiler)
+
+  await app.register(swagger, {
+    openapi: {
+      info: {
+        title: "PoliTopics API",
+        description: "API for PoliTopics",
+        version: "0.1.0",
+      },
+      servers: [],
+    },
+    transform: jsonSchemaTransform,
+  })
+
+  await app.register(swaggerUi, {
+    routePrefix: "/docs",
   })
 
   await app.register(repositoryPlugin)

@@ -1,9 +1,14 @@
 import { appConfig } from "../config"
 import { DynamoArticleRepository } from "./dynamoArticleRepository"
+import { MockArticleRepository } from "./mockArticleRepository"
 import type { ArticleRepository } from "./articleRepository"
 import type { DynamoRepositoryOptions } from "./dynamoArticleRepository"
 
 export function createArticleRepository(): ArticleRepository {
+  if (appConfig.dataMode === "mock") {
+    return new MockArticleRepository()
+  }
+
   const options: DynamoRepositoryOptions = {
     tableName: appConfig.tableName,
     region: appConfig.region,
