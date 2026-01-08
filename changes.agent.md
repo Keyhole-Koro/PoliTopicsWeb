@@ -198,6 +198,30 @@ Details:
 
 ### Changes After Review
 - Removed unused static params helper that referenced a missing module to unblock Next.js build.
+
+Agent: Codex
+Date/Time: 2026-01-05 18:20 JST
+Keywords: asset-url, signing, schema, e2e, mock-data
+Topic: Add signed asset URLs with TTL and propagate asset metadata to API responses
+Details:
+- Added nullable `assetUrl` to shared article types and HTTP schemas and documented signed URL TTL configuration.
+- Introduced S3 presigned URL generation (configurable via `ASSET_URL_TTL_SECONDS`) and ensured summaries/detail responses return null instead of undefined.
+- Enriched mapper/index types and mock uploader to carry asset keys/description for single-query card rendering; category index entries now emitted.
+- Updated backend/playwright tests to assert presence of `assetUrl` and refreshed mock data to include the new fields.
+- Files changed:
+  - `PoliTopicsWeb/shared/types/article.d.ts`
+  - `PoliTopicsWeb/backend/src/http/schemas/articles.ts`
+  - `PoliTopicsWeb/backend/src/repositories/dynamoArticleMapper.ts`
+  - `PoliTopicsWeb/backend/src/repositories/dynamoArticleRepository.ts`
+  - `PoliTopicsWeb/backend/src/repositories/mockArticleRepository.ts`
+  - `PoliTopicsWeb/backend/src/repositories/factory.ts`
+  - `PoliTopicsWeb/backend/src/config.ts`
+  - `PoliTopicsWeb/backend/package.json`
+  - `PoliTopicsWeb/backend/.env.example`
+  - `PoliTopicsWeb/tests/e2e/backend.spec.ts`
+  - `PoliTopicsWeb/terraform/mock-article/upload_articles.js`
+  - `PoliTopicsWeb/README.md`
+  - `PoliTopicsWeb/package-lock.json`
 - Files changed:
   - `PoliTopicsWeb/frontend/lib/static-params.ts`
 - Removed the local R2 bucket creation step (unsupported `--local` flag) and dropped the deprecated `--persist` flag from the local worker script.

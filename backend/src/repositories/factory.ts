@@ -14,6 +14,7 @@ export function createArticleRepository(): ArticleRepository {
     tableName: appConfig.tableName,
     region: appConfig.region,
     assetBucket: appConfig.articleAssetBucket,
+    assetUrlTtlSeconds: appConfig.assetUrlTtlSeconds,
   }
 
   if (appConfig.localstackUrl) {

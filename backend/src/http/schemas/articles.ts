@@ -31,6 +31,7 @@ export const ArticleSummarySchema = z.object({
   session: z.number(),
   nameOfHouse: z.string(),
   nameOfMeeting: z.string(),
+  assetUrl: z.string().nullable(),
 });
 
 export const BaseSummarySchema = z.object({

@@ -17,6 +17,7 @@ const MOCK_ARTICLES: Article[] = [
     session: 213,
     nameOfHouse: "House of Representatives",
     nameOfMeeting: "Education Committee",
+    assetUrl: null,
     summary: { based_on_orders: [1], summary: "Reviewed funding and nutrition standards." },
     soft_language_summary: { based_on_orders: [1], summary: "Talked about better lunches." },
     middle_summary: [{ based_on_orders: [1], summary: "Focused on budget and safety." }],
@@ -48,6 +49,7 @@ const MOCK_ARTICLES: Article[] = [
     session: 213,
     nameOfHouse: "House of Councillors",
     nameOfMeeting: "Health Committee",
+    assetUrl: null,
     summary: { based_on_orders: [2], summary: "Outlined grant rollout plans." },
     soft_language_summary: { based_on_orders: [2], summary: "Explained how grants will be shared." },
     middle_summary: [{ based_on_orders: [2], summary: "Discussed regional distribution." }],
@@ -138,6 +140,7 @@ function toSummary(article: Article): ArticleSummary {
     session: article.session,
     nameOfHouse: article.nameOfHouse,
     nameOfMeeting: article.nameOfMeeting,
+    assetUrl: article.assetUrl,
   }
 }
 

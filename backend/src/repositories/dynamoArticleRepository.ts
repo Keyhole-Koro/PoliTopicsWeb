@@ -6,6 +6,7 @@ import {
 } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { GetObjectCommand, S3Client, type GetObjectCommandOutput } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Readable } from "node:stream";
 import {
   mapArticleToSummary,
@@ -13,6 +14,7 @@ import {
   mapItemToArticle,
   type ArticleAssetData,
   type DynamoArticleItem,
+  type DynamoIndexItem,
 } from "./dynamoArticleMapper";
 import type { ArticleRepository, HeadlinesResult } from "./articleRepository";
 import type { Article, ArticleSummary, SearchFilters } from "@shared/types/article";
@@ -25,6 +27,7 @@ export type DynamoRepositoryOptions = {
   credentials?: DynamoDBClientConfig["credentials"];
   assetBucket?: string;
   s3Endpoint?: string;
+  assetUrlTtlSeconds?: number;
 };
 
 export class DynamoArticleRepository implements ArticleRepository {
@@ -32,6 +35,7 @@ export class DynamoArticleRepository implements ArticleRepository {
   private readonly tableName: string;
   private readonly s3Client?: S3Client;
   private readonly assetBucket?: string;
+  private readonly assetUrlTtlSeconds: number;
 
   constructor(options: DynamoRepositoryOptions) {
     const client = new DynamoDBClient({
@@ -44,6 +48,7 @@ export class DynamoArticleRepository implements ArticleRepository {
       marshallOptions: { removeUndefinedValues: true },
     });
     this.tableName = options.tableName;
+    this.assetUrlTtlSeconds = options.assetUrlTtlSeconds ?? 900;
 
     if (options.assetBucket) {
       this.assetBucket = options.assetBucket;
@@ -90,7 +95,7 @@ export class DynamoArticleRepository implements ArticleRepository {
       }),
     );
 
-    const items = (response.Items ?? []).map(mapArticleToSummary);
+    const items = await this.mapSummariesWithSignedAssets(response.Items ?? []);
     const hasMore = Boolean(response.LastEvaluatedKey);
 
     return {
@@ -123,18 +128,19 @@ export class DynamoArticleRepository implements ArticleRepository {
         }),
       );
 
-      const items = (response.Items ?? [])
-        .map(mapIndexToSummary)
-        .filter((item): item is ArticleSummary => Boolean(item))
-        .filter((item) => {
-          if (categories.length === 0) return true;
-          const normalizedTargets = categories.map((category) => category.toLowerCase());
-          return item.categories.some((categoryName) =>
-            normalizedTargets.some((target) => target === categoryName.toLowerCase()),
-          );
-        });
+      const items = (await this.mapIndexSummariesWithSignedAssets(response.Items ?? [])).filter(
+        (item): item is ArticleSummary => Boolean(item),
+      );
 
-      return this.filterArticles(items, { categories, houses, meetings, dateStart, dateEnd });
+      const filtered = items.filter((item) => {
+        if (categories.length === 0) return true;
+        const normalizedTargets = categories.map((category) => category.toLowerCase());
+        return item.categories.some((categoryName) =>
+          normalizedTargets.some((target) => target === categoryName.toLowerCase()),
+        );
+      });
+
+      return this.filterArticles(filtered, { categories, houses, meetings, dateStart, dateEnd });
     }
 
     if (categories.length > 0) {
@@ -148,9 +154,9 @@ export class DynamoArticleRepository implements ArticleRepository {
         }),
       );
 
-      const items = (response.Items ?? [])
-        .map(mapIndexToSummary)
-        .filter((item): item is ArticleSummary => Boolean(item));
+      const items = (await this.mapIndexSummariesWithSignedAssets(response.Items ?? [])).filter(
+        (item): item is ArticleSummary => Boolean(item),
+      );
 
       return this.filterArticles(items, { categories, houses, meetings, dateStart, dateEnd });
     }
@@ -168,7 +174,7 @@ export class DynamoArticleRepository implements ArticleRepository {
       }),
     );
 
-    const items = (response.Items ?? []).map(mapArticleToSummary);
+    const items = await this.mapSummariesWithSignedAssets(response.Items ?? []);
     return this.filterArticles(items, { categories, houses, meetings, dateStart, dateEnd });
   }
 
@@ -188,8 +194,8 @@ export class DynamoArticleRepository implements ArticleRepository {
     }
 
     const item = response.Item as DynamoArticleItem;
-    const asset = await this.loadAsset(item);
-    return mapItemToArticle(item, asset);
+    const [asset, signedAssetUrl] = await Promise.all([this.loadAsset(item), this.buildSignedAssetUrl(item)]);
+    return mapItemToArticle(item, asset, signedAssetUrl);
   }
 
   private filterArticles(
@@ -270,9 +276,9 @@ export class DynamoArticleRepository implements ArticleRepository {
       }),
     );
 
-    const summaries = (response.Items ?? [])
-      .map(mapIndexToSummary)
-      .filter((item): item is ArticleSummary => Boolean(item));
+    const summaries = (await this.mapIndexSummariesWithSignedAssets(response.Items ?? [])).filter(
+      (item): item is ArticleSummary => Boolean(item),
+    );
     const filtered = this.filterArticles(summaries, {
       categories: filters.categories ?? [],
       houses: filters.houses ?? [],
@@ -290,6 +296,44 @@ export class DynamoArticleRepository implements ArticleRepository {
     }
 
     return Array.from(suggestions).slice(0, limit);
+  }
+
+  private async mapSummariesWithSignedAssets(items: Record<string, unknown>[]): Promise<ArticleSummary[]> {
+    return Promise.all(
+      items.map(async (raw) => {
+        const signedAssetUrl = await this.buildSignedAssetUrl(raw as DynamoArticleItem);
+        return mapArticleToSummary(raw, signedAssetUrl);
+      }),
+    );
+  }
+
+  private async mapIndexSummariesWithSignedAssets(
+    items: Record<string, unknown>[],
+  ): Promise<(ArticleSummary | undefined)[]> {
+    return Promise.all(
+      items.map(async (raw) => {
+        const signedAssetUrl = await this.buildSignedAssetUrl(raw as DynamoIndexItem);
+        return mapIndexToSummary(raw, signedAssetUrl);
+      }),
+    );
+  }
+
+  private async buildSignedAssetUrl(item: DynamoArticleItem | DynamoIndexItem): Promise<string | null> {
+    if (!this.s3Client || !this.assetBucket) return null;
+    const key = item.asset_key ?? this.extractKeyFromUrl(item.asset_url);
+    if (!key) return null;
+
+    try {
+      const command = new GetObjectCommand({
+        Bucket: this.assetBucket,
+        Key: key,
+      });
+      const signed = await getSignedUrl(this.s3Client, command, { expiresIn: this.assetUrlTtlSeconds });
+      return signed;
+    } catch (error) {
+      console.warn("Failed to sign asset URL", { key, bucket: this.assetBucket, error });
+      return null;
+    }
   }
 
   private async loadAsset(item: DynamoArticleItem): Promise<ArticleAssetData | undefined> {

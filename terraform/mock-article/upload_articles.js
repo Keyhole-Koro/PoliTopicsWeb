@@ -99,6 +99,7 @@ function buildArticleItem(article, assetKey, assetUrl) {
     session: article.session,
     nameOfHouse: article.nameOfHouse,
     nameOfMeeting: article.nameOfMeeting,
+    description: article.description,
     terms: article.terms,
     asset_key: assetKey,
     asset_url: assetUrl,
@@ -113,6 +114,7 @@ function* buildKeywordItems(article) {
   const base = {
     articleId: article.id,
     title: article.title,
+    description: article.description,
     date: article.date,
     month: article.month,
     categories: article.categories,
@@ -122,6 +124,8 @@ function* buildKeywordItems(article) {
     session: article.session,
     nameOfHouse: article.nameOfHouse,
     nameOfMeeting: article.nameOfMeeting,
+    asset_key: buildAssetKey(article.id),
+    asset_url: null,
   };
   const sk = buildThinIndexSk(article.date, article.id);
 
@@ -133,6 +137,38 @@ function* buildKeywordItems(article) {
       SK: sk,
       type: "THIN_INDEX",
       kind: "KEYWORD_INDEX",
+      ...base,
+    };
+  }
+}
+
+function* buildCategoryItems(article) {
+  const base = {
+    articleId: article.id,
+    title: article.title,
+    description: article.description,
+    date: article.date,
+    month: article.month,
+    categories: article.categories,
+    keywords: article.keywords,
+    participants: article.participants,
+    imageKind: article.imageKind,
+    session: article.session,
+    nameOfHouse: article.nameOfHouse,
+    nameOfMeeting: article.nameOfMeeting,
+    asset_key: buildAssetKey(article.id),
+    asset_url: null,
+  };
+  const sk = buildThinIndexSk(article.date, article.id);
+
+  for (const category of article.categories ?? []) {
+    const categoryValue = String(category || "").toLowerCase();
+    if (!categoryValue) continue;
+    yield {
+      PK: `CATEGORY#${categoryValue}`,
+      SK: sk,
+      type: "THIN_INDEX",
+      kind: "CATEGORY_INDEX",
       ...base,
     };
   }
@@ -198,6 +234,15 @@ async function putItems(docClient, tableName, articles, s3Client, bucketName, as
         new PutCommand({
           TableName: tableName,
           Item: keywordItem,
+        }),
+      );
+    }
+
+    for (const categoryItem of buildCategoryItems(article)) {
+      await docClient.send(
+        new PutCommand({
+          TableName: tableName,
+          Item: categoryItem,
         }),
       );
     }

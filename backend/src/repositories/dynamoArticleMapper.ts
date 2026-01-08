@@ -39,6 +39,7 @@ export type DynamoIndexItem = {
   SK: string;
   articleId: string;
   title: string;
+  description?: string;
   date: string;
   month: string;
   categories?: string[];
@@ -48,6 +49,8 @@ export type DynamoIndexItem = {
   session?: number | string;
   nameOfHouse?: string;
   nameOfMeeting?: string;
+  asset_key?: string;
+  asset_url?: string;
 };
 
 export type ArticleAssetData = {
@@ -57,12 +60,16 @@ export type ArticleAssetData = {
   dialogs?: Dialog[];
 };
 
-export function mapArticleToSummary(item: Record<string, unknown>): ArticleSummary {
-  const article = mapItemToArticle(item as DynamoArticleItem);
+export function mapArticleToSummary(item: Record<string, unknown>, signedAssetUrl?: string | null): ArticleSummary {
+  const article = mapItemToArticle(item as DynamoArticleItem, undefined, signedAssetUrl);
   return toSummary(article);
 }
 
-export function mapItemToArticle(item: DynamoArticleItem, asset?: ArticleAssetData): Article {
+export function mapItemToArticle(
+  item: DynamoArticleItem,
+  asset?: ArticleAssetData,
+  signedAssetUrl?: string | null,
+): Article {
   const id = item.PK.replace("A#", "");
   return {
     id,
@@ -82,17 +89,18 @@ export function mapItemToArticle(item: DynamoArticleItem, asset?: ArticleAssetDa
     middle_summary: normalizeMiddleSummaries(asset?.middle_summary ?? item.middle_summary),
     dialogs: normalizeDialogs(asset?.dialogs ?? item.dialogs),
     terms: normalizeTerms(item.terms),
+    assetUrl: signedAssetUrl ?? null,
   };
 }
 
-export function mapIndexToSummary(item: Record<string, unknown>): ArticleSummary | undefined {
+export function mapIndexToSummary(item: Record<string, unknown>, signedAssetUrl?: string | null): ArticleSummary | undefined {
   if (!item) return undefined;
   const record = item as DynamoIndexItem;
 
   return {
     id: record.articleId ?? record.PK?.split("#").pop() ?? "",
     title: record.title,
-    description: "",
+    description: record.description ?? "",
     date: record.date,
     month: record.month,
     categories: record.categories ?? [],
@@ -102,6 +110,7 @@ export function mapIndexToSummary(item: Record<string, unknown>): ArticleSummary
     session: typeof record.session === "number" ? record.session : Number(record.session) || 0,
     nameOfHouse: record.nameOfHouse ?? "",
     nameOfMeeting: record.nameOfMeeting ?? "",
+    assetUrl: signedAssetUrl ?? null,
   };
 }
 
@@ -119,6 +128,7 @@ export function toSummary(article: Article): ArticleSummary {
     session,
     nameOfHouse,
     nameOfMeeting,
+    assetUrl,
   } = article;
 
   return {
@@ -134,6 +144,7 @@ export function toSummary(article: Article): ArticleSummary {
     session,
     nameOfHouse,
     nameOfMeeting,
+    assetUrl,
   };
 }
 

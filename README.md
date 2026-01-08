@@ -23,6 +23,12 @@ The frontend is served on http://127.0.0.1:3333 and expects the backend on http:
 
 Set the backend `ENV` variable to `local` (default), `localstack`, `stage`, or `prod` to pull the matching table/bucket defaults. Stage/Prod deploys receive this automatically via Terraform; local Docker Compose can override it if you need to mimic another environment.
 
+### Signed article assets
+
+- Article endpoints now return `assetUrl` (string or `null`) for both summaries and full articles. The URL is a signed `GET` link with a short TTL (default: 900 seconds).
+- Configure TTL via `ASSET_URL_TTL_SECONDS` in the backend environment. When unset, the default 900 seconds is used.
+- Signing uses the article asset bucket configured per environment and honors the LocalStack endpoint for local runs.
+
 Terraform provisions the Lambda + HTTP API per environment (stage/prod/localstack). Package the backend by zipping the compiled `backend/dist` folder (default path: `backend/dist/backend.zip`) so Terraform can read it through the `backend_lambda_package` variable, then run `terraform init -backend-config backends/<env>.hcl` followed by `terraform apply -var-file tfvars/<env>.tfvars` from the `terraform/` directory.
 
 Use `terraform/import_all.sh <env>` if you need to import an existing SPA bucket (and its public-access helpers) into state before applying.

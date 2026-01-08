@@ -53,6 +53,7 @@ export type AppConfig = {
   dataMode: DataMode
   tableName: string
   articleAssetBucket: string
+  assetUrlTtlSeconds: number
   region: string
   localstackUrl?: string
   credentials?: { accessKeyId: string; secretAccessKey: string }
@@ -69,6 +70,7 @@ export let appConfig: AppConfig = {
   dataMode,
   tableName: defaults.tableName,
   articleAssetBucket: defaults.articleAssetBucket,
+  assetUrlTtlSeconds: resolveAssetUrlTtl(),
   region: defaults.region,
   localstackUrl,
   credentials,
@@ -88,6 +90,7 @@ export function setAppEnvironment(environment: AppEnvironment) {
     dataMode: appConfig.dataMode,
     tableName: envDefaults.tableName,
     articleAssetBucket: envDefaults.articleAssetBucket,
+    assetUrlTtlSeconds: appConfig.assetUrlTtlSeconds,
     region: envDefaults.region,
     localstackUrl: resolvedLocalstackUrl,
     credentials: resolvedCredentials,
@@ -124,4 +127,14 @@ function resolveDataMode(): DataMode {
     throw new Error(`Invalid DATA_MODE "${raw}". Must be one of: ${VALID_DATA_MODES.join(", ")}`)
   }
   return raw as DataMode
+}
+
+function resolveAssetUrlTtl(): number {
+  const raw = process.env.ASSET_URL_TTL_SECONDS
+  if (!raw) return 900
+  const parsed = Number(raw)
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    throw new Error("ASSET_URL_TTL_SECONDS must be a positive number")
+  }
+  return parsed
 }

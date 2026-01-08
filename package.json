@@ -29,6 +29,7 @@
     "e2e:prepare": "npm run build:frontend:local && npm run r2:sync:local",
     "test:e2e": "npm run e2e:prepare && npx playwright test",
     "test:e2e:local": "npm run build:frontend:local && npm run r2:sync:local && npx playwright test",
+    "test:e2e:no:build": "npx playwright test",
     "test:e2e:backend": "npx playwright test tests/e2e/backend.spec.ts",
     "setup:e2e": "npx playwright install && sudo env \"PATH=$PATH\" npx playwright install-deps",
 
