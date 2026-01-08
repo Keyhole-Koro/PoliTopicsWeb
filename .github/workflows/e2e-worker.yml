@@ -1,0 +1,36 @@
+name: SPA E2E (Wrangler Local)
+
+on:
+  pull_request:
+    paths:
+      - "**"
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend (local)
+        run: npm run build:frontend:local
+
+      - name: Sync static assets to local R2
+        run: npm run r2:local:sync
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: npx playwright test

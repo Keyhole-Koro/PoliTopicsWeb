@@ -15,7 +15,7 @@ The seed script now stores the large article payload fields (`summary`, `soft_la
 `dialogs`) as JSON blobs in the `POLITOPICS_ARTICLE_BUCKET` (defaults to
 `politopics-articles-local` when using LocalStack) and only keeps references in DynamoDB via `asset_url`.
 
-The frontend is served on http://localhost:3333 and expects the backend on http://localhost:4000. Configure other environments with `NEXT_PUBLIC_API_BASE_URL`.
+The frontend is served on http://127.0.0.1:3333 and expects the backend on http://127.0.0.1:4500. Configure other environments with `NEXT_PUBLIC_API_BASE_URL`.
 
 ## Backend Lambda
 
@@ -50,6 +50,20 @@ terraform/
 1. Build the static bundle: `npm run build:frontend`.
 2. Upload `frontend/out` to the desired S3 bucket (`politopics-frontend-stage` or `...-prod`).
 3. Configure the bucket website error document to `index.html` to support SPA routing (article, search, etc.).
+
+## Local SPA via Wrangler + R2 (Miniflare)
+
+Use the Worker + R2 path locally so the SPA runs through the same routing layer as production.
+
+1. Build the SPA for local use: `npm run build:frontend:local`
+2. Sync static assets into local R2: `npm run r2:local:sync`
+3. Start the mock backend (no LocalStack required): `npm run dev:backend:mock`
+4. Start the Worker with Miniflare: `npm run worker:dev:local`
+5. (Optional) Run Playwright E2E: `npx playwright test`
+
+Notes:
+- The mock backend is enabled via `DATA_MODE=mock` and `DISABLE_NOTIFICATIONS=true`.
+- The Worker listens on http://127.0.0.1:8787; the backend listens on http://127.0.0.1:4500.
 
 ## API surface
 

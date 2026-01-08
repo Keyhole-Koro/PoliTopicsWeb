@@ -65,7 +65,7 @@ export type AppConfig = {
 
 export let appConfig: AppConfig = {
   environment: ACTIVE_ENVIRONMENT,
-  port: 4000,
+  port: 4500,
   dataMode,
   tableName: defaults.tableName,
   articleAssetBucket: defaults.articleAssetBucket,

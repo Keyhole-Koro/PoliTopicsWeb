@@ -5,6 +5,7 @@ import type { ArticleRepository } from "./articleRepository"
 import type { DynamoRepositoryOptions } from "./dynamoArticleRepository"
 
 export function createArticleRepository(): ArticleRepository {
+  console.log("Factory: Creating repository. Mode:", appConfig.dataMode)
   if (appConfig.dataMode === "mock") {
     return new MockArticleRepository()
   }

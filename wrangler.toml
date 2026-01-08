@@ -2,6 +2,10 @@ name = "politopics-frontend"
 main = "workers/spa-r2-proxy.js"
 compatibility_date = "2024-09-02"
 
+[env.local]
+name = "politopics-frontend-local"
+r2_buckets = [{ binding = "ASSETS", bucket_name = "politopics-frontend-local" }]
+
 [env.stage]
 name = "politopics-frontend-stage"
 r2_buckets = [{ binding = "ASSETS", bucket_name = "politopics-frontend-stage" }]

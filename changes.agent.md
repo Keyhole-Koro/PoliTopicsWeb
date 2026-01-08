@@ -171,3 +171,51 @@ Details:
 - Updated workflow paths to be relative to the PoliTopicsWeb repo root after moving the workflow.
 - Files changed:
   - `PoliTopicsWeb/.github/workflows/deploy-frontend.yml`
+
+Agent: Codex
+Date/Time: 2026-01-05 15:24 JST
+Keywords: wrangler, r2, miniflare, playwright, e2e
+Topic: Local SPA testing via Workers + R2 with mock backend
+Details:
+- Added a local Wrangler environment, R2 sync script, and content-type fallback for SPA asset delivery.
+- Implemented mock backend mode (`DATA_MODE=mock`) with notification disablement for LocalStack-free runs.
+- Added Playwright E2E coverage and GitHub Actions workflow for CI runs.
+- Documented the local Worker + R2 flow in the README.
+- Files changed:
+  - `PoliTopicsWeb/wrangler.toml`
+  - `PoliTopicsWeb/workers/spa-r2-proxy.js`
+  - `PoliTopicsWeb/scripts/r2-sync-local.mjs`
+  - `PoliTopicsWeb/backend/src/config.ts`
+  - `PoliTopicsWeb/backend/src/repositories/mockArticleRepository.ts`
+  - `PoliTopicsWeb/backend/src/repositories/factory.ts`
+  - `PoliTopicsWeb/backend/.env.example`
+  - `PoliTopicsWeb/playwright.config.ts`
+  - `PoliTopicsWeb/tests/e2e/spa.spec.ts`
+  - `PoliTopicsWeb/.github/workflows/e2e-worker.yml`
+  - `PoliTopicsWeb/package.json`
+  - `PoliTopicsWeb/package-lock.json`
+  - `PoliTopicsWeb/README.md`
+
+### Changes After Review
+- Removed unused static params helper that referenced a missing module to unblock Next.js build.
+- Files changed:
+  - `PoliTopicsWeb/frontend/lib/static-params.ts`
+- Removed the local R2 bucket creation step (unsupported `--local` flag) and dropped the deprecated `--persist` flag from the local worker script.
+- Files changed:
+  - `PoliTopicsWeb/scripts/r2-sync-local.mjs`
+  - `PoliTopicsWeb/package.json`
+
+Agent: Gemini
+Date/Time: 2026-01-05 16:30 JST
+Keywords: swagger, openapi, fastify, zod
+Topic: Add OpenAPI and Swagger UI support
+Details:
+- Added `@fastify/swagger`, `@fastify/swagger-ui`, and `fastify-type-provider-zod` to backend dependencies.
+- Created Zod schemas for article types and API request/response structures.
+- Updated Fastify app initialization to register Swagger plugins and use Zod type provider.
+- Refactored `articles` routes to use Zod schemas for validation and documentation generation.
+- Files changed:
+  - `PoliTopicsWeb/backend/package.json`
+  - `PoliTopicsWeb/backend/src/http/schemas/articles.ts`
+  - `PoliTopicsWeb/backend/src/http/app.ts`
+  - `PoliTopicsWeb/backend/src/http/routes/articles.ts`

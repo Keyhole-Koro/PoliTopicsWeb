@@ -58,9 +58,11 @@ export default {
       headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
     }
 
-    // Ensure Content-Type for index.html (especially during fallback)
-    if (!headers.has("Content-Type") && object.key.endsWith("index.html")) {
-      headers.set("Content-Type", "text/html; charset=utf-8");
+    if (!headers.has("Content-Type")) {
+      const contentType = guessContentType(object.key);
+      if (contentType) {
+        headers.set("Content-Type", contentType);
+      }
     }
 
     return new Response(object.body, {
@@ -69,3 +71,29 @@ export default {
     });
   },
 };
+
+const EXTENSION_CONTENT_TYPES = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "application/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".map": "application/json; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".ico": "image/x-icon",
+  ".txt": "text/plain; charset=utf-8",
+  ".woff": "font/woff",
+  ".woff2": "font/woff2",
+  ".ttf": "font/ttf",
+  ".otf": "font/otf",
+  ".eot": "application/vnd.ms-fontobject",
+};
+
+function guessContentType(key) {
+  const match = key.toLowerCase().match(/\.[a-z0-9]+$/);
+  if (!match) return undefined;
+  return EXTENSION_CONTENT_TYPES[match[0]];
+}

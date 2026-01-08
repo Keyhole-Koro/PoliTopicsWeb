@@ -112,17 +112,27 @@ export async function fetchSuggestions(input: string, options: SuggestionOptions
 }
 
 async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(init.headers ?? {}),
-    },
-  })
+  const url = `${API_BASE_URL}${path}`
+  console.log(`[api] Fetching: ${url}`)
+  try {
+    const response = await fetch(url, {
+      ...init,
+      headers: {
+        "Content-Type": "application/json",
+        ...(init.headers ?? {}),
+      },
+    })
 
-  if (!response.ok) {
-    throw new Error(`API request failed with status ${response.status}`)
+    if (!response.ok) {
+      console.error(`[api] Request failed: ${response.status} ${response.statusText}`)
+      throw new Error(`API request failed with status ${response.status}`)
+    }
+
+    const data = (await response.json()) as T
+    console.log(`[api] Success: ${url}`, data)
+    return data
+  } catch (error) {
+    console.error(`[api] Network error for ${url}:`, error)
+    throw error
   }
-
-  return (await response.json()) as T
 }

@@ -29,4 +29,42 @@ case "$ENVIRONMENT" in
     ;;
 esac
 
+echo "Environment : $ENVIRONMENT"
+echo "Bucket      : $BUCKET"
+echo "Region      : $REGION"
+if [ "$ENVIRONMENT" = "local" ]; then
+  echo "Endpoint    : $LOCALSTACK_ENDPOINT"
+fi
+echo
+
+
+echo "==> Checking S3 bucket exists..."
+
+if aws "${AWS_ARGS[@]}" s3api head-bucket --bucket "$BUCKET" 2>/dev/null; then
+  echo "S3 bucket already exists: $BUCKET"
+else
+  echo "Creating S3 bucket: $BUCKET"
+  aws "${AWS_ARGS[@]}" s3api create-bucket \
+    --bucket "$BUCKET" \
+    --region "$REGION" \
+    --create-bucket-configuration LocationConstraint="$REGION"
+
+  echo "Enabling default encryption (AES256)..."
+  aws "${AWS_ARGS[@]}" s3api put-bucket-encryption \
+    --bucket "$BUCKET" \
+    --server-side-encryption-configuration '{
+      "Rules": [{
+        "ApplyServerSideEncryptionByDefault": {
+          "SSEAlgorithm": "AES256"
+        }
+      }]
+    }'
+
+  echo "Enabling versioning..."
+  aws "${AWS_ARGS[@]}" s3api put-bucket-versioning \
+    --bucket "$BUCKET" \
+    --versioning-configuration Status=Enabled
+fi
+
+
 echo "✅ S3 bucket setup completed."

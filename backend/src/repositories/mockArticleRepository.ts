@@ -74,6 +74,8 @@ export class MockArticleRepository implements ArticleRepository {
     sort: SearchFilters["sort"] = "date_desc",
     offset = 0,
   ): Promise<HeadlinesResult> {
+    console.log("MockRepo: getHeadlines called", { limit, sort, offset })
+    console.log("MockRepo: Total summaries:", MOCK_SUMMARIES.length)
     const safeLimit = Number.isFinite(limit) && limit ? Math.max(1, Math.min(Number(limit), 50)) : 6
     const safeOffset = Number.isFinite(offset) && offset ? Math.max(0, Number(offset)) : 0
     const sorted = sortByDate(MOCK_SUMMARIES, sort)
