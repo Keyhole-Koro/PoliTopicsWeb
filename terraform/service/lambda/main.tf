@@ -73,7 +73,7 @@ resource "aws_lambda_function" "backend" {
   role             = aws_iam_role.backend_lambda.arn
   filename         = pathexpand(var.backend_lambda_package)
   source_code_hash = filebase64sha256(pathexpand(var.backend_lambda_package))
-  handler          = "backend/src/lambda.handler"
+  handler          = "src/lambda.handler"
   runtime          = var.is_localstack ? "nodejs20.x" : "nodejs22.x"
   memory_size      = 128
   timeout          = 10
