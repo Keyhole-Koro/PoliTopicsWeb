@@ -28,9 +28,12 @@ export async function handler(
   context: Context,
 ): Promise<APIGatewayProxyResultV2> {
   const proxy = await getFastifyProxy()
-  // Remove "/stage" prefix from rawPath because default path in API Gateway stage includes it
   const rawPath = typeof event.rawPath === "string" ? event.rawPath : "/"
-  const strippedRawPath = rawPath.replace(/^\/stage(?=\/|$)/, "") || "/"
+  // Remove stage prefix from rawPath (e.g., "/prod", "/stage", "/dev")
+  const stageName = event.requestContext?.stage
+  const strippedRawPath = stageName 
+    ? (rawPath.replace(new RegExp(`^/${stageName}(?=/|$)`), "") || "/")
+    : rawPath
   const normalizedEvent = rawPath === strippedRawPath ? event : { ...event, rawPath: strippedRawPath }
   
   return new Promise<APIGatewayProxyResultV2>((resolve, reject) => {
