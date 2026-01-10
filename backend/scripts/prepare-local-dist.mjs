@@ -18,12 +18,17 @@ const pkgJsonPath = path.join(ROOT_DIR, "package.json")
 const pkgLockPath = path.join(ROOT_DIR, "package-lock.json")
 const distPkgJsonPath = path.join(DIST_DIR, "package.json")
 const distPkgLockPath = path.join(DIST_DIR, "package-lock.json")
+const rootNpmrcPath = path.join(ROOT_DIR, "..", ".npmrc")
+const distNpmrcPath = path.join(DIST_DIR, ".npmrc")
 
 const pkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, "utf8"))
 delete pkgJson.type
 fs.writeFileSync(distPkgJsonPath, JSON.stringify(pkgJson, null, 2))
 if (fs.existsSync(pkgLockPath)) {
   fs.copyFileSync(pkgLockPath, distPkgLockPath)
+}
+if (fs.existsSync(rootNpmrcPath)) {
+  fs.copyFileSync(rootNpmrcPath, distNpmrcPath)
 }
 
 if (fs.existsSync(DIST_NODE_MODULES)) {
