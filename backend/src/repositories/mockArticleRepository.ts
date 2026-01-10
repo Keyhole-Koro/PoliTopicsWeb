@@ -3,10 +3,11 @@ import path from "node:path"
 import type { Article, ArticleSummary, SearchFilters } from "@shared/types/article"
 import type { ArticleRepository, HeadlinesResult } from "./articleRepository"
 
-const ARTICLES_PATH = "../../../terraform/mock-article/articles.json"
+const ACTIVE_ENV = (process.env.ACTIVE_ENVIRONMENT ?? "").toLowerCase()
+const ALLOW_MOCK_FIXTURE = ACTIVE_ENV === "local"
 
-const MOCK_ARTICLES: Article[] = loadArticlesFromFixture()
-const MOCK_SUMMARIES = MOCK_ARTICLES.map(toSummary)
+let cachedArticles: Article[] | null = null
+let cachedSummaries: ArticleSummary[] | null = null
 
 export class MockArticleRepository implements ArticleRepository {
   async getHeadlines(
@@ -14,18 +15,19 @@ export class MockArticleRepository implements ArticleRepository {
     sort: SearchFilters["sort"] = "date_desc",
     offset = 0,
   ): Promise<HeadlinesResult> {
-    console.log("MockRepo: getHeadlines called", { limit, sort, offset })
-    console.log("MockRepo: Total summaries:", MOCK_SUMMARIES.length)
+    const summaries = getMockSummaries()
+    console.log("MockRepo: getHeadlines called", { limit, sort, offset, total: summaries.length })
     const safeLimit = Number.isFinite(limit) && limit ? Math.max(1, Math.min(Number(limit), 50)) : 6
     const safeOffset = Number.isFinite(offset) && offset ? Math.max(0, Number(offset)) : 0
-    const sorted = sortByDate(MOCK_SUMMARIES, sort)
+    const sorted = sortByDate(summaries, sort)
     const items = sorted.slice(safeOffset, safeOffset + safeLimit)
     return { items, hasMore: sorted.length > safeOffset + safeLimit }
   }
 
   async searchArticles(filters: SearchFilters): Promise<ArticleSummary[]> {
+    const summaries = getMockSummaries()
     const words = (filters.words ?? []).map((word) => word.trim().toLowerCase()).filter(Boolean)
-    const initial = words.length > 0 ? MOCK_SUMMARIES.filter((item) => matchesWords(item, words)) : MOCK_SUMMARIES
+    const initial = words.length > 0 ? summaries.filter((item) => matchesWords(item, words)) : summaries
     return filterArticles(initial, {
       categories: filters.categories,
       houses: filters.houses,
@@ -36,7 +38,8 @@ export class MockArticleRepository implements ArticleRepository {
   }
 
   async getArticle(id: string): Promise<Article | undefined> {
-    return MOCK_ARTICLES.find((article) => article.id === id)
+    const articles = getMockArticles()
+    return articles.find((article) => article.id === id)
   }
 
   async getSuggestions(
@@ -46,7 +49,8 @@ export class MockArticleRepository implements ArticleRepository {
   ): Promise<string[]> {
     if (!input.trim()) return []
     const normalized = input.toLowerCase()
-    const filtered = filterArticles(MOCK_SUMMARIES, filters)
+    const summaries = getMockSummaries()
+    const filtered = filterArticles(summaries, filters)
     const suggestions = new Set<string>()
 
     for (const article of filtered) {
@@ -162,9 +166,44 @@ function normalizeBoundary(value: string | undefined, type: "start" | "end"): nu
   return date.getTime()
 }
 
+function getMockArticles(): Article[] {
+  if (!ALLOW_MOCK_FIXTURE) {
+    if (cachedArticles === null) {
+      console.warn("MockRepo: mock fixture disabled for environment", ACTIVE_ENV || "<unknown>")
+      cachedArticles = []
+    }
+    return cachedArticles
+  }
+
+  if (cachedArticles !== null) return cachedArticles
+
+  cachedArticles = loadArticlesFromFixture()
+  return cachedArticles
+}
+
+function getMockSummaries(): ArticleSummary[] {
+  if (cachedSummaries !== null) return cachedSummaries
+  const articles = getMockArticles()
+  cachedSummaries = articles.map(toSummary)
+  return cachedSummaries
+}
+
+function resolveArticlesPath(): string {
+  const candidates = [
+    process.env.MOCK_ARTICLES_PATH,
+    path.resolve(__dirname, "../../shared/mock/articles.json"),
+    path.resolve(__dirname, "../../../terraform/mock-article/articles.json"),
+  ].filter(Boolean) as string[]
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) return candidate
+  }
+  return candidates[0] ?? "../../../terraform/mock-article/articles.json"
+}
+
 function loadArticlesFromFixture(): Article[] {
+  const articlesPath = resolveArticlesPath()
   try {
-    const raw = fs.readFileSync(ARTICLES_PATH, "utf-8")
+    const raw = fs.readFileSync(articlesPath, "utf-8")
     const parsed = JSON.parse(raw)
     if (!Array.isArray(parsed)) {
       throw new Error("Fixture is not an array")
