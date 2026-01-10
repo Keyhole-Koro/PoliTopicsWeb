@@ -29,7 +29,7 @@ export async function handler(
 ): Promise<APIGatewayProxyResultV2> {
   const proxy = await getFastifyProxy()
   const rawPath = typeof event.rawPath === "string" ? event.rawPath : "/"
-  // Remove stage prefix from rawPath (e.g., "/prod", "/stage", "/dev")
+  // Remove stage prefix from rawPath (e.g., "/prod", "/stage")
   const stageName = event.requestContext?.stage
   const strippedRawPath = stageName 
     ? (rawPath.replace(new RegExp(`^/${stageName}(?=/|$)`), "") || "/")

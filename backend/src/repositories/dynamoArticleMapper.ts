@@ -70,7 +70,7 @@ export function mapItemToArticle(
   asset?: ArticleAssetData,
   signedAssetUrl?: string | null,
 ): Article {
-  assertArticleRecord(item);
+  assertArticleRecord(item, asset, signedAssetUrl);
   const id = item.PK.replace("A#", "");
   return {
     id,
@@ -165,14 +165,27 @@ function resolveAssetUrl(
   return url;
 }
 
-function assertArticleRecord(item: DynamoArticleItem) {
+function assertArticleRecord(item: DynamoArticleItem, asset?: ArticleAssetData, signedAssetUrl?: string | null) {
   if (!item?.PK) throw new Error("Dynamo article item missing PK");
   if (!item.title) throw new Error(`Dynamo article item ${item.PK} missing title`);
   if (!item.description) throw new Error(`Dynamo article item ${item.PK} missing description`);
   if (!item.date) throw new Error(`Dynamo article item ${item.PK} missing date`);
   if (!item.month) throw new Error(`Dynamo article item ${item.PK} missing month`);
-  if (!item.summary && (!item.soft_language_summary || !item.middle_summary || !item.dialogs)) {
-    // At least one of the rich summary fields should be present
+
+  const hasInlineSummary =
+    Boolean(item.summary) ||
+    Boolean(item.soft_language_summary) ||
+    Boolean(item.middle_summary?.length) ||
+    Boolean(item.dialogs?.length);
+  const hasAssetSummary =
+    Boolean(asset?.summary) ||
+    Boolean(asset?.soft_language_summary) ||
+    Boolean(asset?.middle_summary?.length) ||
+    Boolean(asset?.dialogs?.length);
+  const hasAssetReference = Boolean(item.asset_key || item.asset_url || signedAssetUrl);
+
+  if (!hasInlineSummary && !hasAssetSummary && !hasAssetReference) {
+    // Require either embedded summaries or a reference to the asset that contains them
     throw new Error(`Dynamo article item ${item.PK} missing summary fields`);
   }
 }
