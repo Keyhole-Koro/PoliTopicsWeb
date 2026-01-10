@@ -1,73 +1,11 @@
+import fs from "node:fs"
+import path from "node:path"
 import type { Article, ArticleSummary, SearchFilters } from "@shared/types/article"
 import type { ArticleRepository, HeadlinesResult } from "./articleRepository"
 
-const MOCK_ARTICLES: Article[] = [
-  {
-    id: "ISSUE-1001",
-    title: "School Lunch Policy Review",
-    description: "Committee discussion on school lunch funding and nutrition standards.",
-    date: "2025-01-10",
-    month: "2025-01",
-    categories: ["Education"],
-    participants: [
-      { name: "Taro Yamada", position: "Member", summary: "Asked about subsidy allocation." },
-    ],
-    keywords: [{ keyword: "school lunch", priority: "high" }],
-    imageKind: "会議録",
-    session: 213,
-    nameOfHouse: "House of Representatives",
-    nameOfMeeting: "Education Committee",
-    assetUrl: null,
-    summary: { based_on_orders: [1], summary: "Reviewed funding and nutrition standards." },
-    soft_language_summary: { based_on_orders: [1], summary: "Talked about better lunches." },
-    middle_summary: [{ based_on_orders: [1], summary: "Focused on budget and safety." }],
-    dialogs: [
-      {
-        order: 1,
-        summary: "Asked about budget safeguards.",
-        soft_language: "Asked how the budget is protected.",
-        reaction: "質問",
-        original_text: "What measures protect the lunch budget?",
-        speaker: "Taro Yamada",
-        position: "Member",
-      },
-    ],
-    terms: [{ term: "Subsidy", definition: "Public funding that offsets costs." }],
-  },
-  {
-    id: "ISSUE-1002",
-    title: "Child Welfare Budget Update",
-    description: "Updates on child welfare grants and regional support.",
-    date: "2025-01-05",
-    month: "2025-01",
-    categories: ["Child welfare"],
-    participants: [
-      { name: "Hanako Sato", position: "Minister", summary: "Provided grant timeline." },
-    ],
-    keywords: [{ keyword: "grants", priority: "medium" }],
-    imageKind: "会議録",
-    session: 213,
-    nameOfHouse: "House of Councillors",
-    nameOfMeeting: "Health Committee",
-    assetUrl: null,
-    summary: { based_on_orders: [2], summary: "Outlined grant rollout plans." },
-    soft_language_summary: { based_on_orders: [2], summary: "Explained how grants will be shared." },
-    middle_summary: [{ based_on_orders: [2], summary: "Discussed regional distribution." }],
-    dialogs: [
-      {
-        order: 2,
-        summary: "Outlined regional rollout schedule.",
-        soft_language: "Explained when regions get support.",
-        reaction: "回答",
-        original_text: "We will roll out support region by region.",
-        speaker: "Hanako Sato",
-        position: "Minister",
-      },
-    ],
-    terms: [{ term: "Grant", definition: "Funding distributed to local programs." }],
-  },
-]
+const ARTICLES_PATH = "../../../terraform/mock-article/articles.json"
 
+const MOCK_ARTICLES: Article[] = loadArticlesFromFixture()
 const MOCK_SUMMARIES = MOCK_ARTICLES.map(toSummary)
 
 export class MockArticleRepository implements ArticleRepository {
@@ -222,4 +160,48 @@ function normalizeBoundary(value: string | undefined, type: "start" | "end"): nu
     date.setHours(23, 59, 59, 999)
   }
   return date.getTime()
+}
+
+function loadArticlesFromFixture(): Article[] {
+  try {
+    const raw = fs.readFileSync(ARTICLES_PATH, "utf-8")
+    const parsed = JSON.parse(raw)
+    if (!Array.isArray(parsed)) {
+      throw new Error("Fixture is not an array")
+    }
+    return parsed.map((item, index) => {
+      assertFixtureItem(item, index)
+      const id = String(item.id ?? "").trim()
+      const assetUrl = String(item.assetUrl ?? item.asset_url ?? "").trim()
+      if (!assetUrl) {
+        throw new Error(`Fixture item ${id || index} missing assetUrl`)
+      }
+      return {
+        ...item,
+        id,
+        keywords: item.keywords ?? [],
+        participants: item.participants ?? [],
+        categories: item.categories ?? [],
+        middle_summary: item.middle_summary ?? [],
+        dialogs: item.dialogs ?? [],
+        terms: item.terms ?? [],
+        assetUrl,
+      }
+    })
+  } catch (error) {
+    console.error("MockRepo: failed to load mock articles fixture:", error)
+    return []
+  }
+}
+
+function assertFixtureItem(item: any, index: number) {
+  if (!item || typeof item !== "object") {
+    throw new Error(`Fixture item at index ${index} is not an object`)
+  }
+  if (!item.id) throw new Error(`Fixture item at index ${index} missing id`)
+  if (!item.title) throw new Error(`Fixture item at index ${index} missing title`)
+  if (!item.description) throw new Error(`Fixture item at index ${index} missing description`)
+  if (!item.date) throw new Error(`Fixture item at index ${index} missing date`)
+  if (!item.month) throw new Error(`Fixture item at index ${index} missing month`)
+  if (!item.summary) throw new Error(`Fixture item at index ${index} missing summary`)
 }

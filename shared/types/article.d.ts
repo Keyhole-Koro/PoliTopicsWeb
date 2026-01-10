@@ -44,7 +44,7 @@ export type ArticleSummary = {
     session: number;
     nameOfHouse: string;
     nameOfMeeting: string;
-    assetUrl: string | null;
+    assetUrl: string;
 };
 export default interface Article extends ArticleSummary {
     summary: Summary;

@@ -1,5 +1,5 @@
 const DEFAULT_REGION = "ap-northeast-3"
-const VALID_ENVIRONMENTS = ["local", "stage", "prod"] as const
+const VALID_ENVIRONMENTS = ["local", "stage", "prod", "localstack"] as const
 const VALID_DATA_MODES = ["dynamo", "mock"] as const
 
 type AppEnvironment = (typeof VALID_ENVIRONMENTS)[number]
@@ -15,6 +15,13 @@ type EnvironmentDefaults = {
 
 const ENVIRONMENT_DEFAULTS: Record<AppEnvironment, EnvironmentDefaults> = {
   local: {
+    tableName: "politopics-local",
+    articleAssetBucket: "politopics-articles-local",
+    region: DEFAULT_REGION,
+    localstackUrl: "http://localstack:4566",
+    credentials: { accessKeyId: "test", secretAccessKey: "test" },
+  },
+  localstack: {
     tableName: "politopics-local",
     articleAssetBucket: "politopics-articles-local",
     region: DEFAULT_REGION,

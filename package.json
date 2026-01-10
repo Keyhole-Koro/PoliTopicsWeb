@@ -26,12 +26,13 @@
     "worker:dev:local": "npx --yes wrangler dev --local --env local --config wrangler.toml --port 8787 --ip 127.0.0.1",
 
     "// e2e": "",
+    "setup:e2e": "npx playwright install && sudo env \"PATH=$PATH\" npx playwright install-deps",
     "e2e:prepare": "npm run build:frontend:local && npm run r2:sync:local",
     "test:e2e": "npm run e2e:prepare && npx playwright test",
-    "test:e2e:local": "npm run build:frontend:local && npm run r2:sync:local && npx playwright test",
-    "test:e2e:no:build": "npx playwright test",
+    "test:e2e:quick": "npx playwright test",
     "test:e2e:backend": "npx playwright test tests/e2e/backend.spec.ts",
-    "setup:e2e": "npx playwright install && sudo env \"PATH=$PATH\" npx playwright install-deps",
+    "test:e2e:localstack": "bash scripts/test-e2e-localstack.sh",
+    "r2:sync:local:fast": "bash scripts/r2-sync-bulk.sh",
 
     "// deploy": "",
     "deploy:localstack": "npm run build:backend:local && cd terraform && terraform apply -auto-approve -var-file=tfvars/localstack.tfvars",

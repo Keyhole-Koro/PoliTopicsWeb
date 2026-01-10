@@ -243,3 +243,53 @@ Details:
   - `PoliTopicsWeb/backend/src/http/schemas/articles.ts`
   - `PoliTopicsWeb/backend/src/http/app.ts`
   - `PoliTopicsWeb/backend/src/http/routes/articles.ts`
+
+Agent: Codex
+Date/Time: 2026-01-09 19:40 JST
+Keywords: localstack, e2e, playwright, terraform, wrangler
+Topic: LocalStack-backed E2E flow with API Gateway `_user_request_`
+Details:
+- Added LocalStack environment support to the backend config and disabled notifications for LocalStack Lambda deploys.
+- Unified mock data with the LocalStack seed dataset and adjusted Playwright to use a single set of expectations.
+- Parameterized Playwright to skip the mock backend in LocalStack mode.
+- Introduced `test:e2e:localstack` script to deploy the backend to LocalStack, seed data via `upload_articles.js`, build/sync frontend assets to local R2, and run Playwright against the `_user_request_` API URL.
+- Documented the LocalStack E2E workflow in the README.
+- Files changed:
+  - `PoliTopicsWeb/backend/src/config.ts`
+  - `PoliTopicsWeb/backend/src/repositories/mockArticleRepository.ts`
+  - `PoliTopicsWeb/backend/src/repositories/dynamoArticleMapper.ts`
+  - `PoliTopicsWeb/shared/types/article.d.ts`
+  - `PoliTopicsWeb/backend/src/http/schemas/articles.ts`
+  - `PoliTopicsWeb/playwright.config.ts`
+  - `PoliTopicsWeb/tests/e2e/backend.spec.ts`
+  - `PoliTopicsWeb/tests/e2e/spa.spec.ts`
+  - `PoliTopicsWeb/scripts/test-e2e-localstack.sh`
+  - `PoliTopicsWeb/package.json`
+  - `PoliTopicsWeb/README.md`
+  - `PoliTopicsWeb/terraform/service/lambda/main.tf`
+  - `PoliTopicsWeb/changes.agent.md`
+
+Agent: Codex
+Date/Time: 2026-01-10 02:40 JST
+Keywords: asset-url, s3, validation, mock-data
+Topic: Require non-null asset URLs and align mock data with S3 fixture
+Details:
+- Made assetUrl a required string in shared types and HTTP schemas; repository mappings now throw when asset URLs are missing.
+- Mock repository now loads the fixture and derives asset URLs using the LocalStack endpoint/bucket (articles/<id>.json) to mirror real uploads.
+- Files changed:
+  - `PoliTopicsWeb/shared/types/article.d.ts`
+  - `PoliTopicsWeb/backend/src/http/schemas/articles.ts`
+  - `PoliTopicsWeb/backend/src/repositories/dynamoArticleMapper.ts`
+  - `PoliTopicsWeb/backend/src/repositories/mockArticleRepository.ts`
+  - `PoliTopicsWeb/changes.agent.md`
+
+Agent: Codex
+Date/Time: 2026-01-10 14:20 JST
+Keywords: r2, wrangler, bulk-upload
+Topic: Add bulk R2 sync helper
+Details:
+- Added a bash helper to upload `frontend/out` to the local R2 bucket using wrangler in a single command.
+- Exposed it via `npm run r2:sync:local:fast`.
+- Files changed:
+  - `PoliTopicsWeb/scripts/r2-sync-bulk.sh`
+  - `PoliTopicsWeb/package.json`

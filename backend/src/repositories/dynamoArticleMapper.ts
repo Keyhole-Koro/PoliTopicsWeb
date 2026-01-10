@@ -19,15 +19,15 @@ export type DynamoArticleItem = {
   date: string;
   month: string;
   categories?: string[];
-  keywords?: Keyword[] | string[];
-  participants?: Participant[] | string[];
-  imageKind?: ArticleImageKind | string;
-  session?: number | string;
+  keywords?: Keyword[];
+  participants?: Participant[];
+  imageKind?: ArticleImageKind;
+  session?: number;
   nameOfHouse?: string;
   nameOfMeeting?: string;
-  terms?: Term[] | string[];
-  summary?: Summary | string;
-  soft_language_summary?: SoftLanguageSummary | string;
+  terms?: Term[];
+  summary?: Summary;
+  soft_language_summary?: SoftLanguageSummary;
   middle_summary?: MiddleSummary[];
   dialogs?: Dialog[];
   asset_key?: string;
@@ -43,10 +43,10 @@ export type DynamoIndexItem = {
   date: string;
   month: string;
   categories?: string[];
-  keywords?: Keyword[] | string[];
-  participants?: Participant[] | string[];
-  imageKind?: ArticleImageKind | string;
-  session?: number | string;
+  keywords?: Keyword[];
+  participants?: Participant[];
+  imageKind?: ArticleImageKind;
+  session?: number;
   nameOfHouse?: string;
   nameOfMeeting?: string;
   asset_key?: string;
@@ -54,8 +54,8 @@ export type DynamoIndexItem = {
 };
 
 export type ArticleAssetData = {
-  summary?: Summary | string;
-  soft_language_summary?: SoftLanguageSummary | string;
+  summary?: Summary;
+  soft_language_summary?: SoftLanguageSummary;
   middle_summary?: MiddleSummary[];
   dialogs?: Dialog[];
 };
@@ -70,6 +70,7 @@ export function mapItemToArticle(
   asset?: ArticleAssetData,
   signedAssetUrl?: string | null,
 ): Article {
+  assertArticleRecord(item);
   const id = item.PK.replace("A#", "");
   return {
     id,
@@ -78,24 +79,28 @@ export function mapItemToArticle(
     date: item.date ?? "",
     month: item.month ?? "",
     categories: item.categories ?? [],
-    keywords: normalizeKeywords(item.keywords),
-    participants: normalizeParticipants(item.participants),
-    imageKind: normalizeImageKind(item.imageKind),
-    session: typeof item.session === "number" ? item.session : Number(item.session) || 0,
+    keywords: item.keywords ?? [],
+    participants: item.participants ?? [],
+    imageKind: item.imageKind ?? "会議録",
+    session: item.session ?? 0,
     nameOfHouse: item.nameOfHouse ?? "",
     nameOfMeeting: item.nameOfMeeting ?? "",
-    summary: normalizeSummary(asset?.summary ?? item.summary),
-    soft_language_summary: normalizeSummary(asset?.soft_language_summary ?? item.soft_language_summary),
-    middle_summary: normalizeMiddleSummaries(asset?.middle_summary ?? item.middle_summary),
-    dialogs: normalizeDialogs(asset?.dialogs ?? item.dialogs),
-    terms: normalizeTerms(item.terms),
-    assetUrl: signedAssetUrl ?? null,
+    summary: asset?.summary ?? item.summary ?? { based_on_orders: [], summary: "" },
+    soft_language_summary: asset?.soft_language_summary ?? item.soft_language_summary ?? {
+      based_on_orders: [],
+      summary: "",
+    },
+    middle_summary: asset?.middle_summary ?? item.middle_summary ?? [],
+    dialogs: asset?.dialogs ?? item.dialogs ?? [],
+    terms: item.terms ?? [],
+    assetUrl: resolveAssetUrl(item, signedAssetUrl),
   };
 }
 
 export function mapIndexToSummary(item: Record<string, unknown>, signedAssetUrl?: string | null): ArticleSummary | undefined {
   if (!item) return undefined;
   const record = item as DynamoIndexItem;
+  assertIndexRecord(record);
 
   return {
     id: record.articleId ?? record.PK?.split("#").pop() ?? "",
@@ -104,13 +109,13 @@ export function mapIndexToSummary(item: Record<string, unknown>, signedAssetUrl?
     date: record.date,
     month: record.month,
     categories: record.categories ?? [],
-    keywords: normalizeKeywords(record.keywords),
-    participants: normalizeParticipants(record.participants),
-    imageKind: normalizeImageKind(record.imageKind),
-    session: typeof record.session === "number" ? record.session : Number(record.session) || 0,
+    keywords: record.keywords ?? [],
+    participants: record.participants ?? [],
+    imageKind: record.imageKind ?? "会議録",
+    session: record.session ?? 0,
     nameOfHouse: record.nameOfHouse ?? "",
     nameOfMeeting: record.nameOfMeeting ?? "",
-    assetUrl: signedAssetUrl ?? null,
+    assetUrl: resolveAssetUrl(record, signedAssetUrl),
   };
 }
 
@@ -148,117 +153,33 @@ export function toSummary(article: Article): ArticleSummary {
   };
 }
 
-export function normalizeSummary(source: unknown, fallback = ""): Summary {
-  if (typeof source === "string") {
-    return { based_on_orders: [], summary: source };
+function resolveAssetUrl(
+  item: Pick<DynamoArticleItem, "asset_url"> | Pick<DynamoIndexItem, "asset_url">,
+  signedAssetUrl?: string | null,
+): string {
+  const url = (signedAssetUrl ?? item.asset_url ?? "").trim();
+  if (!url) {
+    const identifier = (item as DynamoArticleItem).PK ?? (item as DynamoIndexItem).articleId ?? "unknown";
+    throw new Error(`Missing asset URL for article ${identifier}`);
   }
-  if (source && typeof source === "object") {
-    const summary = (source as Partial<Summary>).summary;
-    const basedOnOrders = (source as Partial<Summary>).based_on_orders;
-    if (typeof summary === "string" && Array.isArray(basedOnOrders)) {
-      return { based_on_orders: basedOnOrders, summary };
-    }
+  return url;
+}
+
+function assertArticleRecord(item: DynamoArticleItem) {
+  if (!item?.PK) throw new Error("Dynamo article item missing PK");
+  if (!item.title) throw new Error(`Dynamo article item ${item.PK} missing title`);
+  if (!item.description) throw new Error(`Dynamo article item ${item.PK} missing description`);
+  if (!item.date) throw new Error(`Dynamo article item ${item.PK} missing date`);
+  if (!item.month) throw new Error(`Dynamo article item ${item.PK} missing month`);
+  if (!item.summary && (!item.soft_language_summary || !item.middle_summary || !item.dialogs)) {
+    // At least one of the rich summary fields should be present
+    throw new Error(`Dynamo article item ${item.PK} missing summary fields`);
   }
-  return { based_on_orders: [], summary: fallback };
 }
 
-export function normalizeMiddleSummaries(source: unknown): MiddleSummary[] {
-  if (!Array.isArray(source)) return [];
-  return source
-    .map((entry) => normalizeSummary(entry))
-    .filter((entry) => entry.summary.length > 0 || entry.based_on_orders.length > 0);
-}
-
-export function normalizeKeywords(source: unknown): Keyword[] {
-  if (!Array.isArray(source)) return [];
-  return source
-    .map((item) => {
-      if (typeof item === "string") {
-        return { keyword: item, priority: "medium" as Keyword["priority"] };
-      }
-      if (item && typeof item === "object") {
-        const keyword = "keyword" in item ? (item as Keyword).keyword : "";
-        if (!keyword) return null;
-        const priority = "priority" in item ? (item as Keyword).priority : "medium";
-        const normalizedPriority: Keyword["priority"] =
-          priority === "high" || priority === "low" ? priority : "medium";
-        return { keyword, priority: normalizedPriority };
-      }
-      return null;
-    })
-    .filter((item): item is Keyword => Boolean(item));
-}
-
-export function normalizeParticipants(source: unknown): Participant[] {
-  if (!Array.isArray(source)) return [];
-  return source
-    .map((item) => {
-      if (typeof item === "string") {
-        return { name: item, summary: "" };
-      }
-      if (item && typeof item === "object") {
-        const name = "name" in item ? String((item as Participant).name) : "";
-        if (!name) return null;
-        return {
-          name,
-          position: (item as Participant).position,
-          summary: typeof (item as Participant).summary === "string" ? (item as Participant).summary : "",
-          based_on_orders: (item as Participant).based_on_orders,
-        };
-      }
-      return null;
-    })
-    .filter((item): item is Participant => Boolean(item));
-}
-
-export function normalizeTerms(source: unknown): Term[] {
-  if (!Array.isArray(source)) return [];
-  return source
-    .map((item) => {
-      if (typeof item === "string") {
-        return { term: item, definition: item };
-      }
-      if (item && typeof item === "object" && "term" in item) {
-        return {
-          term: (item as Term).term,
-          definition: (item as Term).definition ?? "",
-        };
-      }
-      return null;
-    })
-    .filter((item): item is Term => Boolean(item));
-}
-
-export function normalizeDialogs(source: unknown): Dialog[] {
-  if (!Array.isArray(source)) return [];
-  return source
-    .map((item): Dialog | null => {
-      if (!item || typeof item !== "object") return null;
-      const dialog = item as Partial<Dialog> & { order?: number };
-      if (typeof dialog.order === "undefined" || typeof dialog.summary !== "string") {
-        return null;
-      }
-      const order = Number(dialog.order);
-      if (Number.isNaN(order)) {
-        return null;
-      }
-      return {
-        order,
-        summary: dialog.summary,
-        soft_language: typeof dialog.soft_language === "string" ? dialog.soft_language : "",
-        reaction: (dialog.reaction as Dialog["reaction"]) ?? "中立",
-        original_text: dialog.original_text || "",
-        speaker: dialog.speaker,
-        position: dialog.position,
-      };
-    })
-    .filter((item): item is Dialog => Boolean(item));
-}
-
-export function normalizeImageKind(value: unknown): ArticleImageKind {
-  const allowed: ArticleImageKind[] = ["会議録", "目次", "索引", "附録", "追録"];
-  if (typeof value === "string" && allowed.includes(value as ArticleImageKind)) {
-    return value as ArticleImageKind;
-  }
-  return "会議録";
+function assertIndexRecord(item: DynamoIndexItem) {
+  if (!item?.PK) throw new Error("Dynamo index item missing PK");
+  if (!item.title) throw new Error(`Dynamo index item ${item.PK} missing title`);
+  if (!item.date) throw new Error(`Dynamo index item ${item.PK} missing date`);
+  if (!item.month) throw new Error(`Dynamo index item ${item.PK} missing month`);
 }

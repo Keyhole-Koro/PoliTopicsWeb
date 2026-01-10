@@ -25,7 +25,7 @@ Set the backend `ENV` variable to `local` (default), `localstack`, `stage`, or `
 
 ### Signed article assets
 
-- Article endpoints now return `assetUrl` (string or `null`) for both summaries and full articles. The URL is a signed `GET` link with a short TTL (default: 900 seconds).
+- Article endpoints now return `assetUrl` (string, never null) for both summaries and full articles. The URL is a signed `GET` link with a short TTL (default: 900 seconds).
 - Configure TTL via `ASSET_URL_TTL_SECONDS` in the backend environment. When unset, the default 900 seconds is used.
 - Signing uses the article asset bucket configured per environment and honors the LocalStack endpoint for local runs.
 
@@ -70,6 +70,33 @@ Use the Worker + R2 path locally so the SPA runs through the same routing layer 
 Notes:
 - The mock backend is enabled via `DATA_MODE=mock` and `DISABLE_NOTIFICATIONS=true`.
 - The Worker listens on http://127.0.0.1:8787; the backend listens on http://127.0.0.1:4500.
+
+## E2E Testing
+
+The project uses Playwright for End-to-End testing.
+
+| Command | Description | Use Case |
+| :--- | :--- | :--- |
+| `npm run setup:e2e` | Installs Playwright browsers & dependencies. | First time setup. |
+| `npm run test:e2e` | **Standard Run.** Builds frontend, syncs assets, runs tests. | Run this before committing. |
+| `npm run test:e2e:quick` | **Quick Run.** Runs Playwright *without* building. | Fast iteration when only editing test files. |
+| `npm run test:e2e:backend`| **Backend Only.** Runs only `backend.spec.ts`. | Verifying API changes independently. |
+| `npm run test:e2e:localstack` | **Full Integration.** Deploys backend to LocalStack + full E2E. | Deep system testing with AWS simulation. |
+
+## LocalStack E2E (Full Integration)
+
+Use this flow to hit the deployed Lambda/API on LocalStack (already running inside the devcontainer; reachable at `http://localstack:4566`).
+
+```
+cd PoliTopicsWeb
+npm install --workspaces --include-workspace-root   # first time only
+npm run test:e2e:localstack
+```
+
+What it does:
+- Builds the backend Lambda, runs Terraform with `tfvars/localstack.tfvars`, and converts the API Gateway invoke URL to the LocalStack `_user_request_` form.
+- Seeds the DynamoDB table + S3 payload bucket via `terraform/mock-article/upload_articles.js` (same dataset the Playwright specs assert).
+- Builds the frontend with `NEXT_PUBLIC_API_BASE_URL` set to the LocalStack `_user_request_` URL, syncs to local R2, starts Wrangler (Miniflare), then runs Playwright with `E2E_MODE=localstack` (skips the mock Fastify server).
 
 ## API surface
 
