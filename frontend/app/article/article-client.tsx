@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { DialogViewer, type Dialog as TranscriptDialog } from "@/components/dialog-viewer"
+import { Markdown } from "@/components/markdown"
 import { Quote, Users, Tag, BookOpen, MessageSquare } from "lucide-react"
 
 type Props = {
@@ -94,11 +95,11 @@ export function ArticleClient({ issueId }: Props) {
         <CardContent className="space-y-4">
           <div>
             <h4 className="mb-2 text-base font-semibold text-foreground">詳細要約</h4>
-            <p className="leading-relaxed text-muted-foreground">{summaryText}</p>
+            <Markdown content={summaryText} />
           </div>
           <div className="border-t pt-4">
             <h4 className="mb-2 text-base font-semibold text-foreground">簡潔要約</h4>
-            <p className="text-sm italic text-muted-foreground">{softSummaryText}</p>
+            <Markdown content={softSummaryText} className="italic text-muted-foreground" />
           </div>
         </CardContent>
       </Card>

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev:local": "ACTIVE_ENVIRONMENT=local watch src/server.ts",
     "start": "node dist/server.js",
     "build": "tsc -p tsconfig.json && node scripts/prepare-local-dist.mjs && node scripts/zip.mjs",
     "build:local": "tsc -p tsconfig.json && node scripts/prepare-local-dist.mjs && node scripts/zip.mjs",

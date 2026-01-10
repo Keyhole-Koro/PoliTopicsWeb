@@ -293,3 +293,21 @@ Details:
 - Files changed:
   - `PoliTopicsWeb/scripts/r2-sync-bulk.sh`
   - `PoliTopicsWeb/package.json`
+
+Agent: Codex
+Date/Time: 2026-01-11 11:00 JST
+Keywords: frontend, markdown, summaries, backend, schema
+Topic: Render summaries as Markdown and harden participant mapping
+Details:
+- Added a shared `Markdown` component using `react-markdown` + `remark-gfm` to render AI要約/簡潔要約 with Markdown support and added prose styles to `frontend/styles/globals.css`.
+- Swapped summary/soft summary rendering on the article page to use the Markdown component and pulled in the new dependencies.
+- Normalized participant records in Dynamo mappers to avoid null `position` values violating Zod response schemas and allowed summary validation to pass when data is provided via asset references.
+- Seed mock article (issue-001) summaries now include Markdown (bullet list, link, ordered list) to verify rendering in mock/local runs.
+- Frontend dev scripts now bind Next.js to `0.0.0.0` on port 3333 so hosts outside the devcontainer (e.g., Windows Chrome) can access the dev server.
+- Files changed:
+  - `PoliTopicsWeb/frontend/app/article/article-client.tsx`
+  - `PoliTopicsWeb/frontend/components/markdown.tsx`
+  - `PoliTopicsWeb/frontend/styles/globals.css`
+  - `PoliTopicsWeb/frontend/package.json`
+  - `PoliTopicsWeb/frontend/pnpm-lock.yaml`
+  - `PoliTopicsWeb/backend/src/repositories/dynamoArticleMapper.ts`
