@@ -45,6 +45,13 @@ jobs:
       - name: Build backend Lambda bundle
         run: npm run build:backend
 
+      - name: Verify backend bundle contents
+        run: |
+          set -e
+          ls -la backend/dist
+          unzip -l backend/dist/backend.zip | sed -n '1,20p'
+          unzip -l backend/dist/backend.zip | grep -q "backend/src/handler.js"
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
