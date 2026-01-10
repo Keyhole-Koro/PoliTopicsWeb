@@ -80,7 +80,7 @@ export function mapItemToArticle(
     month: item.month ?? "",
     categories: item.categories ?? [],
     keywords: item.keywords ?? [],
-    participants: item.participants ?? [],
+    participants: normalizeParticipants(item.participants),
     imageKind: item.imageKind ?? "会議録",
     session: item.session ?? 0,
     nameOfHouse: item.nameOfHouse ?? "",
@@ -110,7 +110,7 @@ export function mapIndexToSummary(item: Record<string, unknown>, signedAssetUrl?
     month: record.month,
     categories: record.categories ?? [],
     keywords: record.keywords ?? [],
-    participants: record.participants ?? [],
+    participants: normalizeParticipants(record.participants),
     imageKind: record.imageKind ?? "会議録",
     session: record.session ?? 0,
     nameOfHouse: record.nameOfHouse ?? "",
@@ -195,4 +195,16 @@ function assertIndexRecord(item: DynamoIndexItem) {
   if (!item.title) throw new Error(`Dynamo index item ${item.PK} missing title`);
   if (!item.date) throw new Error(`Dynamo index item ${item.PK} missing date`);
   if (!item.month) throw new Error(`Dynamo index item ${item.PK} missing month`);
+}
+
+function normalizeParticipants(participants?: Participant[]): Participant[] {
+  if (!participants) return [];
+  return participants.map((participant) => ({
+    ...participant,
+    name: participant.name ?? "",
+    summary: participant.summary ?? "",
+    // position can be missing in some records; Zod schema treats it as optional, not nullable
+    position: participant.position ?? undefined,
+    based_on_orders: participant.based_on_orders ?? [],
+  }));
 }
