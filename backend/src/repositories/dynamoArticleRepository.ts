@@ -179,6 +179,7 @@ export class DynamoArticleRepository implements ArticleRepository {
   }
 
   async getArticle(id: string): Promise<Article | undefined> {
+    const started = process.hrtime.bigint();
     const response = await this.docClient.send(
       new GetCommand({
         TableName: this.tableName,
@@ -187,6 +188,13 @@ export class DynamoArticleRepository implements ArticleRepository {
           SK: "META",
         },
       }),
+    );
+    const durationMs = Number(process.hrtime.bigint() - started) / 1_000_000;
+    // eslint-disable-next-line no-console
+    console.log(
+      `[dynamo] getArticle table=${this.tableName} id=${id} duration_ms=${durationMs.toFixed(2)} hit=${Boolean(
+        response.Item,
+      )}`,
     );
 
     if (!response.Item) {

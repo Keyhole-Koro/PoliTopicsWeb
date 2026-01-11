@@ -109,13 +109,24 @@ const articlesRoutes: FastifyPluginAsync = async (fastify) => {
       },
     },
     async (request, reply) => {
-      const article = await fastify.articleRepository.getArticle(request.params.id)
-      if (!article) {
-        reply.status(404)
-        return { message: "Article not found" }
-      }
+      const started = process.hrtime.bigint()
+      let statusCode = 200
+      try {
+        const article = await fastify.articleRepository.getArticle(request.params.id)
+        if (!article) {
+          statusCode = 404
+          reply.status(statusCode)
+          return { message: "Article not found" }
+        }
 
-      return { article }
+        return { article }
+      } catch (error) {
+        statusCode = reply.statusCode || 500
+        throw error
+      } finally {
+        const durationMs = Number(process.hrtime.bigint() - started) / 1_000_000
+        console.log(`[article] id=${request.params.id} status=${statusCode} duration_ms=${durationMs.toFixed(2)}`)
+      }
     }
   )
 }

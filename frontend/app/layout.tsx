@@ -16,7 +16,7 @@ const manrope = Manrope({
 })
 
 export const metadata: Metadata = {
-  title: "PoliTopics - 国会議事録viwer",
+  title: "PoliTopics - 国会議事録ニュース",
 }
 
 export default function RootLayout({
