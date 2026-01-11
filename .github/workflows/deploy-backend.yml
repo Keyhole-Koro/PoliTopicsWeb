@@ -73,3 +73,24 @@ jobs:
       - name: Terraform Apply
         working-directory: ${{ env.TERRAFORM_WORKING_DIR }}
         run: terraform apply -auto-approve tfplan
+
+      - name: Export backend API URL
+        id: backend-output
+        working-directory: ${{ env.TERRAFORM_WORKING_DIR }}
+        run: |
+          set -euo pipefail
+          API_URL=$(terraform output -raw backend_api_url)
+          echo "BACKEND_API_URL=${API_URL}" >> "$GITHUB_ENV"
+
+      - name: Verify backend health
+        env:
+          BACKEND_API_URL: ${{ env.BACKEND_API_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${BACKEND_API_URL:-}" ]; then
+            echo "BACKEND_API_URL is missing" >&2
+            exit 1
+          fi
+          HEALTH_URL="${BACKEND_API_URL%/}/healthz"
+          echo "Checking backend health at ${HEALTH_URL}"
+          curl -fsS --retry 4 --retry-delay 2 --retry-all-errors "${HEALTH_URL}"

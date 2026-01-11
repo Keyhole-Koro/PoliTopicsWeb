@@ -119,3 +119,24 @@ jobs:
               -H "Content-Type: application/json" \
               --data '{"purge_everything":true}'
           fi
+
+      - name: Verify frontend health
+        env:
+          ENV: ${{ env.ENV }}
+          STAGE_FRONTEND_URL: ${{ secrets.STAGE_FRONTEND_URL }}
+        run: |
+          set -euo pipefail
+
+          if [ "${ENV}" = "prod" ]; then
+            frontend_url="https://politopics.net/"
+          else
+            if [ -z "${STAGE_FRONTEND_URL:-}" ]; then
+              echo "STAGE_FRONTEND_URL secret is required for stage frontend health check" >&2
+              exit 1
+            fi
+
+            frontend_url="${STAGE_FRONTEND_URL}"
+          fi
+
+          echo "Checking frontend health at ${frontend_url}"
+          curl -fsSI --retry 4 --retry-delay 2 --retry-all-errors "${frontend_url}"
