@@ -1,5 +1,5 @@
 import fs from "node:fs"
-import { fileURLToPath } from "node:url"
+import path from "node:path"
 import type { Article, ArticleSummary, SearchFilters } from "@shared/types/article"
 import type { ArticleRepository, HeadlinesResult } from "./articleRepository"
 
@@ -191,15 +191,15 @@ function getMockSummaries(): ArticleSummary[] {
 function resolveArticlesPath(): string {
   const candidates = [
     process.env.MOCK_ARTICLES_PATH,
-    // @ts-ignore
-    fileURLToPath(new URL("../../shared/mock/articles.json", import.meta.url)),
-    // @ts-ignore
-    fileURLToPath(new URL("../../../terraform/mock-article/articles.json", import.meta.url)),
+    path.resolve(process.cwd(), "../shared/mock/articles.json"),
+    path.resolve(process.cwd(), "../../shared/mock/articles.json"),
+    path.resolve(process.cwd(), "../terraform/mock-article/articles.json"),
+    path.resolve(process.cwd(), "../../terraform/mock-article/articles.json"),
   ].filter(Boolean) as string[]
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) return candidate
   }
-  return candidates[0] ?? "../../../terraform/mock-article/articles.json"
+  return candidates[0] ?? "articles.json"
 }
 
 function loadArticlesFromFixture(): Article[] {
