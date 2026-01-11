@@ -11,20 +11,19 @@ export function ArticleMeta({ article }: Props) {
   const meetingType = article.imageKind
 
   const categories = article.categories ?? []
+  const primaryCategory = categories[0]
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
         <div className="flex flex-wrap gap-2">
-          {categories.length > 0 ? (
-            categories.map((category) => (
-              <Badge key={category} className="bg-primary/10 text-primary">
-                {category}
-              </Badge>
-            ))
+          {primaryCategory ? (
+            <Badge key={primaryCategory} className="bg-primary/10 text-primary">
+              {primaryCategory}
+            </Badge>
           ) : (
             <Badge variant="secondary" className="text-muted-foreground">
-              カテゴリ未設定
+              院名未設定
             </Badge>
           )}
         </div>
