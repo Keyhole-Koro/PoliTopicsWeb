@@ -199,7 +199,7 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
   }, [dialogs])
 
   const groups = useMemo(() => {
-    const uniqueGroups = Array.from(new Set(dialogs.map((d) => d.speaker_group)))
+    const uniqueGroups = Array.from(new Set(dialogs.map((d) => d.speaker_group).filter(Boolean)))
     return uniqueGroups.sort()
   }, [dialogs])
 
@@ -216,7 +216,9 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
 
       const matchesSpeaker = selectedSpeaker === "all" || dialog.speaker === selectedSpeaker
 
-      const matchesGroup = selectedGroup === "all" || dialog.speaker_group === selectedGroup
+      const matchesGroup =
+        selectedGroup === "all" ||
+        (dialog.speaker_group && dialog.speaker_group === selectedGroup)
 
       const matchesReaction =
         selectedReaction === "all" ||
@@ -276,9 +278,11 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-2">
                     <h4 className="font-semibold text-foreground truncate">{dialog.speaker}</h4>
-                    <Badge variant="outline" className="text-xs">
-                      {dialog.speaker_group}
-                    </Badge>
+                    {dialog.speaker_group ? (
+                      <Badge variant="outline" className="text-xs">
+                        {dialog.speaker_group}
+                      </Badge>
+                    ) : null}
                     <Badge variant="secondary" className="text-xs">
                       {viewMode === "original" ? "原文" : viewMode === "soft_summary" ? "やさしい" : "詳細"}
                     </Badge>
@@ -516,10 +520,12 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
                                 <div className="min-w-0 flex-1">
                                   <h4 className="font-semibold text-foreground truncate">{dialog.speaker}</h4>
                                   <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs text-muted-foreground">
-                                    <Badge variant="outline" className="text-xs w-fit">
-                                      {dialog.speaker_group}
-                                    </Badge>
-                                    <span className="truncate">{dialog.speaker_position}</span>
+                                    {dialog.speaker_group ? (
+                                      <Badge variant="outline" className="text-xs w-fit">
+                                        {dialog.speaker_group}
+                                      </Badge>
+                                    ) : null}
+                                    {dialog.speaker_position ? <span className="truncate">{dialog.speaker_position}</span> : null}
                                   </div>
                                 </div>
                               </div>

@@ -1,3 +1,5 @@
+import { debugLog } from "./logger"
+
 type AppEnvironment = "local" | "stage" | "prod"
 
 type AppConfig = {
@@ -29,4 +31,6 @@ export const appConfig: AppConfig = {
   apiBaseUrl: CONFIG_BY_ENV[ACTIVE_ENVIRONMENT].apiBaseUrl,
 }
 
-console.log("[config] App Config:", JSON.stringify(appConfig, null, 2))
+if (appConfig.environment === "local") {
+  debugLog("[config] App Config:", JSON.stringify(appConfig, null, 2))
+}

@@ -21,11 +21,7 @@ export function ArticleMeta({ article }: Props) {
             <Badge key={primaryCategory} className="bg-primary/10 text-primary">
               {primaryCategory}
             </Badge>
-          ) : (
-            <Badge variant="secondary" className="text-muted-foreground">
-              院名未設定
-            </Badge>
-          )}
+          ) : null}
         </div>
         <div className="flex items-center gap-1">
           <Calendar className="h-4 w-4" />

@@ -1,5 +1,6 @@
 import type { Article, ArticleSummary, SearchFilters } from "@shared/types/article"
 import { appConfig } from "./config"
+import { debugLog } from "./logger"
 
 const API_BASE_URL = appConfig.apiBaseUrl
 
@@ -113,7 +114,7 @@ export async function fetchSuggestions(input: string, options: SuggestionOptions
 
 async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${path}`
-  console.log(`[api] Fetching: ${url}`)
+  debugLog(`[api] Fetching: ${url}`)
   try {
     const response = await fetch(url, {
       ...init,
@@ -129,7 +130,7 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
     }
 
     const data = (await response.json()) as T
-    console.log(`[api] Success: ${url}`, data)
+    debugLog(`[api] Success: ${url}`, data)
     return data
   } catch (error) {
     console.error(`[api] Network error for ${url}:`, error)

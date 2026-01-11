@@ -55,8 +55,8 @@ export function ArticleClient({ issueId }: Props) {
   const dialogEntries: TranscriptDialog[] = (article.dialogs ?? []).map((dialog) => ({
     order: dialog.order,
     speaker: dialog.speaker ?? "発言者不明",
-    speaker_group: dialog.position ?? "所属情報未設定",
-    speaker_position: dialog.position ?? "所属情報未設定",
+    speaker_group: dialog.position ?? "",
+    speaker_position: dialog.position ?? "",
     speaker_role: dialog.position ?? "発言者",
     summary: dialog.summary,
     original_text: dialog.original_text,

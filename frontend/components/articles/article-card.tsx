@@ -9,12 +9,15 @@ type Props = {
 }
 
 export function ArticleCard({ article }: Props) {
+  const category = article.categories[0]
   return (
     <Card className="border-foreground/10 shadow-none">
       <CardHeader>
-        <Badge variant="outline" className="w-fit">
-          {article.categories[0] ?? "その他"}
-        </Badge>
+        {category ? (
+          <Badge variant="outline" className="w-fit">
+            {category}
+          </Badge>
+        ) : null}
         <CardTitle className="mt-3 text-xl leading-tight">
           <Link href={`/article/${encodeURIComponent(article.id)}`} className="hover:underline">
             {article.title}
