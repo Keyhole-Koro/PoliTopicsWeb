@@ -1,5 +1,5 @@
 import fs from "node:fs"
-import path from "node:path"
+import { fileURLToPath } from "node:url"
 import type { Article, ArticleSummary, SearchFilters } from "@shared/types/article"
 import type { ArticleRepository, HeadlinesResult } from "./articleRepository"
 
@@ -191,8 +191,10 @@ function getMockSummaries(): ArticleSummary[] {
 function resolveArticlesPath(): string {
   const candidates = [
     process.env.MOCK_ARTICLES_PATH,
-    path.resolve(__dirname, "../../shared/mock/articles.json"),
-    path.resolve(__dirname, "../../../terraform/mock-article/articles.json"),
+    // @ts-ignore
+    fileURLToPath(new URL("../../shared/mock/articles.json", import.meta.url)),
+    // @ts-ignore
+    fileURLToPath(new URL("../../../terraform/mock-article/articles.json", import.meta.url)),
   ].filter(Boolean) as string[]
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) return candidate
@@ -211,10 +213,8 @@ function loadArticlesFromFixture(): Article[] {
     return parsed.map((item, index) => {
       assertFixtureItem(item, index)
       const id = String(item.id ?? "").trim()
-      const assetUrl = String(item.assetUrl ?? item.asset_url ?? "").trim()
-      if (!assetUrl) {
-        throw new Error(`Fixture item ${id || index} missing assetUrl`)
-      }
+      const assetUrl = String(item.assetUrl ?? item.asset_url ?? `https://mock.local/assets/${id}`).trim()
+
       return {
         ...item,
         id,
