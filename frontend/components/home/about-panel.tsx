@@ -22,18 +22,8 @@ export function AboutPanel({ isOpen }: Props) {
           </CardHeader>
           <CardContent className="space-y-4 text-sm leading-relaxed text-muted-foreground">
             <p>
-              PoliTopics は国会の動きを噛み砕いてお届けする SPA
-              です。静的に埋め込まれた最新記事とリアルタイム検索 API を組み合わせ、市民が安心して政治情報にアクセスできる体験を目指しています。
+              PoliTopics は国会の動きを噛み砕いてお届けするwebサイトです。https://kokkai.ndl.go.jp/#/を元に、国会議事録のデータを収集し、AIを活用して要約を生成しています。
             </p>
-            <div>
-              <h4 className="mb-2 flex items-center gap-2 font-semibold text-foreground">
-                <Brain className="h-4 w-4" />
-                AI サマリーのプロンプト
-              </h4>
-              <code className="block max-h-64 overflow-y-auto rounded-lg bg-muted p-3 text-xs text-muted-foreground">
-                {HOME_PROMPT}
-              </code>
-            </div>
             <div>
               <h4 className="mb-2 flex items-center gap-2 font-semibold text-foreground">
                 <Github className="h-4 w-4" />
@@ -41,7 +31,7 @@ export function AboutPanel({ isOpen }: Props) {
               </h4>
               <p>このプロジェクトは透明性を重視し、GitHub で公開しています。</p>
               <Button variant="outline" size="sm" asChild className="mt-3">
-                <a href="https://github.com/example/parliamentary-news" target="_blank" rel="noreferrer">
+                <a href="https://github.com/Keyhole-Koro/PoliTopicsDataCollection/blob/5e869743712ff0ed8e0c70604050916b3e7471c9/src/prompts/prompts.ts" target="_blank" rel="noreferrer">
                   <Github className="mr-2 h-4 w-4" />
                   ソースコードを表示
                 </a>

@@ -16,10 +16,7 @@ const manrope = Manrope({
 })
 
 export const metadata: Metadata = {
-  title: "Parliamentary News - National Diet Proceedings",
-  description:
-    "Stay informed about parliamentary proceedings and national diet sessions. Complex political information made accessible for ordinary citizens.",
-  generator: "v0.app",
+  title: "PoliTopics - 国会議事録viwer",
 }
 
 export default function RootLayout({

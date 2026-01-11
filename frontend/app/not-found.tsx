@@ -13,14 +13,14 @@ export default function NotFound() {
         <h1 className="text-3xl font-bold font-serif text-foreground mb-4">Article Not Found</h1>
 
         <p className="text-muted-foreground mb-8 leading-relaxed">
-          The parliamentary proceeding you're looking for doesn't exist or may have been moved. Please check the article
-          ID or return to the main news page.
+          The PoliTopics article you're looking for doesn't exist or may have been moved. Please check the article ID or
+          return to the main page.
         </p>
 
         <Button asChild>
           <Link href="/" className="flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" />
-            Back to Parliamentary News
+            Back to PoliTopics
           </Link>
         </Button>
       </div>

@@ -1,11 +1,13 @@
 'use client'
 
+import Image from "next/image"
 import { useEffect, useMemo, useState } from "react"
-import { ArrowLeft, MessageSquare } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import { HomeClient } from "../home-client"
 import { ArticleClient } from "../article/article-client"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import Logo from "@/app/icon.png"
 
 type RouteMatch =
   | { kind: "home" }
@@ -70,8 +72,8 @@ export function CatchAllClient() {
             </Button>
             <Separator orientation="vertical" className="h-6" />
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
-                <MessageSquare className="h-4 w-4 text-primary" />
+              <div className="relative h-9 w-9 overflow-hidden rounded-full bg-primary/10">
+                <Image src={Logo} alt="PoliTopics" fill className="object-contain p-1.5" priority />
               </div>
               <span className="font-serif text-base font-semibold text-foreground">国会議事録ニュース</span>
             </div>

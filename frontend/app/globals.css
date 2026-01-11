@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Fixed color values for proper parliamentary news design */
+  /* Fixed color values for PoliTopics */
   --background: oklch(1 0 0); /* #ffffff - Clean background */
   --foreground: oklch(0.2 0 0); /* #374151 - Main text color */
   --card: oklch(0.99 0 0); /* #f9fafb - Card background */

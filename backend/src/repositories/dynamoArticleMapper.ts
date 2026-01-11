@@ -78,7 +78,6 @@ export function mapItemToArticle(
     description: item.description ?? "",
     date: item.date ?? "",
     month: item.month ?? "",
-    categories: item.categories ?? [],
     keywords: item.keywords ?? [],
     participants: normalizeParticipants(item.participants),
     imageKind: item.imageKind ?? "会議録",
@@ -92,6 +91,7 @@ export function mapItemToArticle(
     },
     middle_summary: asset?.middle_summary ?? item.middle_summary ?? [],
     dialogs: asset?.dialogs ?? item.dialogs ?? [],
+    categories: item.categories ?? [],
     terms: item.terms ?? [],
     assetUrl: resolveAssetUrl(item, signedAssetUrl),
   };
