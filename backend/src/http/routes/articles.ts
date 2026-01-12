@@ -110,7 +110,7 @@ const articlesRoutes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       const started = process.hrtime.bigint()
-      let statusCode = 200
+      let statusCode: 200 | 404 = 200
       try {
         const article = await fastify.articleRepository.getArticle(request.params.id)
         if (!article) {
@@ -121,7 +121,7 @@ const articlesRoutes: FastifyPluginAsync = async (fastify) => {
 
         return { article }
       } catch (error) {
-        statusCode = reply.statusCode || 500
+        statusCode = (reply.statusCode || 500) as 200 | 404
         throw error
       } finally {
         const durationMs = Number(process.hrtime.bigint() - started) / 1_000_000

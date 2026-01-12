@@ -151,3 +151,134 @@ variable "discord_webhook_access" {
   sensitive   = true
   default     = ""
 }
+
+variable "headlines_job_enabled" {
+  description = "Enable the scheduled headlines snapshot Lambda"
+  type        = bool
+  default     = false
+}
+
+variable "headlines_job_name" {
+  description = "Lambda function name for the headlines snapshot job (defaults to <lambda_name>-headlines-cron)"
+  type        = string
+  default     = null
+}
+
+variable "headlines_job_package" {
+  description = "Path to the zipped Lambda artifact for the headlines job"
+  type        = string
+  default     = "../cacheCron/dist/headlines-cron.zip"
+}
+
+variable "headlines_job_bucket" {
+  description = "Bucket name to store the headlines JSON (defaults to frontend_bucket when not set)"
+  type        = string
+  default     = null
+}
+
+variable "headlines_job_key" {
+  description = "Object key used for the headlines JSON"
+  type        = string
+  default     = "headlines/latest.json"
+}
+
+variable "headlines_job_limit" {
+  description = "Limit parameter for the /headlines request"
+  type        = number
+  default     = 50
+}
+
+variable "headlines_job_path" {
+  description = "Path for the headlines endpoint"
+  type        = string
+  default     = "/headlines"
+}
+
+variable "headlines_job_schedule_expression" {
+  description = "EventBridge/Cron schedule expression for the headlines snapshot job"
+  type        = string
+  default     = "cron(0 18 * * ? *)" # 03:00 JST
+}
+
+variable "headlines_job_cache_control" {
+  description = "Cache-Control header value for the uploaded headlines JSON"
+  type        = string
+  default     = "public, max-age=300"
+}
+
+variable "headlines_job_timeout" {
+  description = "Lambda timeout (seconds) for the headlines snapshot job"
+  type        = number
+  default     = 20
+}
+
+variable "headlines_job_memory_size" {
+  description = "Lambda memory size (MB) for the headlines snapshot job"
+  type        = number
+  default     = 256
+}
+
+variable "headlines_job_api_url" {
+  description = "Override API base URL for fetching headlines (defaults to the deployed API Gateway URL)"
+  type        = string
+  default     = null
+}
+
+variable "headlines_job_request_timeout_ms" {
+  description = "Timeout (ms) for the headlines fetch request"
+  type        = number
+  default     = 10000
+}
+
+variable "headlines_job_s3_endpoint" {
+  description = "Custom S3-compatible endpoint (set for R2)"
+  type        = string
+  default     = null
+}
+
+variable "headlines_job_s3_region" {
+  description = "Region for the S3/R2 client"
+  type        = string
+  default     = null
+}
+
+variable "headlines_job_s3_force_path_style" {
+  description = "Force path-style addressing (recommended for R2)"
+  type        = bool
+  default     = true
+}
+
+variable "headlines_job_s3_access_key_id" {
+  description = "Access key for S3-compatible uploads (set when using R2)"
+  type        = string
+  sensitive   = true
+  default     = null
+}
+
+variable "headlines_job_s3_secret_access_key" {
+  description = "Secret key for S3-compatible uploads (set when using R2)"
+  type        = string
+  sensitive   = true
+  default     = null
+}
+
+variable "headlines_job_s3_session_token" {
+  description = "Session token for S3-compatible uploads (optional)"
+  type        = string
+  sensitive   = true
+  default     = null
+}
+
+variable "headlines_job_batch_webhook" {
+  description = "Discord webhook for successful headlines cron runs"
+  type        = string
+  sensitive   = true
+  default     = null
+}
+
+variable "headlines_job_error_webhook" {
+  description = "Discord webhook for failed headlines cron runs (defaults to batch webhook when null)"
+  type        = string
+  sensitive   = true
+  default     = null
+}

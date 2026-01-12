@@ -13,8 +13,7 @@ export default function NotFound() {
         <h1 className="text-3xl font-bold font-serif text-foreground mb-4">Article Not Found</h1>
 
         <p className="text-muted-foreground mb-8 leading-relaxed">
-          The PoliTopics article you're looking for doesn't exist or may have been moved. Please check the article ID or
-          return to the main page.
+          記事が見つかりませんでした
         </p>
 
         <Button asChild>

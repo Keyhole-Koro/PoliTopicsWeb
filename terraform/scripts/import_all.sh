@@ -81,12 +81,21 @@ lambda_name_raw = extract_raw("lambda_name")
 create_dynamodb_table_raw = extract_raw("create_dynamodb_table")
 is_localstack_raw = extract_raw("is_localstack")
 frontend_public_enabled_raw = extract_raw("frontend_public_enabled")
+headlines_job_enabled_raw = extract_raw("headlines_job_enabled")
+headlines_job_name_raw = extract_raw("headlines_job_name")
+headlines_job_bucket_raw = extract_raw("headlines_job_bucket")
+headlines_job_batch_webhook_raw = extract_raw("headlines_job_batch_webhook")
+headlines_job_error_webhook_raw = extract_raw("headlines_job_error_webhook")
 
 environment = parse_string(environment_raw)
 frontend_bucket = parse_string(frontend_bucket_raw)
 article_asset_url_bucket = parse_string(article_asset_url_bucket_raw)
 articles_table = parse_string(articles_table_raw)
 lambda_name = parse_string(lambda_name_raw)
+headlines_job_name = parse_string(headlines_job_name_raw)
+headlines_job_bucket = parse_string(headlines_job_bucket_raw)
+headlines_job_batch_webhook = parse_string(headlines_job_batch_webhook_raw)
+headlines_job_error_webhook = parse_string(headlines_job_error_webhook_raw)
 
 def parse_bool(raw, default):
   if raw is None:
@@ -101,6 +110,7 @@ def parse_bool(raw, default):
 create_dynamodb_table = parse_bool(create_dynamodb_table_raw, "false")
 is_localstack = parse_bool(is_localstack_raw, "false")
 frontend_public_enabled = parse_bool(frontend_public_enabled_raw, "false")
+headlines_job_enabled = parse_bool(headlines_job_enabled_raw, "false")
 
 def emit(name, value):
   value = value or ""
@@ -114,6 +124,11 @@ emit("LAMBDA_NAME", lambda_name)
 emit("CREATE_DYNAMODB_TABLE", create_dynamodb_table)
 emit("IS_LOCALSTACK", is_localstack)
 emit("FRONTEND_PUBLIC_ENABLED", frontend_public_enabled)
+emit("HEADLINES_JOB_ENABLED", headlines_job_enabled)
+emit("HEADLINES_JOB_NAME", headlines_job_name)
+emit("HEADLINES_JOB_BUCKET", headlines_job_bucket)
+emit("HEADLINES_JOB_BATCH_WEBHOOK", headlines_job_batch_webhook)
+emit("HEADLINES_JOB_ERROR_WEBHOOK", headlines_job_error_webhook)
 PY
 )"
 
@@ -123,6 +138,15 @@ for required in ENVIRONMENT FRONTEND_BUCKET ARTICLE_ASSET_URL_BUCKET ARTICLES_TA
     exit 1
   fi
 done
+
+if [[ "${HEADLINES_JOB_ENABLED:-false}" == "true" && -z "${HEADLINES_JOB_NAME:-}" ]]; then
+  echo "Missing required value for HEADLINES_JOB_NAME (check $VAR_FILE)" >&2
+  exit 1
+fi
+if [[ "${HEADLINES_JOB_ENABLED:-false}" == "true" && -z "${HEADLINES_JOB_BATCH_WEBHOOK:-}" ]]; then
+  echo "Missing required value for HEADLINES_JOB_BATCH_WEBHOOK (check $VAR_FILE or secrets)" >&2
+  exit 1
+fi
 
 get_account_id() {
   if [[ -n "${AWS_ACCOUNT_ID:-}" ]]; then
@@ -227,5 +251,22 @@ run_import "$LAMBDA_MOD.aws_iam_role.backend_lambda" "${LAMBDA_NAME}-role"
 run_import "$LAMBDA_MOD.aws_iam_policy.backend_data_access" "$CUSTOM_POLICY_ARN"
 run_import "$LAMBDA_MOD.aws_iam_role_policy_attachment.backend_data_access" "${LAMBDA_NAME}-role/$CUSTOM_POLICY_ARN"
 run_import "$LAMBDA_MOD.aws_iam_role_policy_attachment.backend_basic_execution" "${LAMBDA_NAME}-role/arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+
+if [[ "${HEADLINES_JOB_ENABLED}" == "true" ]]; then
+  echo "Importing Headlines cron Lambda resources for ${HEADLINES_JOB_NAME}..."
+  CRON_MOD="module.service"
+  CRON_POLICY_ARN="arn:aws:iam::${ACCOUNT_ID}:policy/${HEADLINES_JOB_NAME}-bucket-access"
+  CRON_STATEMENT_ID="AllowExecutionFromEventsHeadlines-${ENVIRONMENT}"
+  CRON_RULE_NAME="${HEADLINES_JOB_NAME}-schedule"
+
+  run_import "$CRON_MOD.aws_iam_role.headlines_job[\"current\"]" "${HEADLINES_JOB_NAME}-role"
+  run_import "$CRON_MOD.aws_iam_policy.headlines_job_bucket_access[\"current\"]" "$CRON_POLICY_ARN"
+  run_import "$CRON_MOD.aws_iam_role_policy_attachment.headlines_job_bucket_access[\"current\"]" "${HEADLINES_JOB_NAME}-role/$CRON_POLICY_ARN"
+  run_import "$CRON_MOD.aws_iam_role_policy_attachment.headlines_job_basic_execution[\"current\"]" "${HEADLINES_JOB_NAME}-role/arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  run_import "$CRON_MOD.aws_lambda_function.headlines_job[\"current\"]" "$HEADLINES_JOB_NAME"
+  run_import "$CRON_MOD.aws_cloudwatch_event_rule.headlines_job[\"current\"]" "$CRON_RULE_NAME"
+  run_import "$CRON_MOD.aws_cloudwatch_event_target.headlines_job[\"current\"]" "${CRON_RULE_NAME}/headlines-cron"
+  run_import "$CRON_MOD.aws_lambda_permission.allow_events_headlines_job[\"current\"]" "${HEADLINES_JOB_NAME}/${CRON_STATEMENT_ID}"
+fi
 
 echo "Imports complete."
