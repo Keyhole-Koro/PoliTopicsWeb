@@ -150,7 +150,7 @@ variable "headlines_job_enabled" {
 }
 
 variable "headlines_job_name" {
-  description = "Lambda function name for the headlines snapshot job (defaults to <lambda_name>-headlines-cron)"
+  description = "Lambda function name for the headlines snapshot job (defaults to politopics-headlines-cron-<environment>)"
   type        = string
   default     = null
 }

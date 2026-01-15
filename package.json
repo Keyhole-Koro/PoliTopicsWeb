@@ -2,7 +2,7 @@
   "name": "politopicsweb",
   "version": "0.1.0",
   "private": true,
-  "workspaces": ["frontend", "backend"],
+  "workspaces": ["frontend", "backend", "cacheCron"],
   "scripts": {
     "// dev": "",
     "dev": "bash -c 'npm run dev:backend & npm run dev:frontend'",
@@ -11,11 +11,12 @@
     "dev:backend:mock": "cd backend && DISABLE_NOTIFICATIONS=true DATA_MODE=mock ACTIVE_ENVIRONMENT=local npm run dev",
 
     "// build": "",
-    "build": "npm run build:frontend && npm run build:backend",
+    "build": "npm run build:frontend && npm run build:backend && npm run build:cacheCron",
     "build:frontend": "npm --prefix frontend run build",
     "build:frontend:local": "npm --prefix frontend run build:local",
     "build:backend": "npm --prefix backend run build",
     "build:backend:local": "npm --prefix backend run build:local",
+    "build:cacheCron": "npm --prefix cacheCron run build",
 
     "// lint": "",
     "lint": "npm run lint:frontend",

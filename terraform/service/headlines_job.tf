@@ -1,8 +1,27 @@
 locals {
   headlines_job_enabled = var.headlines_job_enabled ? { current = true } : {}
-  headlines_job_name    = coalesce(var.headlines_job_name, "${var.lambda_name}-headlines-cron")
-  headlines_job_bucket  = coalesce(var.headlines_job_bucket, var.frontend_bucket, "")
-  headlines_job_api_url = coalesce(var.headlines_job_api_url, module.lambda.api_url)
+  headlines_job_name = (
+    var.headlines_job_name != null && var.headlines_job_name != ""
+      ? var.headlines_job_name
+      : "politopics-headlines-cron-${var.environment}"
+  )
+  headlines_job_bucket = (
+    var.headlines_job_bucket != null && var.headlines_job_bucket != ""
+      ? var.headlines_job_bucket
+      : var.frontend_bucket
+  )
+  headlines_job_api_url = (
+    var.headlines_job_api_url != null && var.headlines_job_api_url != ""
+      ? var.headlines_job_api_url
+      : module.lambda.api_url
+  )
+  headlines_job_s3_endpoint          = var.headlines_job_s3_endpoint != null ? var.headlines_job_s3_endpoint : ""
+  headlines_job_s3_region            = var.headlines_job_s3_region != null ? var.headlines_job_s3_region : var.region
+  headlines_job_s3_access_key_id     = var.headlines_job_s3_access_key_id != null ? var.headlines_job_s3_access_key_id : ""
+  headlines_job_s3_secret_access_key = var.headlines_job_s3_secret_access_key != null ? var.headlines_job_s3_secret_access_key : ""
+  headlines_job_s3_session_token     = var.headlines_job_s3_session_token != null ? var.headlines_job_s3_session_token : ""
+  headlines_job_batch_webhook        = var.headlines_job_batch_webhook != null ? var.headlines_job_batch_webhook : ""
+  headlines_job_error_webhook        = var.headlines_job_error_webhook != null ? var.headlines_job_error_webhook : local.headlines_job_batch_webhook
 }
 
 data "aws_iam_policy_document" "headlines_job_assume_role" {
@@ -82,16 +101,16 @@ resource "aws_lambda_function" "headlines_job" {
       HEADLINES_CACHE_CONTROL      = var.headlines_job_cache_control
       HEADLINES_REQUEST_TIMEOUT_MS = tostring(var.headlines_job_request_timeout_ms)
       STAGE_BACKEND_API_URL        = var.environment == "stage" ? local.headlines_job_api_url : ""
-      S3_ENDPOINT                  = coalesce(var.headlines_job_s3_endpoint, "")
-      S3_COMPATIBLE_API_STAGE      = var.environment == "stage" ? coalesce(var.headlines_job_s3_endpoint, "") : ""
-      S3_COMPATIBLE_API_PROD       = var.environment == "prod" ? coalesce(var.headlines_job_s3_endpoint, "") : ""
-      S3_REGION                    = coalesce(var.headlines_job_s3_region, var.region)
+      S3_ENDPOINT                  = local.headlines_job_s3_endpoint
+      S3_COMPATIBLE_API_STAGE      = var.environment == "stage" ? local.headlines_job_s3_endpoint : ""
+      S3_COMPATIBLE_API_PROD       = var.environment == "prod" ? local.headlines_job_s3_endpoint : ""
+      S3_REGION                    = local.headlines_job_s3_region
       S3_FORCE_PATH_STYLE          = var.headlines_job_s3_force_path_style ? "true" : "false"
-      S3_ACCESS_KEY_ID             = coalesce(var.headlines_job_s3_access_key_id, "")
-      S3_SECRET_ACCESS_KEY         = coalesce(var.headlines_job_s3_secret_access_key, "")
-      S3_SESSION_TOKEN             = coalesce(var.headlines_job_s3_session_token, "")
-      DISCORD_WEBHOOK_BATCH        = coalesce(var.headlines_job_batch_webhook, "")
-      DISCORD_WEBHOOK_ERROR        = coalesce(var.headlines_job_error_webhook, var.headlines_job_batch_webhook, "")
+      S3_ACCESS_KEY_ID             = local.headlines_job_s3_access_key_id
+      S3_SECRET_ACCESS_KEY         = local.headlines_job_s3_secret_access_key
+      S3_SESSION_TOKEN             = local.headlines_job_s3_session_token
+      DISCORD_WEBHOOK_BATCH        = local.headlines_job_batch_webhook
+      DISCORD_WEBHOOK_ERROR        = local.headlines_job_error_webhook
     }
   }
 

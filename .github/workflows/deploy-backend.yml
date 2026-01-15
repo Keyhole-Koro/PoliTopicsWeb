@@ -22,6 +22,7 @@ jobs:
       id-token: write
     env:
       AWS_REGION: ${{ vars.AWS_REGION || 'ap-northeast-3' }}
+      TARGET_ENV: ${{ startsWith(github.ref, 'refs/heads/prod') && 'prod' || 'stage' }}
       AWS_ROLE_TO_ASSUME: ${{ startsWith(github.ref, 'refs/heads/prod') && secrets.PROD_ROLE_TO_ASSUME || secrets.STAGE_ROLE_TO_ASSUME }}
       TF_VARS_FILE: ${{ startsWith(github.ref, 'refs/heads/prod') && 'prod.tfvars' || 'stage.tfvars' }}
       TF_BACKEND_FILE: ${{ startsWith(github.ref, 'refs/heads/prod') && 'prod.hcl' || 'stage.hcl' }}
@@ -50,8 +51,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build backend Lambda bundle
-        run: npm run build:backend
+      - name: Build backend and cron Lambda bundles
+        run: npm run build:backend && npm run build:cacheCron
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -102,3 +103,10 @@ jobs:
           HEALTH_URL="${BACKEND_API_URL%/}/healthz"
           echo "Checking backend health at ${HEALTH_URL}"
           curl -fsS --retry 4 --retry-delay 2 --retry-all-errors "${HEALTH_URL}"
+
+      - name: Trigger headlines update
+        run: |
+          FUNCTION_NAME="politopics-headlines-cron-${TARGET_ENV}"
+          echo "Invoking Lambda: $FUNCTION_NAME"
+          aws lambda invoke --function-name "$FUNCTION_NAME" --cli-binary-format raw-in-base64-out --payload '{}' response.json
+          cat response.json

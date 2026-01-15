@@ -19,7 +19,7 @@ variable "backend_lambda_package" {
 variable "frontend_bucket" {
   description = "S3 bucket name hosting the SPA for this environment"
   type        = string
-  default     = null
+  nullable    = false
 }
 
 variable "frontend_public_enabled" {
@@ -68,31 +68,31 @@ variable "frontend_r2_secret_access_key" {
 variable "articles_table" {
   description = "Existing DynamoDB table backing this environment"
   type        = string
-  default     = null
+  nullable    = false
 }
 
 variable "article_asset_url_bucket" {
   description = "Existing S3 bucket with article assets for this environment"
   type        = string
-  default     = null
+  nullable    = false
 }
 
 variable "lambda_name" {
   description = "Name of the backend Lambda function"
   type        = string
-  default     = null
+  nullable    = false
 }
 
 variable "api_name" {
   description = "Name of the API Gateway HTTP API"
   type        = string
-  default     = null
+  nullable    = false
 }
 
 variable "lambda_description" {
   description = "Description shared by Lambda and API resources"
   type        = string
-  default     = null
+  nullable    = false
 }
 
 variable "api_custom_domain_name" {
@@ -159,7 +159,7 @@ variable "headlines_job_enabled" {
 }
 
 variable "headlines_job_name" {
-  description = "Lambda function name for the headlines snapshot job (defaults to <lambda_name>-headlines-cron)"
+  description = "Lambda function name for the headlines snapshot job (defaults to politopics-headlines-cron-<environment>)"
   type        = string
   default     = null
 }

@@ -6,7 +6,7 @@ articles_table           = "politopics-prod"
 article_asset_url_bucket = "politopics-articles-prod"
 frontend_public_enabled  = true
 frontend_deploy_enabled  = false
-frontend_r2_endpoint_url = "https://REPLACE_WITH_ACCOUNT_ID.r2.cloudflarestorage.com"
+frontend_r2_endpoint_url = "https://politopics.net"
 
 lambda_name                       = "politopics-backend-prod"
 api_name                          = "politopics-api-prod"
@@ -17,3 +17,4 @@ api_custom_domain_certificate_arn = "arn:aws:acm:ap-northeast-3:789222445929:cer
 backend_lambda_package = "../backend/dist/backend.zip"
 create_dynamodb_table  = false
 is_localstack          = false
+headlines_job_enabled  = true
