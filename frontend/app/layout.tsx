@@ -26,7 +26,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${manrope.variable} antialiased`}>
-      <body className="font-sans">{children}</body>
+      <body className="font-sans">
+        <script
+          id="headlines-cache"
+          type="application/json"
+          dangerouslySetInnerHTML={{ __html: '"__HEADLINES_CACHE__"' }}
+        />
+        {children}
+      </body>
     </html>
   )
 }

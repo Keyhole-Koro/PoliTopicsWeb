@@ -30,6 +30,28 @@ type FetchHeadlinesOptions = {
 }
 
 export async function fetchHeadlines(options: FetchHeadlinesOptions = {}) {
+  // Only use cache if no pagination/filter options are set (requesting "latest")
+  const isDefaultRequest =
+    options.limit === undefined && options.start === undefined && options.end === undefined
+
+  if (isDefaultRequest) {
+    // 1. Check for injected HTML cache
+    if (typeof window !== "undefined") {
+      const script = document.getElementById("headlines-cache")
+      if (script && script.textContent && script.textContent !== '"__HEADLINES_CACHE__"') {
+        try {
+          const injectedData = JSON.parse(script.textContent) as HeadlinesResponse
+          if (injectedData && Array.isArray(injectedData.items)) {
+            debugLog(`[api] Injected cache hit`)
+            return injectedData
+          }
+        } catch (e) {
+          debugLog(`[api] Error parsing injected cache`, e)
+        }
+      }
+    }
+  }
+
   const params = new URLSearchParams()
   if (options.limit !== undefined) {
     params.set("limit", String(options.limit))

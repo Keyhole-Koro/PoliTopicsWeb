@@ -1,4 +1,4 @@
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
+import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import type { Handler } from "aws-lambda"
 import { DISCORD_COLORS, sendNotification, type DiscordField } from "@keyhole-koro/politopics-notification"
 import { loadConfig } from "./config"
@@ -22,6 +22,8 @@ const s3 = new S3Client({
 
 export const handler: Handler = async () => {
   const startedAt = Date.now()
+  let durationMs = 0 // Declare durationMs here
+
   const url = new URL(config.api.path, config.api.url)
   url.searchParams.set("limit", String(config.api.limit))
 
@@ -67,11 +69,68 @@ export const handler: Handler = async () => {
       }),
     )
 
-    const durationMs = Date.now() - startedAt
+    durationMs = Date.now() - startedAt
+
     console.log(
       `[headlines-cron] uploaded to s3://${config.bucket.name}/${config.bucket.key} (${payload.items.length} items) in ${durationMs}ms`,
     )
     await notifySuccess(payload.items.length, durationMs, fetchedAt)
+
+    // --- HTML Injection Logic ---
+    if (config.bucket.indexHtmlKey) {
+      try {
+        // 1. Download index.html
+        console.log(`[headlines-cron] Downloading ${config.bucket.indexHtmlKey} from S3...`)
+        const getHtmlCommand = new GetObjectCommand({
+          Bucket: config.bucket.name,
+          Key: config.bucket.indexHtmlKey,
+        })
+        const { Body: htmlBodyStream } = await s3.send(getHtmlCommand)
+
+        if (htmlBodyStream) {
+          let htmlContent = await streamToString(htmlBodyStream)
+
+          // 2. Inject JSON data
+          const placeholder = '"__HEADLINES_CACHE__"'
+          const escapedJson = JSON.stringify(
+            {
+              fetchedAt,
+              source: url.toString(),
+              items: payload.items,
+              limit: payload.limit,
+              start: payload.start,
+              end: payload.end,
+              hasMore: payload.hasMore,
+            },
+            null,
+            0,
+          ).replace(/<\/script>/g, "<\\/script>") // Escape </script> to prevent HTML parsing issues
+
+          if (htmlContent.includes(placeholder)) {
+            htmlContent = htmlContent.replace(placeholder, escapedJson)
+            console.log(`[headlines-cron] Injected headlines JSON into ${config.bucket.indexHtmlKey}.`)
+
+            // 3. Upload modified index.html
+            await s3.send(
+              new PutObjectCommand({
+                Bucket: config.bucket.name,
+                Key: config.bucket.indexHtmlKey,
+                Body: htmlContent,
+                ContentType: "text/html",
+                CacheControl: "no-cache, no-store, must-revalidate, max-age=0", // Ensure fresh HTML
+              }),
+            )
+            console.log(`[headlines-cron] Uploaded modified ${config.bucket.indexHtmlKey} to S3.`)
+          } else {
+            console.warn(`[headlines-cron] Placeholder "${placeholder}" not found in ${config.bucket.indexHtmlKey}. HTML injection skipped.`)
+          }
+        } else {
+          console.warn(`[headlines-cron] No body received for ${config.bucket.indexHtmlKey}. HTML injection skipped.`)
+        }
+      } catch (htmlErr: any) {
+        console.error(`[headlines-cron] Error during HTML injection:`, htmlErr)
+      }
+    }
 
     return {
       statusCode: 200,
@@ -147,4 +206,13 @@ function formatError(error: unknown): string {
     return error.stack ? `${base}\n${error.stack}`.slice(0, 900) : base.slice(0, 900)
   }
   return String(error).slice(0, 900)
+}
+
+async function streamToString(stream: any): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const chunks: any[] = []
+    stream.on("data", (chunk: any) => chunks.push(chunk))
+    stream.on("error", reject)
+    stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf-8")))
+  })
 }
