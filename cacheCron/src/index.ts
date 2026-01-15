@@ -30,9 +30,9 @@ export const handler: Handler = async () => {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), config.api.requestTimeoutMs)
 
-  try {
-    console.log(`[headlines-cron] fetching ${url.toString()}`)
-    const response = await fetch(url, {
+    try {
+      console.log(`[headlines-cron] fetching ${url.toString()}`)
+      const response = await fetch(url, {
       method: "GET",
       signal: controller.signal,
       headers: { "Content-Type": "application/json" },
@@ -59,21 +59,22 @@ export const handler: Handler = async () => {
       0,
     )
 
-    await s3.send(
-      new PutObjectCommand({
-        Bucket: config.bucket.name,
-        Key: config.bucket.key,
-        Body: body,
-        ContentType: "application/json",
-        CacheControl: config.bucket.cacheControl || "public, max-age=300",
-      }),
-    )
+    // Old JSON cache upload (no longer needed as data is injected into index.html)
+    // await s3.send(
+    //   new PutObjectCommand({
+    //     Bucket: config.bucket.name,
+    //     Key: config.bucket.key,
+    //     Body: body,
+    //     ContentType: "application/json",
+    //     CacheControl: config.bucket.cacheControl || "public, max-age=300",
+    //   }),
+    // )
 
     durationMs = Date.now() - startedAt
 
-    console.log(
-      `[headlines-cron] uploaded to s3://${config.bucket.name}/${config.bucket.key} (${payload.items.length} items) in ${durationMs}ms`,
-    )
+    // console.log(
+    //   `[headlines-cron] uploaded to s3://${config.bucket.name}/${config.bucket.key} (${payload.items.length} items) in ${durationMs}ms`,
+    // )
     await notifySuccess(payload.items.length, durationMs, fetchedAt)
 
     // --- HTML Injection Logic ---
@@ -89,9 +90,12 @@ export const handler: Handler = async () => {
 
         if (htmlBodyStream) {
           let htmlContent = await streamToString(htmlBodyStream)
+          console.log(`[headlines-cron] Downloaded ${config.bucket.indexHtmlKey} content length: ${htmlContent.length}. First 200 chars: ${htmlContent.substring(0, 200)}...`)
 
           // 2. Inject JSON data
-          const placeholder = '"__HEADLINES_CACHE__"'
+          // The placeholder in frontend/app/layout.tsx is dangerouslySetInnerHTML={{ __html: '"__HEADLINES_CACHE__"' }}
+          // which means the actual HTML content will be "__HEADLINES_CACHE__" surrounded by JSON string quotes.
+          const placeholder = `"${'__HEADLINES_CACHE__'}"` // This is the exact string to match in the HTML
           const escapedJson = JSON.stringify(
             {
               fetchedAt,
@@ -105,10 +109,12 @@ export const handler: Handler = async () => {
             null,
             0,
           ).replace(/<\/script>/g, "<\\/script>") // Escape </script> to prevent HTML parsing issues
+          console.log(`[headlines-cron] Generated escaped JSON (first 200 chars): ${escapedJson.substring(0, 200)}...`)
 
           if (htmlContent.includes(placeholder)) {
             htmlContent = htmlContent.replace(placeholder, escapedJson)
             console.log(`[headlines-cron] Injected headlines JSON into ${config.bucket.indexHtmlKey}.`)
+            console.log(`[headlines-cron] Modified HTML (first 200 chars): ${htmlContent.substring(0, 200)}...`)
 
             // 3. Upload modified index.html
             await s3.send(
@@ -122,10 +128,17 @@ export const handler: Handler = async () => {
             )
             console.log(`[headlines-cron] Uploaded modified ${config.bucket.indexHtmlKey} to S3.`)
           } else {
-            console.warn(`[headlines-cron] Placeholder "${placeholder}" not found in ${config.bucket.indexHtmlKey}. HTML injection skipped.`)
+            console.log(`[headlines-cron] Placeholder "${placeholder}" not found in ${config.bucket.indexHtmlKey}. HTML injection skipped.`)
+            // Also log a snippet of HTML around where it should be, to debug missing placeholder
+            const placeholderIndex = htmlContent.indexOf('<script id="headlines-cache"')
+            if (placeholderIndex !== -1) {
+              const snippetStart = Math.max(0, placeholderIndex - 50)
+              const snippetEnd = Math.min(htmlContent.length, placeholderIndex + 100)
+              console.log(`[headlines-cron] HTML snippet around script tag: ...${htmlContent.substring(snippetStart, snippetEnd)}...`)
+            }
           }
         } else {
-          console.warn(`[headlines-cron] No body received for ${config.bucket.indexHtmlKey}. HTML injection skipped.`)
+          console.log(`[headlines-cron] No body received for ${config.bucket.indexHtmlKey}. HTML injection skipped.`)
         }
       } catch (htmlErr: any) {
         console.error(`[headlines-cron] Error during HTML injection:`, htmlErr)
