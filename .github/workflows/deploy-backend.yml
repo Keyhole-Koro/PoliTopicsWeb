@@ -29,14 +29,14 @@ jobs:
       TF_VAR_discord_webhook_error: ${{ secrets.DISCORD_WEBHOOK_ERROR }}
       TF_VAR_discord_webhook_warn: ${{ secrets.DISCORD_WEBHOOK_WARN }}
       TF_VAR_discord_webhook_access: ${{ secrets.DISCORD_WEBHOOK_ACCESS }}
-      TF_VAR_headlines_job_s3_access_key_id: ${{ secrets.HEADLINES_S3_ACCESS_KEY_ID }}
-      TF_VAR_headlines_job_s3_secret_access_key: ${{ secrets.HEADLINES_S3_SECRET_ACCESS_KEY }}
-      TF_VAR_headlines_job_s3_session_token: ${{ secrets.HEADLINES_S3_SESSION_TOKEN }}
+      TF_VAR_headlines_job_s3_access_key_id: ${{ secrets.S3_ACCESS_KEY_ID }}
+      TF_VAR_headlines_job_s3_secret_access_key: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+      TF_VAR_headlines_job_s3_session_token: ${{ secrets.S3_SESSION_TOKEN }}
       TF_VAR_headlines_job_s3_endpoint: ${{ startsWith(github.ref, 'refs/heads/prod') && secrets.S3_COMPATIBLE_API_PROD || secrets.S3_COMPATIBLE_API_STAGE }}
       S3_COMPATIBLE_API_STAGE: ${{ secrets.S3_COMPATIBLE_API_STAGE }}
       S3_COMPATIBLE_API_PROD: ${{ secrets.S3_COMPATIBLE_API_PROD }}
-      TF_VAR_headlines_job_batch_webhook: ${{ secrets.HEADLINES_WEBHOOK_BATCH }}
-      TF_VAR_headlines_job_error_webhook: ${{ secrets.HEADLINES_WEBHOOK_ERROR }}
+      TF_VAR_headlines_job_batch_webhook: ${{ secrets.DISCORD_WEBHOOK_BATCH }}
+      TF_VAR_headlines_job_error_webhook: ${{ secrets.DISCORD_WEBHOOK_ERROR }}
       NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
     steps:
       - name: Checkout
