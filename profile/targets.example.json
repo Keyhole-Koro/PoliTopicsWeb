@@ -1,0 +1,43 @@
+  {
+    "baseUrl": "api.politopics.net",
+    "durationMs": 60000,
+    "defaults": {
+      "method": "GET",
+      "intervalMs": 5000,
+      "timeoutMs": 15000,
+      "samples": 10,
+      "readBody": true
+    },
+    "targets": [
+      {
+        "name": "healthz",
+        "path": "/healthz",
+        "intervalMs": 2000
+      },
+      {
+        "name": "headlines",
+        "path": "/headlines",
+        "query": {
+          "limit": 6
+        },
+        "intervalMs": 5000
+      },
+      {
+        "name": "article",
+        "path": "/article/:id",
+        "pathParams": {
+          "id": "121715254X02920250620"
+        },
+        "intervalMs": 8000
+      },
+      {
+        "name": "search",
+        "path": "/search",
+        "query": {
+          "words": "ガソリン暫定税率",
+          "limit": 10
+        },
+        "intervalMs": 10000
+      }
+    ]
+  }

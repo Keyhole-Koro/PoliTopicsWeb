@@ -321,3 +321,16 @@ Details:
 - Covers `/headlines`, `/search`, `/search/suggest`, and `/article/:id` endpoints.
 - Files changed:
   - `PoliTopicsWeb/backend/src/http/routes/articles.ts`
+
+Agent: Gemini
+Date/Time: 2026-01-15 JST
+Keywords: profile, latency, measure
+Topic: Improve backend latency measurement tool
+Details:
+- Added URL validation to `measure-backend-latency.js` to ensure `baseUrl` has a protocol (auto-prepepend `https://`).
+- Added strict path parameter validation to throw errors for placeholders like `REPLACE_ME` or `YOUR_ID_HERE`.
+- Added `--warmup <count>` CLI option to send dummy requests before measurement to mitigate cold start outliers.
+- Updated `targets.example.json` with a more realistic cold-start cooldown (5 minutes).
+- Files changed:
+  - `PoliTopicsWeb/profile/measure-backend-latency.js`
+  - `PoliTopicsWeb/profile/targets.example.json`
