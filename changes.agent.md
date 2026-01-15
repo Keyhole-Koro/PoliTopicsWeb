@@ -311,3 +311,13 @@ Details:
   - `PoliTopicsWeb/frontend/package.json`
   - `PoliTopicsWeb/frontend/pnpm-lock.yaml`
   - `PoliTopicsWeb/backend/src/repositories/dynamoArticleMapper.ts`
+
+Agent: Gemini
+Date/Time: 2026-01-15 JST
+Keywords: logging, debug, web-backend
+Topic: Add debug logs to API routes
+Details:
+- Added structured console logs to `articles.ts` to trace incoming requests, query parameters, and response summaries.
+- Covers `/headlines`, `/search`, `/search/suggest`, and `/article/:id` endpoints.
+- Files changed:
+  - `PoliTopicsWeb/backend/src/http/routes/articles.ts`

@@ -10,6 +10,7 @@ ENVIRONMENT="$1"
 REGION="ap-northeast-3"
 LOCALSTACK_ENDPOINT="${LOCALSTACK_ENDPOINT:-http://localstack:4566}"
 AWS_ARGS=()
+export AWS_PAGER=""
 
 case "$ENVIRONMENT" in
   local)

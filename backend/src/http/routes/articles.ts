@@ -38,8 +38,10 @@ const articlesRoutes: FastifyPluginAsync = async (fastify) => {
         limit = Math.min(50, Math.max(1, requestedEnd - start))
       }
 
+      console.log(`[WebBackend] /headlines req: start=${start}, limit=${limit}, end=${request.query.end}`);
       const { items, hasMore } = await fastify.articleRepository.getHeadlines(limit, "date_desc", start)
       const end = start + items.length
+      console.log(`[WebBackend] /headlines res: items=${items.length}, hasMore=${hasMore}`);
 
       return { items, limit, start, end, hasMore }
     }
@@ -67,7 +69,9 @@ const articlesRoutes: FastifyPluginAsync = async (fastify) => {
         limit: toNumber(request.query.limit, 20),
       }
 
+      console.log(`[WebBackend] /search req: filters=${JSON.stringify(filters)}`);
       const items = await fastify.articleRepository.searchArticles(filters)
+      console.log(`[WebBackend] /search res: found=${items.length}`);
       return { query: filters, items, total: items.length }
     }
   )
@@ -92,7 +96,9 @@ const articlesRoutes: FastifyPluginAsync = async (fastify) => {
         dateStart: sanitizeDate(request.query.dateStart),
         dateEnd: sanitizeDate(request.query.dateEnd),
       }
+      console.log(`[WebBackend] /search/suggest req: input="${input}", limit=${limit}, filters=${JSON.stringify(filters)}`);
       const suggestions = await fastify.articleRepository.getSuggestions(input, limit, filters)
+      console.log(`[WebBackend] /search/suggest res: count=${suggestions.length}`);
       return { input, suggestions }
     }
   )
@@ -112,6 +118,7 @@ const articlesRoutes: FastifyPluginAsync = async (fastify) => {
       const started = process.hrtime.bigint()
       let statusCode: 200 | 404 = 200
       try {
+        console.log(`[WebBackend] /article/:id req: id=${request.params.id}`);
         const article = await fastify.articleRepository.getArticle(request.params.id)
         if (!article) {
           statusCode = 404
@@ -125,7 +132,7 @@ const articlesRoutes: FastifyPluginAsync = async (fastify) => {
         throw error
       } finally {
         const durationMs = Number(process.hrtime.bigint() - started) / 1_000_000
-        console.log(`[article] id=${request.params.id} status=${statusCode} duration_ms=${durationMs.toFixed(2)}`)
+        console.log(`[WebBackend] /article/:id res: id=${request.params.id} status=${statusCode} duration_ms=${durationMs.toFixed(2)}`)
       }
     }
   )

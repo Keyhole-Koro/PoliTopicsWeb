@@ -1,5 +1,5 @@
 const DEFAULT_REGION = "ap-northeast-3"
-const VALID_ENVIRONMENTS = ["local", "stage", "prod", "localstack"] as const
+const VALID_ENVIRONMENTS = ["local", "stage", "prod", "localstack", "localstackTest"] as const
 const VALID_DATA_MODES = ["dynamo", "mock"] as const
 
 type AppEnvironment = (typeof VALID_ENVIRONMENTS)[number]
@@ -37,6 +37,13 @@ const ENVIRONMENT_DEFAULTS: Record<AppEnvironment, EnvironmentDefaults> = {
     tableName: "politopics-prod",
     articleAssetBucket: "politopics-articles-prod",
     region: DEFAULT_REGION,
+  },
+  localstackTest: {
+    tableName: "politopics-test",
+    articleAssetBucket: "politopics-articles-test",
+    region: DEFAULT_REGION,
+    localstackUrl: "http://localhost:4566",
+    credentials: { accessKeyId: "test", secretAccessKey: "test" },
   },
 }
 
@@ -81,7 +88,7 @@ export let appConfig: AppConfig = {
   region: defaults.region,
   localstackUrl,
   credentials,
-  notifications: buildNotifications(),
+  notifications: buildNotifications(ACTIVE_ENVIRONMENT),
 }
 
 export function setAppEnvironment(environment: AppEnvironment) {
@@ -101,7 +108,7 @@ export function setAppEnvironment(environment: AppEnvironment) {
     region: envDefaults.region,
     localstackUrl: resolvedLocalstackUrl,
     credentials: resolvedCredentials,
-    notifications: buildNotifications(),
+    notifications: buildNotifications(environment),
   }
 }
 
@@ -113,7 +120,14 @@ function requireEnv(name: string): string {
   return value
 }
 
-function buildNotifications() {
+function buildNotifications(env: AppEnvironment = ACTIVE_ENVIRONMENT) {
+  if (env === "localstackTest") {
+    return {
+      errorWebhook: "",
+      warnWebhook: "",
+      accessWebhook: "",
+    }
+  }
   if (process.env.DISABLE_NOTIFICATIONS === "true") {
     return {
       errorWebhook: "",
