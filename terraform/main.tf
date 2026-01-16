@@ -38,9 +38,9 @@ module "service" {
 
   use_http_api = var.use_http_api
 
-  headlines_job_limit                = var.headlines_job_limit
-  headlines_job_path                 = var.headlines_job_path
-  headlines_job_schedule_expression  = var.headlines_job_schedule_expression
+  headlines_job_limit               = var.headlines_job_limit
+  headlines_job_path                = var.headlines_job_path
+  headlines_job_schedule_expression = var.headlines_job_schedule_expression
 
   headlines_job_timeout              = var.headlines_job_timeout
   headlines_job_memory_size          = var.headlines_job_memory_size
