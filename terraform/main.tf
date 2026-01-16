@@ -18,7 +18,7 @@ module "service" {
   headlines_job_name     = var.headlines_job_name
   headlines_job_package  = var.headlines_job_package
   headlines_job_bucket   = var.headlines_job_bucket
-  headlines_job_key      = var.headlines_job_key
+
 
   frontend_bucket               = var.frontend_bucket
   frontend_public_enabled       = var.frontend_public_enabled
@@ -41,7 +41,7 @@ module "service" {
   headlines_job_limit                = var.headlines_job_limit
   headlines_job_path                 = var.headlines_job_path
   headlines_job_schedule_expression  = var.headlines_job_schedule_expression
-  headlines_job_cache_control        = var.headlines_job_cache_control
+
   headlines_job_timeout              = var.headlines_job_timeout
   headlines_job_memory_size          = var.headlines_job_memory_size
   headlines_job_api_url              = var.headlines_job_api_url

@@ -10,9 +10,9 @@ export type AppConfig = {
   }
   bucket: {
     name: string
-    key: string
+
     indexHtmlKey?: string
-    cacheControl?: string
+
   }
   s3: {
     endpoint: string | undefined //but required in stage/prod
@@ -35,9 +35,7 @@ export const APP_CONFIG: Record<AppEnvironment, AppConfig> = {
     api: { url: "http://127.0.0.1:4500", path: "/headlines", limit: 50, requestTimeoutMs: 10_000 },
     bucket: {
       name: "politopics-frontend-local",
-      key: "cache/headlines/latest.json",
       indexHtmlKey: "index.html",
-      cacheControl: "public, max-age=300",
     },
     s3: {
       endpoint: "http://localstack:4566",
@@ -56,9 +54,7 @@ export const APP_CONFIG: Record<AppEnvironment, AppConfig> = {
     },
     bucket: {
       name: "politopics-frontend-stage",
-      key: "cache/headlines/latest.json",
       indexHtmlKey: "index.html",
-      cacheControl: "public, max-age=300",
     },
     s3: {
       endpoint: process.env.S3_COMPATIBLE_API_STAGE,
@@ -72,9 +68,8 @@ export const APP_CONFIG: Record<AppEnvironment, AppConfig> = {
     api: { url: "https://api.politopics.net", path: "/headlines", limit: 50, requestTimeoutMs: 10_000 },
     bucket: {
       name: "politopics-frontend-prod",
-      key: "cache/headlines/latest.json",
       indexHtmlKey: "index.html",
-      cacheControl: "public, max-age=300",
+
     },
     s3: {
       endpoint: process.env.S3_COMPATIBLE_API_PROD,

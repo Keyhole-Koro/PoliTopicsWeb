@@ -89,7 +89,7 @@ resource "aws_lambda_function" "headlines_job" {
   memory_size      = var.headlines_job_memory_size
   timeout          = var.headlines_job_timeout
   architectures    = var.is_localstack ? ["x86_64"] : ["arm64"]
-  description      = "Fetch /headlines and upload to ${local.headlines_job_bucket}/${var.headlines_job_key}"
+  description      = "Fetch /headlines and inject into index.html in ${local.headlines_job_bucket}"
 
   environment {
     variables = {
@@ -97,8 +97,8 @@ resource "aws_lambda_function" "headlines_job" {
       HEADLINES_PATH               = var.headlines_job_path
       HEADLINES_LIMIT              = tostring(var.headlines_job_limit)
       HEADLINES_BUCKET             = local.headlines_job_bucket
-      HEADLINES_KEY                = var.headlines_job_key
-      HEADLINES_CACHE_CONTROL      = var.headlines_job_cache_control
+
+
       HEADLINES_REQUEST_TIMEOUT_MS = tostring(var.headlines_job_request_timeout_ms)
       STAGE_BACKEND_API_URL        = var.environment == "stage" ? local.headlines_job_api_url : ""
       S3_ENDPOINT                  = local.headlines_job_s3_endpoint

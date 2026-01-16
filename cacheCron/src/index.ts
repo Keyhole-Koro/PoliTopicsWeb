@@ -59,22 +59,11 @@ export const handler: Handler = async () => {
       0,
     )
 
-    // Old JSON cache upload (no longer needed as data is injected into index.html)
-    // await s3.send(
-    //   new PutObjectCommand({
-    //     Bucket: config.bucket.name,
-    //     Key: config.bucket.key,
-    //     Body: body,
-    //     ContentType: "application/json",
-    //     CacheControl: config.bucket.cacheControl || "public, max-age=300",
-    //   }),
-    // )
+
 
     durationMs = Date.now() - startedAt
 
-    // console.log(
-    //   `[headlines-cron] uploaded to s3://${config.bucket.name}/${config.bucket.key} (${payload.items.length} items) in ${durationMs}ms`,
-    // )
+
     await notifySuccess(payload.items.length, durationMs, fetchedAt)
 
     // --- HTML Injection Logic ---
@@ -152,7 +141,7 @@ export const handler: Handler = async () => {
         ok: true,
         count: payload.items.length,
         bucket: config.bucket.name,
-        key: config.bucket.key,
+
         durationMs,
         fetchedAt,
       }),
@@ -172,7 +161,6 @@ export const handler: Handler = async () => {
 function baseFields(): DiscordField[] {
   return [
     { name: "Bucket", value: config.bucket.name, inline: true },
-    { name: "Key", value: config.bucket.key, inline: true },
     { name: "Source", value: `${config.api.url}${config.api.path}`, inline: false },
   ]
 }

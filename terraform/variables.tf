@@ -176,11 +176,7 @@ variable "headlines_job_bucket" {
   default     = null
 }
 
-variable "headlines_job_key" {
-  description = "Object key used for the headlines JSON"
-  type        = string
-  default     = "headlines/latest.json"
-}
+
 
 variable "headlines_job_limit" {
   description = "Limit parameter for the /headlines request"
@@ -200,11 +196,7 @@ variable "headlines_job_schedule_expression" {
   default     = "cron(0 18 * * ? *)" # 03:00 JST
 }
 
-variable "headlines_job_cache_control" {
-  description = "Cache-Control header value for the uploaded headlines JSON"
-  type        = string
-  default     = "public, max-age=300"
-}
+
 
 variable "headlines_job_timeout" {
   description = "Lambda timeout (seconds) for the headlines snapshot job"
