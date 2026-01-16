@@ -59,3 +59,5 @@ module "service" {
   tags                  = local.tags
   is_localstack         = var.is_localstack
 }
+
+

@@ -13,7 +13,7 @@ locals {
   headlines_job_api_url = (
     var.headlines_job_api_url != null && var.headlines_job_api_url != ""
       ? var.headlines_job_api_url
-      : module.lambda.api_url
+      : var.api_url_from_lambda_module
   )
   headlines_job_s3_endpoint          = var.headlines_job_s3_endpoint != null ? var.headlines_job_s3_endpoint : ""
   headlines_job_s3_region            = var.headlines_job_s3_region != null ? var.headlines_job_s3_region : var.region

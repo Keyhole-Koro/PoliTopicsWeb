@@ -113,6 +113,7 @@ export const handler: Handler = async () => {
 
           if (htmlContent.includes(placeholder)) {
             htmlContent = htmlContent.replace(placeholder, escapedJson)
+            console.log(`[headlines-cron] new json content: ${escapedJson}.`)
             console.log(`[headlines-cron] Injected headlines JSON into ${config.bucket.indexHtmlKey}.`)
             console.log(`[headlines-cron] Modified HTML (first 200 chars): ${htmlContent.substring(0, 200)}...`)
 
