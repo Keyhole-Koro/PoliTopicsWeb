@@ -70,6 +70,7 @@ Use the Worker + R2 path locally so the SPA runs through the same routing layer 
 Notes:
 - The mock backend is enabled via `DATA_MODE=mock` and `DISABLE_NOTIFICATIONS=true`.
 - The Worker listens on http://127.0.0.1:8787; the backend listens on http://127.0.0.1:4500.
+- For direct S3-compatible access to R2, the endpoint is `https://${ACCOUNT_ID}.r2.cloudflarestorage.com`.
 
 ## E2E Testing
 

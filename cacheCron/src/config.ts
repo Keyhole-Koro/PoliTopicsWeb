@@ -17,7 +17,6 @@ export type AppConfig = {
   s3: {
     endpoint: string | undefined //but required in stage/prod
     region: string
-    forcePathStyle: boolean
     credentials?: {
       accessKeyId: string
       secretAccessKey: string
@@ -39,8 +38,7 @@ export const APP_CONFIG: Record<AppEnvironment, AppConfig> = {
     },
     s3: {
       endpoint: "http://localstack:4566",
-      region: "us-east-1",
-      forcePathStyle: true,
+      region: "ap-northeast-3",
     },
     notifications: {},
   },
@@ -59,7 +57,6 @@ export const APP_CONFIG: Record<AppEnvironment, AppConfig> = {
     s3: {
       endpoint: process.env.S3_COMPATIBLE_API_STAGE,
       region: "auto",
-      forcePathStyle: false,
     },
     notifications: {},
   },
@@ -74,7 +71,6 @@ export const APP_CONFIG: Record<AppEnvironment, AppConfig> = {
     s3: {
       endpoint: process.env.S3_COMPATIBLE_API_PROD,
       region: "auto",
-      forcePathStyle: false,
     },
     notifications: {},
   },

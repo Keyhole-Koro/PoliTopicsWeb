@@ -30,24 +30,37 @@ type FetchHeadlinesOptions = {
 }
 
 export async function fetchHeadlines(options: FetchHeadlinesOptions = {}) {
-  // Only use cache if no pagination/filter options are set (requesting "latest")
-  const isDefaultRequest =
-    options.limit === undefined && options.start === undefined && options.end === undefined
+  const canUseInjectedCache =
+    (options.start === undefined || options.start === 0) && options.end === undefined
 
-  if (isDefaultRequest) {
-    // 1. Check for injected HTML cache
-    if (typeof window !== "undefined") {
-      const script = document.getElementById("headlines-cache")
-      if (script && script.textContent && script.textContent !== '"__HEADLINES_CACHE__"') {
-        try {
-          const injectedData = JSON.parse(script.textContent) as HeadlinesResponse
-          if (injectedData && Array.isArray(injectedData.items)) {
+  if (canUseInjectedCache && typeof window !== "undefined") {
+    const script = document.getElementById("headlines-cache")
+    if (script && script.textContent && script.textContent !== '"__HEADLINES_CACHE__"') {
+      try {
+        const injectedData = JSON.parse(script.textContent) as HeadlinesResponse
+        if (injectedData && Array.isArray(injectedData.items)) {
+          if (injectedData.items.length === 0) {
+            debugLog(`[api] Injected cache empty; falling back to API`)
+          } else if (options.limit === undefined) {
             debugLog(`[api] Injected cache hit`)
             return injectedData
+          } else if (injectedData.items.length >= options.limit) {
+            debugLog(`[api] Injected cache hit (sliced)`)
+            const items = injectedData.items.slice(0, options.limit)
+            return {
+              ...injectedData,
+              items,
+              limit: options.limit,
+              start: 0,
+              end: items.length,
+              hasMore: injectedData.hasMore || injectedData.items.length > items.length,
+            }
+          } else {
+            debugLog(`[api] Injected cache too small; falling back to API`)
           }
-        } catch (e) {
-          debugLog(`[api] Error parsing injected cache`, e)
         }
+      } catch (e) {
+        debugLog(`[api] Error parsing injected cache`, e)
       }
     }
   }
