@@ -23,10 +23,9 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-          cache-dependency-path: workers/backend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        working-directory: workers/backend
         run: npm ci
 
       - name: Type check
@@ -58,23 +57,23 @@ jobs:
         run: |
           # Only set secrets if they are provided (first deploy or secret update)
           # Wrangler will skip if secrets are already set
-          
+
           if [ -n "${AWS_ACCESS_KEY_ID}" ]; then
             echo "${AWS_ACCESS_KEY_ID}" | npx wrangler secret put AWS_ACCESS_KEY_ID --env "${ENV}"
           fi
-          
+
           if [ -n "${AWS_SECRET_ACCESS_KEY}" ]; then
             echo "${AWS_SECRET_ACCESS_KEY}" | npx wrangler secret put AWS_SECRET_ACCESS_KEY --env "${ENV}"
           fi
-          
+
           if [ -n "${DISCORD_WEBHOOK_ERROR}" ]; then
             echo "${DISCORD_WEBHOOK_ERROR}" | npx wrangler secret put DISCORD_WEBHOOK_ERROR --env "${ENV}"
           fi
-          
+
           if [ -n "${DISCORD_WEBHOOK_WARN}" ]; then
             echo "${DISCORD_WEBHOOK_WARN}" | npx wrangler secret put DISCORD_WEBHOOK_WARN --env "${ENV}"
           fi
-          
+
           if [ -n "${DISCORD_WEBHOOK_ACCESS}" ]; then
             echo "${DISCORD_WEBHOOK_ACCESS}" | npx wrangler secret put DISCORD_WEBHOOK_ACCESS --env "${ENV}"
           fi
@@ -82,22 +81,22 @@ jobs:
       - name: Verify backend health
         run: |
           set -euo pipefail
-          
+
           if [ "${ENV}" = "prod" ]; then
             HEALTH_URL="https://api.politopics.net/healthz"
           else
             # Stage URL - update this with your actual stage worker URL
             HEALTH_URL="${{ secrets.STAGE_BACKEND_WORKER_URL }}/healthz"
           fi
-          
+
           if [ -z "${HEALTH_URL}" ] || [ "${HEALTH_URL}" = "/healthz" ]; then
             echo "Skipping health check - STAGE_BACKEND_WORKER_URL not set"
             exit 0
           fi
-          
+
           echo "Checking backend health at ${HEALTH_URL}"
-          
+
           # Wait a bit for the worker to be ready
           sleep 5
-          
+
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "${HEALTH_URL}"
