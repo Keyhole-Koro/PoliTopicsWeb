@@ -6,7 +6,6 @@ import {
 } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { GetObjectCommand, S3Client, type GetObjectCommandOutput } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Readable } from "node:stream";
 import {
   mapArticleToSummary,
@@ -202,8 +201,8 @@ export class DynamoArticleRepository implements ArticleRepository {
     }
 
     const item = response.Item as DynamoArticleItem;
-    const [asset, signedAssetUrl] = await Promise.all([this.loadAsset(item), this.buildSignedAssetUrl(item)]);
-    return mapItemToArticle(item, asset, signedAssetUrl);
+    const asset = await this.loadAsset(item);
+    return mapItemToArticle(item, asset, null);
   }
 
   private filterArticles(
@@ -307,41 +306,13 @@ export class DynamoArticleRepository implements ArticleRepository {
   }
 
   private async mapSummariesWithSignedAssets(items: Record<string, unknown>[]): Promise<ArticleSummary[]> {
-    return Promise.all(
-      items.map(async (raw) => {
-        const signedAssetUrl = await this.buildSignedAssetUrl(raw as DynamoArticleItem);
-        return mapArticleToSummary(raw, signedAssetUrl);
-      }),
-    );
+    return items.map((raw) => mapArticleToSummary(raw, null));
   }
 
   private async mapIndexSummariesWithSignedAssets(
     items: Record<string, unknown>[],
   ): Promise<(ArticleSummary | undefined)[]> {
-    return Promise.all(
-      items.map(async (raw) => {
-        const signedAssetUrl = await this.buildSignedAssetUrl(raw as DynamoIndexItem);
-        return mapIndexToSummary(raw, signedAssetUrl);
-      }),
-    );
-  }
-
-  private async buildSignedAssetUrl(item: DynamoArticleItem | DynamoIndexItem): Promise<string | null> {
-    if (!this.s3Client || !this.assetBucket) return null;
-    const key = item.asset_key ?? this.extractKeyFromUrl(item.asset_url);
-    if (!key) return null;
-
-    try {
-      const command = new GetObjectCommand({
-        Bucket: this.assetBucket,
-        Key: key,
-      });
-      const signed = await getSignedUrl(this.s3Client, command, { expiresIn: this.assetUrlTtlSeconds });
-      return signed;
-    } catch (error) {
-      console.warn("Failed to sign asset URL", { key, bucket: this.assetBucket, error });
-      return null;
-    }
+    return items.map((raw) => mapIndexToSummary(raw, null));
   }
 
   private async loadAsset(item: DynamoArticleItem): Promise<ArticleAssetData | undefined> {
