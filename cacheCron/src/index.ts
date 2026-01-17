@@ -158,7 +158,7 @@ export const handler: Handler = async () => {
 function baseFields(): DiscordField[] {
   return [
     { name: "Bucket", value: config.bucket.name, inline: true },
-    { name: "Source", value: `${config.api.url}`, inline: false },
+    { name: "Source", value: `${config.api.url}${config.api.path}`, inline: false },
   ]
 }
 

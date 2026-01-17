@@ -71,7 +71,8 @@ export function mapItemToArticle(
   signedAssetUrl?: string | null,
 ): Article {
   assertArticleRecord(item, asset, signedAssetUrl);
-  const id = item.PK.replace("A#", "");
+  const rawId = typeof item.PK === "string" ? item.PK : "";
+  const id = rawId ? rawId.replace("A#", "") : "";
   return {
     id,
     title: item.title ?? "",
@@ -104,10 +105,10 @@ export function mapIndexToSummary(item: Record<string, unknown>, signedAssetUrl?
 
   return {
     id: record.articleId ?? record.PK?.split("#").pop() ?? "",
-    title: record.title,
+    title: record.title ?? "",
     description: record.description ?? "",
-    date: record.date,
-    month: record.month,
+    date: record.date ?? "",
+    month: record.month ?? "",
     categories: record.categories ?? [],
     keywords: record.keywords ?? [],
     participants: normalizeParticipants(record.participants),
@@ -159,18 +160,24 @@ function resolveAssetUrl(
 ): string {
   const url = (signedAssetUrl ?? item.asset_url ?? "").trim();
   if (!url) {
-    const identifier = (item as DynamoArticleItem).PK ?? (item as DynamoIndexItem).articleId ?? "unknown";
-    throw new Error(`Missing asset URL for article ${identifier}`);
+    const identifier =
+      (item as DynamoArticleItem).PK ?? (item as DynamoIndexItem).articleId ?? "unknown";
+    console.error(`[dynamo] Missing asset URL for article ${identifier}`);
+    return "";
   }
   return url;
 }
 
 function assertArticleRecord(item: DynamoArticleItem, asset?: ArticleAssetData, signedAssetUrl?: string | null) {
-  if (!item?.PK) throw new Error("Dynamo article item missing PK");
-  if (!item.title) throw new Error(`Dynamo article item ${item.PK} missing title`);
-  if (!item.description) throw new Error(`Dynamo article item ${item.PK} missing description`);
-  if (!item.date) throw new Error(`Dynamo article item ${item.PK} missing date`);
-  if (!item.month) throw new Error(`Dynamo article item ${item.PK} missing month`);
+  const missing: string[] = [];
+  if (!item?.PK) missing.push("PK");
+  if (!item.title) missing.push("title");
+  if (!item.description) missing.push("description");
+  if (!item.date) missing.push("date");
+  if (!item.month) missing.push("month");
+  if (missing.length > 0) {
+    console.error(`[dynamo] Article item ${item?.PK ?? "unknown"} missing ${missing.join(", ")}`);
+  }
 
   const hasInlineSummary =
     Boolean(item.summary) ||
@@ -186,15 +193,19 @@ function assertArticleRecord(item: DynamoArticleItem, asset?: ArticleAssetData, 
 
   if (!hasInlineSummary && !hasAssetSummary && !hasAssetReference) {
     // Require either embedded summaries or a reference to the asset that contains them
-    throw new Error(`Dynamo article item ${item.PK} missing summary fields`);
+    console.error(`[dynamo] Article item ${item?.PK ?? "unknown"} missing summary fields`);
   }
 }
 
 function assertIndexRecord(item: DynamoIndexItem) {
-  if (!item?.PK) throw new Error("Dynamo index item missing PK");
-  if (!item.title) throw new Error(`Dynamo index item ${item.PK} missing title`);
-  if (!item.date) throw new Error(`Dynamo index item ${item.PK} missing date`);
-  if (!item.month) throw new Error(`Dynamo index item ${item.PK} missing month`);
+  const missing: string[] = [];
+  if (!item?.PK) missing.push("PK");
+  if (!item.title) missing.push("title");
+  if (!item.date) missing.push("date");
+  if (!item.month) missing.push("month");
+  if (missing.length > 0) {
+    console.error(`[dynamo] Index item ${item?.PK ?? "unknown"} missing ${missing.join(", ")}`);
+  }
 }
 
 function normalizeParticipants(participants?: Participant[]): Participant[] {
