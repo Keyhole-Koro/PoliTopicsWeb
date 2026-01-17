@@ -56,7 +56,15 @@ export async function fetchHeadlines(options: FetchHeadlinesOptions = {}) {
               hasMore: injectedData.hasMore || injectedData.items.length > items.length,
             }
           } else {
-            debugLog(`[api] Injected cache too small; falling back to API`)
+            debugLog(`[api] Injected cache partial; using cache`)
+            return {
+              ...injectedData,
+              items: injectedData.items,
+              limit: options.limit,
+              start: 0,
+              end: injectedData.items.length,
+              hasMore: injectedData.hasMore,
+            }
           }
         }
       } catch (e) {
