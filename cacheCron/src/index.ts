@@ -23,7 +23,9 @@ export const handler: Handler = async () => {
   const startedAt = Date.now()
   let durationMs = 0 // Declare durationMs here
 
-  const url = new URL(config.api.path, config.api.url)
+  const baseUrl = config.api.url.endsWith("/") ? config.api.url : `${config.api.url}/`
+  const normalizedPath = config.api.path.replace(/^\/+/, "")
+  const url = new URL(normalizedPath, baseUrl)
   url.searchParams.set("limit", String(config.api.limit))
 
   const controller = new AbortController()

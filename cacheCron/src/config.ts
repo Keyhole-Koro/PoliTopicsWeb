@@ -3,7 +3,7 @@ export type AppEnvironment = "local" | "stage" | "prod"
 export type AppConfig = {
   environment: AppEnvironment
   api: {
-    url: string | undefined //but required in stage/prod
+    url: string //but required in stage/prod
     path: string
     limit: number
     requestTimeoutMs: number
@@ -26,6 +26,10 @@ export type AppConfig = {
     batchWebhook?: string
     errorWebhook?: string
   }
+}
+
+if (!process.env.STAGE_BACKEND_API_URL) {
+  throw new Error("STAGE_BACKEND_API_URL must be set in stage/prod environments")
 }
 
 export const APP_CONFIG: Record<AppEnvironment, AppConfig> = {
