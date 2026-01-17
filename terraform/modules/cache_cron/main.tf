@@ -93,6 +93,7 @@ resource "aws_lambda_function" "headlines_job" {
 
   environment {
     variables = {
+      ACTIVE_ENVIRONMENT           = var.environment
       HEADLINES_API_URL            = local.headlines_job_api_url
       HEADLINES_PATH               = var.headlines_job_path
       HEADLINES_LIMIT              = tostring(var.headlines_job_limit)

@@ -1,9 +1,11 @@
-export type AppEnvironment = "local" | "stage" | "prod"
+const VALID_ENVIRONMENTS = ["local", "stage", "prod"] as const
+
+export type AppEnvironment = (typeof VALID_ENVIRONMENTS)[number]
 
 export type AppConfig = {
   environment: AppEnvironment
   api: {
-    url: string //but required in stage/prod
+    url: string
     path: string
     limit: number
     requestTimeoutMs: number
@@ -28,10 +30,6 @@ export type AppConfig = {
   }
 }
 
-if (!process.env.STAGE_BACKEND_API_URL) {
-  throw new Error("STAGE_BACKEND_API_URL must be set in stage/prod environments")
-}
-
 export const APP_CONFIG: Record<AppEnvironment, AppConfig> = {
   local: {
     environment: "local",
@@ -49,7 +47,7 @@ export const APP_CONFIG: Record<AppEnvironment, AppConfig> = {
   stage: {
     environment: "stage",
     api: {
-      url: process.env.STAGE_BACKEND_API_URL,
+      url: "",
       path: "/headlines",
       limit: 50,
       requestTimeoutMs: 10_000,
@@ -81,17 +79,16 @@ export const APP_CONFIG: Record<AppEnvironment, AppConfig> = {
 }
 
 export function loadConfig(): AppConfig {
-  const envName = detectEnvironment()
+  const envName = resolveEnvironment()
   const preset = APP_CONFIG[envName]
+  const stageApiUrl = envName === "stage" ? requireEnv("STAGE_BACKEND_API_URL") : undefined
+  const apiUrl = stageApiUrl ?? preset.api.url
   const s3AccessKeyId = process.env.S3_ACCESS_KEY_ID
   const s3SecretAccessKey = process.env.S3_SECRET_ACCESS_KEY
   const batchWebhook = process.env.DISCORD_WEBHOOK_BATCH
   const errorWebhook = process.env.DISCORD_WEBHOOK_ERROR
 
   if (envName !== "local") {
-    if (envName === "stage" && (!preset.api.url || preset.api.url.trim() === "")) {
-      throw new Error("STAGE_BACKEND_API_URL is required in stage")
-    }
     if (!s3AccessKeyId || !s3SecretAccessKey) {
       throw new Error("S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY are required in stage/prod")
     }
@@ -103,6 +100,10 @@ export function loadConfig(): AppConfig {
 
   return {
     ...preset,
+    api: {
+      ...preset.api,
+      url: apiUrl,
+    },
     s3: {
       ...preset.s3,
       credentials:
@@ -117,9 +118,21 @@ export function loadConfig(): AppConfig {
   }
 }
 
-function detectEnvironment(): AppEnvironment {
-  const name = process.env.AWS_LAMBDA_FUNCTION_NAME?.toLowerCase() || ""
-  if (name.includes("prod")) return "prod"
-  if (name.includes("stage")) return "stage"
-  return "local"
+function requireEnv(name: string): string {
+  const value = process.env[name]
+  if (!value || value.trim() === "") {
+    throw new Error(`${name} is required`)
+  }
+  return value
+}
+
+function resolveEnvironment(): AppEnvironment {
+  const value = process.env.ACTIVE_ENVIRONMENT
+  if (!value || value.trim() === "") {
+    throw new Error("ACTIVE_ENVIRONMENT is required")
+  }
+  if (!VALID_ENVIRONMENTS.includes(value as AppEnvironment)) {
+    throw new Error(`Invalid ACTIVE_ENVIRONMENT "${value}". Must be one of: ${VALID_ENVIRONMENTS.join(", ")}`)
+  }
+  return value as AppEnvironment
 }
