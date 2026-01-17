@@ -80,7 +80,6 @@ export const handler: Handler = async () => {
         // 2. Inject JSON data
         // The placeholder in frontend/app/layout.tsx is dangerouslySetInnerHTML={{ __html: '"__HEADLINES_CACHE__"' }}
         // which means the actual HTML content will be "__HEADLINES_CACHE__" surrounded by JSON string quotes.
-        const placeholder = `"${'__HEADLINES_CACHE__'}"` // This is the exact string to match in the HTML
         const escapedJson = JSON.stringify(
           {
             fetchedAt,
@@ -96,8 +95,18 @@ export const handler: Handler = async () => {
         ).replace(/<\/script>/g, "<\\/script>") // Escape </script> to prevent HTML parsing issues
         console.log(`[headlines-cron] Generated escaped JSON (first 200 chars): ${escapedJson.substring(0, 200)}...`)
 
-        if (htmlContent.includes(placeholder)) {
-          htmlContent = htmlContent.replace(placeholder, escapedJson)
+        // Use regex to replace the content of the script tag.
+        // It looks for <script id="headlines-cache" ...> CONTENT </script>
+        // The content could be the placeholder OR previously injected JSON.
+        const scriptRegex = /(<script\s+id="headlines-cache"[^>]*>)([\s\S]*?)(<\/script>)/i
+        const match = htmlContent.match(scriptRegex)
+
+        if (match) {
+          // match[1] is the opening tag
+          // match[2] is the old content (placeholder or JSON)
+          // match[3] is the closing tag
+          htmlContent = htmlContent.replace(scriptRegex, `$1${escapedJson}$3`)
+          
           console.log(`[headlines-cron] new json content: ${escapedJson}.`)
           console.log(`[headlines-cron] Injected headlines JSON into ${config.bucket.indexHtmlKey}.`)
           console.log(`[headlines-cron] Modified HTML (first 200 chars): ${htmlContent.substring(0, 200)}...`)
@@ -114,14 +123,7 @@ export const handler: Handler = async () => {
           )
           console.log(`[headlines-cron] Uploaded modified ${config.bucket.indexHtmlKey} to S3.`)
         } else {
-          console.log(`[headlines-cron] Placeholder "${placeholder}" not found in ${config.bucket.indexHtmlKey}. HTML injection skipped.`)
-          // Also log a snippet of HTML around where it should be, to debug missing placeholder
-          const placeholderIndex = htmlContent.indexOf('<script id="headlines-cache"')
-          if (placeholderIndex !== -1) {
-            const snippetStart = Math.max(0, placeholderIndex - 50)
-            const snippetEnd = Math.min(htmlContent.length, placeholderIndex + 100)
-            console.log(`[headlines-cron] HTML snippet around script tag: ...${htmlContent.substring(snippetStart, snippetEnd)}...`)
-          }
+          console.log(`[headlines-cron] Script tag with id="headlines-cache" not found in ${config.bucket.indexHtmlKey}. HTML injection skipped.`)
         }
       } else {
         console.log(`[headlines-cron] No body received for ${config.bucket.indexHtmlKey}. HTML injection skipped.`)

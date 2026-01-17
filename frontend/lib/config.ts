@@ -34,6 +34,6 @@ export const appConfig: AppConfig = {
   apiBaseUrl: CONFIG_BY_ENV[ACTIVE_ENVIRONMENT].apiBaseUrl,
 }
 
-if (appConfig.environment === "local") {
+if (appConfig.environment === "local" || appConfig.environment === "stage") {
   debugLog("[config] App Config:", JSON.stringify(appConfig, null, 2))
 }

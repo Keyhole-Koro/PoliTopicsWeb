@@ -1,5 +1,5 @@
 const APP_ENV = process.env.NEXT_PUBLIC_APP_ENV ?? "prod"
-const LOG_LEVEL = process.env.NEXT_PUBLIC_LOG_LEVEL ?? (APP_ENV === "local" ? "debug" : "error")
+const LOG_LEVEL = process.env.NEXT_PUBLIC_LOG_LEVEL ?? (APP_ENV === "local" || APP_ENV === "stage" ? "debug" : "error")
 
 const ENABLE_DEBUG = LOG_LEVEL === "debug"
 
