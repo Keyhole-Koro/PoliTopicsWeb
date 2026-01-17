@@ -1,0 +1,23 @@
+{
+  "name": "@politopics/backend-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "dev:local": "wrangler dev --env local",
+    "build": "tsc",
+    "deploy:stage": "wrangler deploy --env stage",
+    "deploy:prod": "wrangler deploy --env prod",
+    "types": "wrangler types"
+  },
+  "dependencies": {
+    "aws4fetch": "^1.0.20",
+    "hono": "^4.6.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "typescript": "^5.6.3",
+    "wrangler": "^3.99.0"
+  }
+}

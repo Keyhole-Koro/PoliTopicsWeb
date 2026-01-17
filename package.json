@@ -2,13 +2,14 @@
   "name": "politopicsweb",
   "version": "0.1.0",
   "private": true,
-  "workspaces": ["frontend", "backend", "cacheCron"],
+  "workspaces": ["frontend", "backend", "cacheCron", "workers/backend"],
   "scripts": {
     "// dev": "",
     "dev": "bash -c 'npm run dev:backend & npm run dev:frontend'",
     "dev:frontend": "npm --prefix frontend run dev:local",
     "dev:backend": "npm --prefix backend run dev:local",
     "dev:backend:mock": "cd backend && DISABLE_NOTIFICATIONS=true DATA_MODE=mock ACTIVE_ENVIRONMENT=local npm run dev",
+    "dev:backend:worker": "npm --prefix workers/backend run dev:local",
 
     "// build": "",
     "build": "npm run build:frontend && npm run build:backend && npm run build:cacheCron",

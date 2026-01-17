@@ -1,0 +1,103 @@
+name: Deploy Backend Worker
+
+on:
+  push:
+    branches:
+      - stage
+      - prod
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      ENV: ${{ startsWith(github.ref, 'refs/heads/prod') && 'prod' || 'stage' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: workers/backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: workers/backend
+        run: npm ci
+
+      - name: Type check
+        working-directory: workers/backend
+        run: npm run build
+
+      - name: Deploy to Cloudflare Workers
+        working-directory: workers/backend
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "${CLOUDFLARE_API_TOKEN}" ] || [ -z "${CLOUDFLARE_ACCOUNT_ID}" ]; then
+            echo "CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID must be set as secrets." >&2
+            exit 1
+          fi
+          npx wrangler deploy --env "${ENV}"
+
+      - name: Set Worker Secrets
+        working-directory: workers/backend
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.BACKEND_WORKER_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKEND_WORKER_AWS_SECRET_ACCESS_KEY }}
+          DISCORD_WEBHOOK_ERROR: ${{ secrets.DISCORD_WEBHOOK_ERROR }}
+          DISCORD_WEBHOOK_WARN: ${{ secrets.DISCORD_WEBHOOK_WARN }}
+          DISCORD_WEBHOOK_ACCESS: ${{ secrets.DISCORD_WEBHOOK_ACCESS }}
+        run: |
+          # Only set secrets if they are provided (first deploy or secret update)
+          # Wrangler will skip if secrets are already set
+          
+          if [ -n "${AWS_ACCESS_KEY_ID}" ]; then
+            echo "${AWS_ACCESS_KEY_ID}" | npx wrangler secret put AWS_ACCESS_KEY_ID --env "${ENV}"
+          fi
+          
+          if [ -n "${AWS_SECRET_ACCESS_KEY}" ]; then
+            echo "${AWS_SECRET_ACCESS_KEY}" | npx wrangler secret put AWS_SECRET_ACCESS_KEY --env "${ENV}"
+          fi
+          
+          if [ -n "${DISCORD_WEBHOOK_ERROR}" ]; then
+            echo "${DISCORD_WEBHOOK_ERROR}" | npx wrangler secret put DISCORD_WEBHOOK_ERROR --env "${ENV}"
+          fi
+          
+          if [ -n "${DISCORD_WEBHOOK_WARN}" ]; then
+            echo "${DISCORD_WEBHOOK_WARN}" | npx wrangler secret put DISCORD_WEBHOOK_WARN --env "${ENV}"
+          fi
+          
+          if [ -n "${DISCORD_WEBHOOK_ACCESS}" ]; then
+            echo "${DISCORD_WEBHOOK_ACCESS}" | npx wrangler secret put DISCORD_WEBHOOK_ACCESS --env "${ENV}"
+          fi
+
+      - name: Verify backend health
+        run: |
+          set -euo pipefail
+          
+          if [ "${ENV}" = "prod" ]; then
+            HEALTH_URL="https://api.politopics.net/healthz"
+          else
+            # Stage URL - update this with your actual stage worker URL
+            HEALTH_URL="${{ secrets.STAGE_BACKEND_WORKER_URL }}/healthz"
+          fi
+          
+          if [ -z "${HEALTH_URL}" ] || [ "${HEALTH_URL}" = "/healthz" ]; then
+            echo "Skipping health check - STAGE_BACKEND_WORKER_URL not set"
+            exit 0
+          fi
+          
+          echo "Checking backend health at ${HEALTH_URL}"
+          
+          # Wait a bit for the worker to be ready
+          sleep 5
+          
+          curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "${HEALTH_URL}"
