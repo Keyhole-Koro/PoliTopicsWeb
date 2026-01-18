@@ -1,5 +1,5 @@
   {
-    "baseUrl": "api.politopics.net",
+    "baseUrl": "https://zboh4595x7.execute-api.ap-northeast-3.amazonaws.com/stage/",
     "durationMs": 60000,
     "defaults": {
       "method": "GET",
@@ -9,11 +9,6 @@
       "readBody": true
     },
     "targets": [
-      {
-        "name": "healthz",
-        "path": "/healthz",
-        "intervalMs": 2000
-      },
       {
         "name": "headlines",
         "path": "/headlines",

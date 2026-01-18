@@ -2,19 +2,16 @@ locals {
   headlines_job_enabled = var.headlines_job_enabled ? { current = true } : {}
   headlines_job_name = (
     var.headlines_job_name != null && var.headlines_job_name != ""
-      ? var.headlines_job_name
-      : "politopics-headlines-cron-${var.environment}"
+    ? var.headlines_job_name
+    : "politopics-headlines-cron-${var.environment}"
   )
   headlines_job_bucket = (
     var.headlines_job_bucket != null && var.headlines_job_bucket != ""
-      ? var.headlines_job_bucket
-      : var.frontend_bucket
+    ? var.headlines_job_bucket
+    : var.frontend_bucket
   )
-  headlines_job_api_url = (
-    var.headlines_job_api_url != null && var.headlines_job_api_url != ""
-      ? var.headlines_job_api_url
-      : module.lambda.api_url
-  )
+  # Backend API URL is now required via headlines_job_api_url variable (Cloudflare Workers URL)
+  headlines_job_api_url              = var.headlines_job_api_url
   headlines_job_s3_endpoint          = var.headlines_job_s3_endpoint != null ? var.headlines_job_s3_endpoint : ""
   headlines_job_s3_region            = var.headlines_job_s3_region != null ? var.headlines_job_s3_region : var.region
   headlines_job_s3_access_key_id     = var.headlines_job_s3_access_key_id != null ? var.headlines_job_s3_access_key_id : ""
@@ -93,11 +90,11 @@ resource "aws_lambda_function" "headlines_job" {
 
   environment {
     variables = {
-      ACTIVE_ENVIRONMENT           = var.environment
-      HEADLINES_API_URL            = local.headlines_job_api_url
-      HEADLINES_PATH               = var.headlines_job_path
-      HEADLINES_LIMIT              = tostring(var.headlines_job_limit)
-      HEADLINES_BUCKET             = local.headlines_job_bucket
+      ACTIVE_ENVIRONMENT = var.environment
+      HEADLINES_API_URL  = local.headlines_job_api_url
+      HEADLINES_PATH     = var.headlines_job_path
+      HEADLINES_LIMIT    = tostring(var.headlines_job_limit)
+      HEADLINES_BUCKET   = local.headlines_job_bucket
 
 
       HEADLINES_REQUEST_TIMEOUT_MS = tostring(var.headlines_job_request_timeout_ms)
@@ -129,8 +126,8 @@ resource "aws_cloudwatch_event_rule" "headlines_job" {
 resource "aws_cloudwatch_event_target" "headlines_job" {
   for_each = local.headlines_job_enabled
 
-  rule = aws_cloudwatch_event_rule.headlines_job[each.key].name
-  arn  = aws_lambda_function.headlines_job[each.key].arn
+  rule      = aws_cloudwatch_event_rule.headlines_job[each.key].name
+  arn       = aws_lambda_function.headlines_job[each.key].arn
   target_id = "headlines-cron"
 }
 

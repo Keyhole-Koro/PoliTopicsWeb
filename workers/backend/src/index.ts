@@ -13,10 +13,11 @@ type Variables = {
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 // CORS middleware
+// GitHub Actions health checks don't send Origin header (not a browser), so CORS doesn't apply
 app.use(
   "*",
   cors({
-    origin: "*",
+    origin: ["https://politopics.net", "https://politopics.net"],
     allowMethods: ["GET", "OPTIONS"],
     allowHeaders: ["Content-Type"],
   })

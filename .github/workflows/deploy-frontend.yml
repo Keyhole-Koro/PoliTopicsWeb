@@ -12,11 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
     env:
       ENV: ${{ startsWith(github.ref, 'refs/heads/prod') && 'prod' || 'stage' }}
-      AWS_REGION: ${{ vars.AWS_REGION || 'ap-northeast-3' }}
-      AWS_ROLE_TO_ASSUME: ${{ startsWith(github.ref, 'refs/heads/prod') && secrets.PROD_ROLE_TO_ASSUME || secrets.STAGE_ROLE_TO_ASSUME }}
       NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
     steps:
       - name: Checkout
@@ -29,27 +26,13 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
-          role-session-name: politopics-frontend-deploy
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Terraform init (read state)
-        working-directory: terraform
+      - name: Set backend API URL
         run: |
-          terraform init -backend-config="backends/${ENV}.hcl"
-
-      - name: Fetch backend API URL
-        id: tf-output
-        working-directory: terraform
-        run: |
-          API_URL=$(terraform output -raw backend_api_url)
-          echo "BACKEND_API_URL=${API_URL}" >> "$GITHUB_ENV"
+          if [ "${ENV}" = "prod" ]; then
+            echo "BACKEND_API_URL=https://api.politopics.net" >> "$GITHUB_ENV"
+          else
+            echo "BACKEND_API_URL=${{ secrets.STAGE_BACKEND_API_URL }}" >> "$GITHUB_ENV"
+          fi
 
       - name: Install dependencies
         run: npm ci
