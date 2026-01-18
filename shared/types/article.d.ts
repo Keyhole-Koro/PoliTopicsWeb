@@ -46,14 +46,25 @@ export type ArticleSummary = {
     nameOfMeeting: string;
     assetUrl: string;
 };
-export default interface Article extends ArticleSummary {
+
+/**
+ * Asset data loaded from R2 via assetUrl
+ */
+export type ArticleAssetData = {
     summary: Summary;
     soft_language_summary: SoftLanguageSummary;
     middle_summary: MiddleSummary[];
     dialogs: Dialog[];
+};
+
+export default interface Article extends ArticleSummary {
+    summary?: Summary;
+    soft_language_summary?: SoftLanguageSummary;
+    middle_summary?: MiddleSummary[];
+    dialogs?: Dialog[];
     participants: Participant[];
     keywords: Keyword[];
-    terms: Term[];
+    terms?: Term[];
 }
 export type { Article };
 export type SearchFilters = {

@@ -1,0 +1,21 @@
+{
+  "rules": [
+    {
+      "allowed": {
+        "origins": [
+          "https://politopics.net",
+          "https://www.politopics.net"
+        ],
+        "methods": ["GET", "HEAD"],
+        "headers": ["*"]
+      },
+      "exposed_headers": [
+        "Content-Length",
+        "Content-Type",
+        "ETag",
+        "Cache-Control"
+      ],
+      "max_age_seconds": 86400
+    }
+  ]
+}

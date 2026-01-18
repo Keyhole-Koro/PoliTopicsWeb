@@ -201,8 +201,8 @@ export class ArticleRepository {
     }
 
     const item = unmarshall(response.Item) as DynamoArticleItem;
-    const asset = await this.loadAsset(item);
-    return this.mapItemToArticle(item, asset);
+    // Assets are now fetched directly by frontend from R2 via assetUrl
+    return this.mapItemToArticle(item);
   }
 
   async getSuggestions(
@@ -385,15 +385,13 @@ export class ArticleRepository {
       session: item.session ?? 0,
       nameOfHouse: item.nameOfHouse ?? "",
       nameOfMeeting: item.nameOfMeeting ?? "",
-      summary: asset?.summary ?? item.summary ?? { based_on_orders: [], summary: "" },
-      soft_language_summary: asset?.soft_language_summary ?? item.soft_language_summary ?? {
-        based_on_orders: [],
-        summary: "",
-      },
-      middle_summary: asset?.middle_summary ?? item.middle_summary ?? [],
-      dialogs: asset?.dialogs ?? item.dialogs ?? [],
+      // Asset fields - populated by frontend from assetUrl
+      summary: asset?.summary ?? item.summary,
+      soft_language_summary: asset?.soft_language_summary ?? item.soft_language_summary,
+      middle_summary: asset?.middle_summary ?? item.middle_summary,
+      dialogs: asset?.dialogs ?? item.dialogs,
       categories: item.categories ?? [],
-      terms: item.terms ?? [],
+      terms: item.terms,
       assetUrl: item.asset_url ?? "",
     };
   }
