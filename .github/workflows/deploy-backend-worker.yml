@@ -79,50 +79,6 @@ jobs:
             echo "${DISCORD_WEBHOOK_ACCESS}" | npx wrangler secret put DISCORD_WEBHOOK_ACCESS --env "${ENV}"
           fi
 
-      - name: Configure R2 CORS
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          STAGE_FRONTEND_URL: ${{ secrets.STAGE_FRONTEND_URL }}
-        run: |
-          set -euo pipefail
-
-          if [ "${ENV}" = "prod" ]; then
-            BUCKET_NAME="politopics-assets-prod"
-            ALLOWED_ORIGINS='["https://politopics.net", "https://www.politopics.net"]'
-          else
-            BUCKET_NAME="politopics-assets-stage"
-            if [ -z "${STAGE_FRONTEND_URL:-}" ]; then
-              echo "⚠️ Skipping CORS configuration - STAGE_FRONTEND_URL secret not set"
-              exit 0
-            fi
-            ALLOWED_ORIGINS="[\"${STAGE_FRONTEND_URL}\", \"http://localhost:3000\", \"http://localhost:5173\"]"
-          fi
-
-          echo "🔧 Configuring CORS for R2 bucket: ${BUCKET_NAME}"
-
-          # Create CORS config
-          CORS_CONFIG=$(cat <<EOF
-          {
-            "rules": [
-              {
-                "allowed": {
-                  "origins": ${ALLOWED_ORIGINS},
-                  "methods": ["GET", "HEAD"],
-                  "headers": ["*"]
-                },
-                "exposed_headers": ["Content-Length", "Content-Type", "ETag", "Cache-Control"],
-                "max_age_seconds": 86400
-              }
-            ]
-          }
-          EOF
-          )
-
-          echo "${CORS_CONFIG}" > /tmp/cors-config.json
-          npx wrangler r2 bucket cors set "${BUCKET_NAME}" --file /tmp/cors-config.json
-          echo "✅ CORS configured for ${BUCKET_NAME}"
-
       - name: Verify backend health
         run: |
           set -euo pipefail
