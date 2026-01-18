@@ -85,12 +85,12 @@ jobs:
           if [ "${ENV}" = "prod" ]; then
             HEALTH_URL="https://api.politopics.net/healthz"
           else
-            # Stage URL - update this with your actual stage worker URL
-            HEALTH_URL="${{ secrets.STAGE_BACKEND_WORKER_URL }}/healthz"
+            # Stage URL
+            HEALTH_URL="${{ secrets.STAGE_BACKEND_API_URL }}/healthz"
           fi
 
           if [ -z "${HEALTH_URL}" ] || [ "${HEALTH_URL}" = "/healthz" ]; then
-            echo "Skipping health check - STAGE_BACKEND_WORKER_URL not set"
+            echo "Skipping health check - STAGE_BACKEND_API_URL not set"
             exit 0
           fi
 
