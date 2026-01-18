@@ -1,4 +1,5 @@
 # PoliTopics Web Monorepo
+[Japanese Version](./jp/README.md)
 
 This repository now contains the four pillars requested for integrated development:
 

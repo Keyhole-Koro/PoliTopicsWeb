@@ -1,4 +1,5 @@
 # Scripts and Usage (PoliTopicsWeb)
+[Japanese Version](./jp/scripts_and_usage.md)
 
 This document lists runnable scripts and common workflows for the Web workspace.
 Paths are relative to `PoliTopicsWeb`.

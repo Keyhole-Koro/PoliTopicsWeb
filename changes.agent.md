@@ -409,3 +409,17 @@ Details:
   - `STAGE_BACKEND_API_URL`: Stage Workers URL
   - `BACKEND_WORKER_AWS_ACCESS_KEY_ID`: IAM credentials for Workers
   - `BACKEND_WORKER_AWS_SECRET_ACCESS_KEY`: IAM credentials for Workers
+
+Agent: Gemini
+Date/Time: 2026-01-18 10:00:00 JST
+Keywords: documentation, translation, japanese
+Topic: Translate documentation to Japanese
+Details:
+- Translated `README.md`, `docs/scripts_and_usage.md`, `cacheCron/README.md`, `profile/README.md`, and `terraform/README.md` to Japanese in `jp/` subdirectories.
+- Added links between English and Japanese versions.
+Files:
+- PoliTopicsWeb/jp/README.md
+- PoliTopicsWeb/docs/jp/scripts_and_usage.md
+- PoliTopicsWeb/cacheCron/jp/README.md
+- PoliTopicsWeb/profile/jp/README.md
+- PoliTopicsWeb/terraform/jp/README.md
