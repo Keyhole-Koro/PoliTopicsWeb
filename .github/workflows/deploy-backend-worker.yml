@@ -14,6 +14,7 @@ jobs:
       contents: read
     env:
       ENV: ${{ startsWith(github.ref, 'refs/heads/prod') && 'prod' || 'stage' }}
+      NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
