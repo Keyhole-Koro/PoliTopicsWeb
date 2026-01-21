@@ -445,3 +445,12 @@ Files:
 - PoliTopicsWeb/jp/README.md
 - PoliTopicsWeb/docs/scripts_and_usage.md (deleted)
 - PoliTopicsWeb/docs/jp/scripts_and_usage.md (deleted)
+
+Agent: Codex
+Date/Time: 2026-01-22 00:55:48 JST
+Keywords: cache-cron, monitoring, injection
+Topic: Fail fast when cache cron cannot inject headlines
+Details:
+- Cache cron now emits an error notification and throws when the headlines cache script tag is missing or index.html body is empty, so failed prod injections are surfaced instead of silent skips.
+Files:
+- PoliTopicsWeb/cacheCron/src/index.ts
