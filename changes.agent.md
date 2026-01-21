@@ -423,3 +423,25 @@ Files:
 - PoliTopicsWeb/cacheCron/jp/README.md
 - PoliTopicsWeb/profile/jp/README.md
 - PoliTopicsWeb/terraform/jp/README.md
+
+Agent: Codex
+Date/Time: 2026-01-21 23:22:22 JST
+Keywords: content, footer, copy
+Topic: Remove democracy tagline from footer
+Details:
+- Removed the footer copy "すべての市民に民主主義を身近に。" from the web app to align with updated messaging.
+Files:
+- PoliTopicsWeb/frontend/components/home/site-footer.tsx
+
+Agent: Codex
+Date/Time: 2026-01-21 23:49:05 JST
+Keywords: documentation, workers, r2
+Topic: Rewrite Web README and remove legacy docs
+Details:
+- Rewrote Web README (EN/JP) to reflect Workers + Hono backend, R2 hosting, current endpoints, commands, and local/deploy flows with Mermaid architecture.
+- Removed legacy scripts_and_usage docs.
+Files:
+- PoliTopicsWeb/README.md
+- PoliTopicsWeb/jp/README.md
+- PoliTopicsWeb/docs/scripts_and_usage.md (deleted)
+- PoliTopicsWeb/docs/jp/scripts_and_usage.md (deleted)

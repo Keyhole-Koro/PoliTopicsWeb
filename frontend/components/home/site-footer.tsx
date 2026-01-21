@@ -10,7 +10,6 @@ export function SiteFooter() {
           </div>
           <span className="font-semibold text-foreground">国会議事録ニュース</span>
         </div>
-        <p>すべての市民に民主主義を身近に。</p>
       </div>
     </footer>
   )

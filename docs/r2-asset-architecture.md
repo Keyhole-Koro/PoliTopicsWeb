@@ -90,11 +90,10 @@ This document describes the architecture for serving article assets via R2 publi
 
 ### Environment-specific URLs
 
-| Environment | API URL                            | Asset URL                                |
-| ----------- | ---------------------------------- | ---------------------------------------- |
-| Production  | `https://api.politopics.net`       | `https://asset.politopics.net`           |
-| Stage       | `https://api.stage.politopics.net` | `https://asset.stage.politopics.net`     |
-| Local       | `http://localhost:8787`            | `http://localhost:4566/...` (LocalStack) |
+| Environment | API URL                      | Asset URL                                |
+| ----------- | ---------------------------- | ---------------------------------------- |
+| Production  | `https://api.politopics.net` | `https://asset.politopics.net`           |
+| Local       | `http://localhost:8787`      | `http://localhost:4566/...` (LocalStack) |
 
 ### Asset Path Format
 

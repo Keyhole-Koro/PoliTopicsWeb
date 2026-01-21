@@ -1,5 +1,5 @@
 # Backend Latency Measurement
-[Japanese Version](./jp/README.md)
+[日本語版](./jp/README.md)
 
 This folder contains a simple client-side latency probe script. It sends HTTP
 requests on a fixed interval per target, supports path parameters, and can

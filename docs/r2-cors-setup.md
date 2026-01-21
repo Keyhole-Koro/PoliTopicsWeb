@@ -42,11 +42,7 @@ This guide explains how to manually configure CORS for R2 asset buckets used to 
 ```json
 [
   {
-    "AllowedOrigins": [
-      "https://your-stage-domain.net",
-      "http://localhost:3000",
-      "http://localhost:5173"
-    ],
+    "AllowedOrigins": ["https://your-stage-domain.net"],
     "AllowedMethods": ["GET", "HEAD"],
     "AllowedHeaders": ["*"],
     "ExposeHeaders": [
