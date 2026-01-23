@@ -17,13 +17,7 @@ const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 app.use(
   "*",
   cors({
-    origin: (origin, c) => {
-      const allowedOrigins = ["https://politopics.net"];
-      if (c.env.STAGE_FRONTEND_URL) {
-        allowedOrigins.push(c.env.STAGE_FRONTEND_URL);
-      }
-      return allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
-    },
+    origin: "*",
     allowMethods: ["GET", "OPTIONS"],
     allowHeaders: ["Content-Type"],
   })
