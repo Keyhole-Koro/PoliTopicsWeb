@@ -104,59 +104,50 @@ function getReactionLabel(reaction?: ViewerReaction): string {
   }
 }
 
+function escapeRegExp(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+}
+
 function highlightTerms(text: string, terms: Term[] = []): JSX.Element {
   if (!terms.length) {
     return <span>{text}</span>
   }
 
-  const highlightedText = text
-  const termMap = new Map(terms.map((t) => [t.term, t.definition]))
-
   // Sort terms by length (longest first) to avoid partial matches
-  const sortedTerms = terms.sort((a, b) => b.term.length - a.term.length)
+  const sortedTerms = [...terms].sort((a, b) => b.term.length - a.term.length)
 
-  const elements: JSX.Element[] = []
-  let lastIndex = 0
+  const pattern = new RegExp(
+    `(${sortedTerms.map((t) => escapeRegExp(t.term)).join("|")})`,
+    "gi",
+  )
 
-  sortedTerms.forEach((term) => {
-    const regex = new RegExp(`(${term.term})`, "gi")
-    const matches = Array.from(text.matchAll(regex))
+  const parts = text.split(pattern)
 
-    matches.forEach((match) => {
-      if (match.index !== undefined && match.index >= lastIndex) {
-        // Add text before the match
-        if (match.index > lastIndex) {
-          elements.push(<span key={`text-${lastIndex}`}>{text.slice(lastIndex, match.index)}</span>)
+  return (
+    <>
+      {parts.map((part, index) => {
+        const term = terms.find((t) => t.term.toLowerCase() === part.toLowerCase())
+        if (term) {
+          return (
+            <TooltipProvider key={`term-${index}`}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="cursor-help underline decoration-dotted underline-offset-4 decoration-primary/50 hover:decoration-primary">
+                    {part}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="right" align="center" sideOffset={12} className="max-w-xs">
+                  <p className="font-semibold">{term.term}</p>
+                  <p className="text-sm">{term.definition}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )
         }
-
-        // Add highlighted term with tooltip
-        elements.push(
-          <TooltipProvider key={`term-${match.index}`}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="bg-yellow-200 text-yellow-900 px-1 rounded cursor-help border-b border-yellow-400 hover:bg-yellow-300 transition-colors">
-                  {match[1]}
-                </span>
-              </TooltipTrigger>
-              <TooltipContent side="right" align="center" sideOffset={12} className="max-w-xs">
-                <p className="font-semibold">{term.term}</p>
-                <p className="text-sm">{term.definition}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>,
-        )
-
-        lastIndex = match.index + match[1].length
-      }
-    })
-  })
-
-  // Add remaining text
-  if (lastIndex < text.length) {
-    elements.push(<span key={`text-end`}>{text.slice(lastIndex)}</span>)
-  }
-
-  return <>{elements}</>
+        return <span key={`text-${index}`}>{part}</span>
+      })}
+    </>
+  )
 }
 
 export function DialogViewer({ dialogs, terms = [], title = "会議の議事録", className = "" }: DialogViewerProps) {

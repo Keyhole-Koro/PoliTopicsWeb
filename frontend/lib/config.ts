@@ -9,7 +9,7 @@ type AppConfig = {
 
 const CONFIG_BY_ENV: Record<AppEnvironment, Omit<AppConfig, "environment">> = {
   local: {
-    apiBaseUrl: "http://127.0.0.1:4500",
+    apiBaseUrl: "http://localhost:45000",
   },
   stage: {
     apiBaseUrl: "https://zboh4595x7.execute-api.ap-northeast-3.amazonaws.com/stage",

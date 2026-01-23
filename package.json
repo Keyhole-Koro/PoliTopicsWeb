@@ -8,7 +8,8 @@
     "dev": "bash -c 'npm run dev:backend & npm run dev:frontend'",
     "dev:frontend": "npm --prefix frontend run dev:local",
     "dev:backend": "npm --prefix backend run dev:local",
-    "dev:backend:mock": "cd backend && DISABLE_NOTIFICATIONS=true DATA_MODE=mock ACTIVE_ENVIRONMENT=local npm run dev",
+    "dev:backend:mock": "npm --prefix backend run dev:local:mock",
+    "dev:backend:dynamo": "npm --prefix backend run dev:local:dynamo",
     "dev:backend:worker": "npm --prefix workers/backend run dev:local",
 
     "// build": "",

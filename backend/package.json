@@ -4,12 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev:local": "ACTIVE_ENVIRONMENT=local DATA_MODE=mock tsx watch src/server.ts",
+    "dev:local": "npm run dev:local:mock",
+    "dev:local:mock": "DISABLE_NOTIFICATIONS=true ACTIVE_ENVIRONMENT=local DATA_MODE=mock tsx watch src/server.ts",
+    "dev:local:dynamo": "ACTIVE_ENVIRONMENT=local DATA_MODE=dynamo tsx watch src/server.ts",
     "start": "node dist/server.js",
     "build": "tsc -p tsconfig.json && node scripts/prepare-local-dist.mjs && node scripts/zip.mjs",
-    "build:local": "tsc -p tsconfig.json && node scripts/prepare-local-dist.mjs && node scripts/zip.mjs",
-    "seed": "ts-node src/scripts/seed-localstack.ts",
-    "bootstrap:localstack": "npm run build:local && npm --prefix ../../shared/mock install && node ../../shared/mock/upload_articles.js --endpoint http://localstack:4566 --bucket politopics-articles-local"
+    "build:local": "tsc -p tsconfig.json && node scripts/prepare-local-dist.mjs && node scripts/zip.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.679.0",

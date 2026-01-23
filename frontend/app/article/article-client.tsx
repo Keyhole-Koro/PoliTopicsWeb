@@ -119,17 +119,17 @@ export function ArticleClient({ issueId }: Props) {
         <CardContent className="space-y-4">
           <div>
             <h4 className="mb-2 text-base font-semibold text-foreground">詳細要約</h4>
-            <Markdown content={summaryText} />
+            <Markdown content={summaryText} terms={termDetails} />
           </div>
           <div className="border-t pt-4">
             <h4 className="mb-2 text-base font-semibold text-foreground">簡潔要約</h4>
-            <Markdown content={softSummaryText} className="italic text-muted-foreground" />
+            <Markdown content={softSummaryText} className="italic text-muted-foreground" terms={termDetails} />
           </div>
         </CardContent>
       </Card>
 
       {hasDialogData ? (
-        <DialogViewer dialogs={dialogEntries} title="会議の議事録" />
+        <DialogViewer dialogs={dialogEntries} title="会議の議事録" terms={termDetails} />
       ) : (
         <Card>
           <CardHeader>
