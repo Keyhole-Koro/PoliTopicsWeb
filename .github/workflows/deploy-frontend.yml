@@ -31,7 +31,7 @@ jobs:
 
       - name: Build frontend
         env:
-          STAGE_BACKEND_API_URL: ${{ secrets.STAGE_BACKEND_API_URL }}
+          NEXT_PUBLIC_STAGE_BACKEND_API_URL: ${{ secrets.STAGE_BACKEND_API_URL }}
         run: |
           if [ "${ENV}" = "stage" ]; then
             npm run build:stage --workspace frontend

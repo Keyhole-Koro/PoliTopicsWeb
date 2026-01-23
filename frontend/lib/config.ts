@@ -12,7 +12,7 @@ const CONFIG_BY_ENV: Record<AppEnvironment, Omit<AppConfig, "environment">> = {
     apiBaseUrl: "http://localhost:45000",
   },
   stage: {
-    apiBaseUrl: process.env.STAGE_BACKEND_API_URL as string,
+    apiBaseUrl: process.env.NEXT_PUBLIC_STAGE_BACKEND_API_URL as string,
   },
   prod: {
     apiBaseUrl: "https://api.politopics.net",
@@ -29,7 +29,7 @@ if (!ENVIRONMENT_FROM_ENV) {
 const ACTIVE_ENVIRONMENT: AppEnvironment = ENVIRONMENT_FROM_ENV
 
 if (ACTIVE_ENVIRONMENT === "stage" && !CONFIG_BY_ENV.stage.apiBaseUrl) {
-  throw new Error("STAGE_BACKEND_API_URL environment variable is required in stage environment")
+  throw new Error("NEXT_PUBLIC_STAGE_BACKEND_API_URL environment variable is required in stage environment")
 }
 
 export const appConfig: AppConfig = {
