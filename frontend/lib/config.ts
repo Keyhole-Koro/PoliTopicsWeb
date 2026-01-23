@@ -12,13 +12,13 @@ const CONFIG_BY_ENV: Record<AppEnvironment, Omit<AppConfig, "environment">> = {
     apiBaseUrl: "http://localhost:45000",
   },
   stage: {
-    apiBaseUrl: "https://zboh4595x7.execute-api.ap-northeast-3.amazonaws.com/stage",
+    apiBaseUrl: process.env.STAGE_BACKEND_API_URL as string,
   },
   prod: {
     apiBaseUrl: "https://api.politopics.net",
   },
   localstackTest: {
-    apiBaseUrl: process.env.NEXT_PUBLIC_LOCALSTACK_API_URL || "http://127.0.0.1:4500",
+    apiBaseUrl: "http://127.0.0.1:4500",
   },
 }
 
@@ -27,6 +27,10 @@ if (!ENVIRONMENT_FROM_ENV) {
   throw new Error("NEXT_PUBLIC_APP_ENV must be set to local, stage, prod, or localstackTest.")
 }
 const ACTIVE_ENVIRONMENT: AppEnvironment = ENVIRONMENT_FROM_ENV
+
+if (ACTIVE_ENVIRONMENT === "stage" && !CONFIG_BY_ENV.stage.apiBaseUrl) {
+  throw new Error("STAGE_BACKEND_API_URL environment variable is required in stage environment")
+}
 
 export const appConfig: AppConfig = {
   environment: ACTIVE_ENVIRONMENT,
