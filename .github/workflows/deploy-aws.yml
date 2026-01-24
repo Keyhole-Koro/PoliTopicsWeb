@@ -83,10 +83,3 @@ jobs:
       - name: Terraform Apply
         working-directory: ${{ env.TERRAFORM_WORKING_DIR }}
         run: terraform apply -auto-approve tfplan
-
-      - name: Trigger headlines update
-        run: |
-          FUNCTION_NAME="politopics-headlines-cron-${TARGET_ENV}"
-          echo "Invoking Lambda: $FUNCTION_NAME"
-          aws lambda invoke --function-name "$FUNCTION_NAME" --cli-binary-format raw-in-base64-out --payload '{}' response.json
-          cat response.json
