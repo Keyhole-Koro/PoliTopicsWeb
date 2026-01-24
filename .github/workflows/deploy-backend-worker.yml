@@ -55,6 +55,7 @@ jobs:
           DISCORD_WEBHOOK_ERROR: ${{ secrets.DISCORD_WEBHOOK_ERROR }}
           DISCORD_WEBHOOK_WARN: ${{ secrets.DISCORD_WEBHOOK_WARN }}
           DISCORD_WEBHOOK_ACCESS: ${{ secrets.DISCORD_WEBHOOK_ACCESS }}
+          STAGE_FRONTEND_URL: ${{ secrets.STAGE_FRONTEND_URL }}
         run: |
           # Only set secrets if they are provided (first deploy or secret update)
           # Wrangler will skip if secrets are already set
@@ -77,6 +78,10 @@ jobs:
 
           if [ -n "${DISCORD_WEBHOOK_ACCESS}" ]; then
             echo "${DISCORD_WEBHOOK_ACCESS}" | npx wrangler secret put DISCORD_WEBHOOK_ACCESS --env "${ENV}"
+          fi
+
+          if [ -n "${STAGE_FRONTEND_URL}" ]; then
+            echo "${STAGE_FRONTEND_URL}" | npx wrangler secret put STAGE_FRONTEND_URL --env "${ENV}"
           fi
 
       - name: Verify backend health

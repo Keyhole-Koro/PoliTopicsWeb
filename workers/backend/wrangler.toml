@@ -28,6 +28,7 @@ S3_ASSET_BUCKET = "politopics-articles-local"
 [env.stage]
 name = "politopics-backend-stage"
 [env.stage.vars]
+APP_ENV = "stage"
 AWS_REGION = "ap-northeast-3"
 DYNAMODB_TABLE_NAME = "politopics-stage"
 S3_ASSET_BUCKET = "politopics-articles-stage"
@@ -38,6 +39,7 @@ routes = [
   { pattern = "api.politopics.net", custom_domain = true }
 ]
 [env.prod.vars]
+APP_ENV = "prod"
 AWS_REGION = "ap-northeast-3"
 DYNAMODB_TABLE_NAME = "politopics-prod"
 S3_ASSET_BUCKET = "politopics-articles-prod"

@@ -17,7 +17,15 @@ const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 app.use(
   "*",
   cors({
-    origin: "*",
+    origin: (origin, c) => {
+      if (c.env.APP_ENV === "prod") {
+        return "https://politopics.net";
+      }
+      if (c.env.APP_ENV === "stage") {
+        return c.env.STAGE_FRONTEND_URL;
+      }
+      throw new Error("CORS not allowed for this environment");
+    },
     allowMethods: ["GET", "OPTIONS"],
     allowHeaders: ["Content-Type"],
   })

@@ -2,6 +2,11 @@
  * Environment bindings for Cloudflare Workers
  */
 export interface Env {
+  APP_ENV: "stage" | "prod";
+  
+  // Frontend URL
+  STAGE_FRONTEND_URL: string;
+
   // AWS credentials (secrets)
   AWS_ACCESS_KEY_ID: string;
   AWS_SECRET_ACCESS_KEY: string;
