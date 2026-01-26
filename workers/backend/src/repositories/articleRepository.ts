@@ -33,6 +33,7 @@ export type DynamoArticleItem = {
   summary?: Summary;
   soft_language_summary?: SoftLanguageSummary;
   middle_summary?: MiddleSummary[];
+  key_points?: string[];
   dialogs?: Dialog[];
   asset_key?: string;
   asset_url?: string;
@@ -58,6 +59,7 @@ export type DynamoIndexItem = {
 };
 
 export type ArticleAssetData = {
+  key_points?: string[];
   summary?: Summary;
   soft_language_summary?: SoftLanguageSummary;
   middle_summary?: MiddleSummary[];
@@ -389,6 +391,7 @@ export class ArticleRepository {
       summary: asset?.summary ?? item.summary,
       soft_language_summary: asset?.soft_language_summary ?? item.soft_language_summary,
       middle_summary: asset?.middle_summary ?? item.middle_summary,
+      key_points: asset?.key_points ?? (item as { key_points?: string[] }).key_points ?? [],
       dialogs: asset?.dialogs ?? item.dialogs,
       categories: item.categories ?? [],
       terms: item.terms,

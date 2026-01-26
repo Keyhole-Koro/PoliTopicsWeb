@@ -3,6 +3,7 @@ import { cors } from "hono/cors";
 import type { Env } from "./types/env";
 import { createArticleRepository, type ArticleRepository } from "./repositories/articleRepository";
 import type { SearchFilters } from "./types/article";
+import { resolveCorsOrigin } from "./config";
 
 type Bindings = Env;
 
@@ -18,13 +19,7 @@ app.use(
   "*",
   cors({
     origin: (origin, c) => {
-      if (c.env.APP_ENV === "prod") {
-        return "https://politopics.net";
-      }
-      if (c.env.APP_ENV === "stage") {
-        return c.env.STAGE_FRONTEND_URL;
-      }
-      throw new Error("CORS not allowed for this environment");
+      return resolveCorsOrigin(origin, c.env);
     },
     allowMethods: ["GET", "OPTIONS"],
     allowHeaders: ["Content-Type"],

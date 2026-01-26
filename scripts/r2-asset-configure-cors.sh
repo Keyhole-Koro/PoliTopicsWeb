@@ -1,5 +1,5 @@
 #!/bin/bash
-# R2 CORS Configuration Script
+# R2 Asset CORS Configuration Script
 # Configures CORS rules for R2 asset bucket using Wrangler CLI
 #
 # Environment Variables (for stage):
@@ -7,7 +7,7 @@
 #   STAGE_CORS_ORIGINS_EXTRA - Additional origins, comma-separated (optional)
 #
 # Example:
-#   STAGE_FRONTEND_URL=https://your-stage-domain.net ./scripts/r2-configure-cors.sh stage
+#   STAGE_FRONTEND_URL=https://your-stage-domain.net ./scripts/r2-asset-configure-cors.sh stage
 
 set -e
 

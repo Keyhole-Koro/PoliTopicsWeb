@@ -12,7 +12,9 @@
     "types": "wrangler types"
   },
   "dependencies": {
+    "@hono/node-server": "^1.19.9",
     "aws4fetch": "^1.0.20",
+    "dotenv": "^17.2.3",
     "hono": "^4.6.0"
   },
   "devDependencies": {

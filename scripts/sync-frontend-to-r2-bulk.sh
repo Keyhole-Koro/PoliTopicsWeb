@@ -9,13 +9,13 @@ WRANGLER_ENV="${WRANGLER_ENV:-local}"
 WRANGLER_CONFIG="${WRANGLER_CONFIG:-$REPO_ROOT/wrangler.toml}"
 
 if [ ! -d "$BUILD_DIR" ]; then
-  echo "[r2-sync-bulk] Build output not found: $BUILD_DIR" >&2
+  echo "[sync-frontend-r2-bulk] Build output not found: $BUILD_DIR" >&2
   exit 1
 fi
 
 find "$BUILD_DIR" -type f -print0 | while IFS= read -r -d '' file; do
   key="${file#$BUILD_DIR/}"
-  echo "[r2-sync-bulk] Uploading ${key}"
+  echo "[sync-frontend-r2-bulk] Uploading ${key}"
   npx wrangler r2 object put "${BUCKET}/${key}" \
     --file "$file" \
     --local \
@@ -23,4 +23,4 @@ find "$BUILD_DIR" -type f -print0 | while IFS= read -r -d '' file; do
     --config "$WRANGLER_CONFIG"
 done
 
-echo "[r2-sync-bulk] Done."
+echo "[sync-frontend-r2-bulk] Done."

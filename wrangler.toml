@@ -5,6 +5,8 @@ compatibility_date = "2024-09-02"
 [env.local]
 name = "politopics-frontend-local"
 r2_buckets = [{ binding = "ASSETS", bucket_name = "politopics-frontend-local" }]
+[env.local.vars]
+ASSET_BASE_URL = "http://localhost:4570"
 
 [env.stage]
 name = "politopics-frontend-stage"

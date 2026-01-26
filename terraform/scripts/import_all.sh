@@ -11,20 +11,25 @@ fi
 
 ENVIRONMENT_NAME="$1"
 
-case "$ENVIRONMENT_NAME" in
-  local)
-    VAR_FILE_INPUT="$TFVARS_DIR/localstack.tfvars"
-    ;;
-  stage)
-    VAR_FILE_INPUT="$TFVARS_DIR/stage.tfvars"
-    ;;
-  prod)
-    VAR_FILE_INPUT="$TFVARS_DIR/prod.tfvars"
-    ;;
-  *)
-    VAR_FILE_INPUT="$TFVARS_DIR/${ENVIRONMENT_NAME}.tfvars"
-    ;;
-esac
+# Allow override via LOCALSTACK_TFVARS environment variable
+if [[ -n "${LOCALSTACK_TFVARS:-}" ]]; then
+  VAR_FILE_INPUT="$TF_DIR/$LOCALSTACK_TFVARS"
+else
+  case "$ENVIRONMENT_NAME" in
+    local)
+      VAR_FILE_INPUT="$TFVARS_DIR/localstack.tfvars"
+      ;;
+    stage)
+      VAR_FILE_INPUT="$TFVARS_DIR/stage.tfvars"
+      ;;
+    prod)
+      VAR_FILE_INPUT="$TFVARS_DIR/prod.tfvars"
+      ;;
+    *)
+      VAR_FILE_INPUT="$TFVARS_DIR/${ENVIRONMENT_NAME}.tfvars"
+      ;;
+  esac
+fi
 
 if [[ ! -f "$VAR_FILE_INPUT" ]]; then
   echo "Variable file not found: $VAR_FILE_INPUT" >&2
@@ -174,7 +179,12 @@ if [[ "$ENVIRONMENT" == "localstack" ]]; then
   BACKEND_NAME="local"
 fi
 
-BACKEND_FILE="$TF_DIR/backends/${BACKEND_NAME}.hcl"
+# Allow override via LOCALSTACK_BACKEND environment variable
+if [[ -n "${LOCALSTACK_BACKEND:-}" ]]; then
+  BACKEND_FILE="$TF_DIR/$LOCALSTACK_BACKEND"
+else
+  BACKEND_FILE="$TF_DIR/backends/${BACKEND_NAME}.hcl"
+fi
 if [[ ! -f "$BACKEND_FILE" ]]; then
   echo "Backend config not found: $BACKEND_FILE" >&2
   exit 1

@@ -21,9 +21,14 @@ AWS_REGION = "ap-northeast-3"
 [env.local]
 name = "politopics-backend-local"
 [env.local.vars]
+APP_ENV = "local"
 AWS_REGION = "ap-northeast-3"
 DYNAMODB_TABLE_NAME = "politopics-local"
 S3_ASSET_BUCKET = "politopics-articles-local"
+AWS_ACCESS_KEY_ID = "test"
+AWS_SECRET_ACCESS_KEY = "test"
+LOCALSTACK_ENDPOINT_URL = "http://localstack:4566"
+S3_FORCE_PATH_STYLE = "true"
 
 [env.stage]
 name = "politopics-backend-stage"

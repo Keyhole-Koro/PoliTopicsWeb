@@ -51,6 +51,7 @@ export type ArticleSummary = {
  * Asset data loaded from R2 via assetUrl
  */
 export type ArticleAssetData = {
+    key_points: string[];
     summary: Summary;
     soft_language_summary: SoftLanguageSummary;
     middle_summary: MiddleSummary[];
@@ -61,6 +62,7 @@ export default interface Article extends ArticleSummary {
     summary?: Summary;
     soft_language_summary?: SoftLanguageSummary;
     middle_summary?: MiddleSummary[];
+    key_points?: string[];
     dialogs?: Dialog[];
     participants: Participant[];
     keywords: Keyword[];

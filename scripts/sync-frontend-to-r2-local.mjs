@@ -8,8 +8,8 @@ const repoRoot = path.resolve(scriptDir, "..");
 const buildDir = path.join(repoRoot, "frontend", "out");
 const wranglerConfig = path.join(repoRoot, "wrangler.toml");
 
-const workerEnv = process.env.WORKER_ENV ?? "local";
-const bucketName = process.env.R2_BUCKET ?? "politopics-frontend-local";
+const workerEnv = "local";
+const bucketName = "politopics-frontend-local";
 
 async function main() {
   await assertDirExists(buildDir);
@@ -18,11 +18,11 @@ async function main() {
 
   const files = await collectFiles(buildDir);
   if (files.length === 0) {
-    console.warn(`[r2-sync] No files found under ${buildDir}`);
+    console.warn(`[sync-frontend-r2] No files found under ${buildDir}`);
     return;
   }
 
-  console.log(`[r2-sync] Uploading ${files.length} files to R2 bucket "${bucketName}" (env=${workerEnv})...`);
+  console.log(`[sync-frontend-r2] Uploading ${files.length} files to R2 bucket "${bucketName}" (env=${workerEnv})...`);
   for (const filePath of files) {
     const key = toObjectKey(buildDir, filePath);
     const result = runWrangler([
@@ -39,7 +39,7 @@ async function main() {
       workerEnv,
     ]);
     if (result.status !== 0) {
-      console.error(`[r2-sync] Failed to upload ${key}`);
+      console.error(`[sync-frontend-r2] Failed to upload ${key}`);
       if (result.stderr) {
         console.error(result.stderr);
       }
@@ -47,7 +47,7 @@ async function main() {
     }
   }
 
-  console.log("[r2-sync] Done.");
+  console.log("[sync-frontend-r2] Done.");
 }
 
 function ensureWranglerConfig() {
@@ -72,7 +72,7 @@ async function assertDirExists(target) {
       throw new Error(`${target} is not a directory`);
     }
   } catch (error) {
-    console.error(`[r2-sync] Missing build output: ${target}`);
+    console.error(`[sync-frontend-r2] Missing build output: ${target}`);
     throw error;
   }
 }
@@ -97,6 +97,6 @@ function toObjectKey(rootDir, filePath) {
 }
 
 main().catch((error) => {
-  console.error("[r2-sync] Failed:", error);
+  console.error("[sync-frontend-r2] Failed:", error);
   process.exit(1);
 });

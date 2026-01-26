@@ -454,3 +454,120 @@ Details:
 - Cache cron now emits an error notification and throws when the headlines cache script tag is missing or index.html body is empty, so failed prod injections are surfaced instead of silent skips.
 Files:
 - PoliTopicsWeb/cacheCron/src/index.ts
+
+Agent: Codex
+Date/Time: 2026-01-24 12:09 JST
+Keywords: key_points, ui, schema, mock, docs
+Topic: Add key_points display to article detail and schemas
+Details:
+- Added key_points to shared article schemas, backend mapping, and mock asset seeding.
+- Rendered key_points list in the article detail AI summary card.
+- Updated documentation to reflect key_points in assets and detail views.
+- Files changed:
+  - `PoliTopicsWeb/shared/types/article.d.ts`
+  - `PoliTopicsWeb/backend/src/http/schemas/articles.ts`
+  - `PoliTopicsWeb/backend/src/repositories/dynamoArticleMapper.ts`
+  - `PoliTopicsWeb/backend/src/repositories/mockArticleRepository.ts`
+  - `PoliTopicsWeb/frontend/app/article/article-client.tsx`
+  - `PoliTopicsWeb/terraform/mock-article/articles.json`
+  - `PoliTopicsWeb/terraform/mock-article/upload_articles.js`
+  - `docs/01_project_overview.md`
+  - `docs/02_functional_spec.md`
+  - `docs/06_architecture.md`
+  - `docs/08_db_design.md`
+  - `docs/system_overview.md`
+  - `docs/tech_choices.md`
+  - `docs/jp/01_project_overview.md`
+  - `docs/jp/02_functional_spec.md`
+  - `docs/jp/06_architecture.md`
+  - `docs/jp/08_db_design.md`
+  - `docs/jp/system_overview.md`
+  - `docs/jp/tech_choices.md`
+  - `PoliTopicsWeb/changes.agent.md`
+
+Agent: Codex
+Date/Time: 2026-01-24 19:17:37 JST
+Keywords: hono, workers, localstack, local-dev, fastify-removal
+Topic: Remove Fastify backend and align local tests with Workers/Hono
+Details:
+- Removed the legacy Fastify/Lambda backend and pruned workspace references.
+- Centralized Workers backend env/endpoint resolution for LocalStack and added local wrangler defaults.
+- Normalized the LocalStack ensure script to use the `local` environment expected by Terraform helpers.
+- Updated Playwright/localstack test flow and frontend config to target the Workers API on port 4500.
+- Aligned Docker and documentation with Workers + LocalStack local dev expectations.
+Files:
+- AGENT.md
+- README.md
+- docs/00_code_reading_guide.md
+- docs/05_system_diagram.md
+- docs/06_architecture.md
+- docs/09_local_dev_setup.md
+- docs/11_test_strategy.md
+- docs/jp/00_code_reading_guide.md
+- docs/jp/05_system_diagram.md
+- docs/jp/06_architecture.md
+- docs/jp/09_local_dev_setup.md
+- docs/jp/11_test_strategy.md
+- jp/agent.md
+- scripts/export_test_env.sh
+- PoliTopicsWeb/README.md
+- PoliTopicsWeb/backend/.env.example (deleted)
+- PoliTopicsWeb/backend/.npmrc (deleted)
+- PoliTopicsWeb/backend/package-lock.json (deleted)
+- PoliTopicsWeb/backend/package.json (deleted)
+- PoliTopicsWeb/backend/scripts/prepare-local-dist.mjs (deleted)
+- PoliTopicsWeb/backend/scripts/zip.mjs (deleted)
+- PoliTopicsWeb/backend/src/config.ts (deleted)
+- PoliTopicsWeb/backend/src/handler.ts (deleted)
+- PoliTopicsWeb/backend/src/http/app.ts (deleted)
+- PoliTopicsWeb/backend/src/http/routes/articles.ts (deleted)
+- PoliTopicsWeb/backend/src/http/schemas/articles.ts (deleted)
+- PoliTopicsWeb/backend/src/lambda.ts (deleted)
+- PoliTopicsWeb/backend/src/notifications.ts (deleted)
+- PoliTopicsWeb/backend/src/plugins/repository.ts (deleted)
+- PoliTopicsWeb/backend/src/repositories/articleRepository.ts (deleted)
+- PoliTopicsWeb/backend/src/repositories/dynamoArticleMapper.ts (deleted)
+- PoliTopicsWeb/backend/src/repositories/dynamoArticleRepository.ts (deleted)
+- PoliTopicsWeb/backend/src/repositories/factory.ts (deleted)
+- PoliTopicsWeb/backend/src/repositories/mockArticleRepository.ts (deleted)
+- PoliTopicsWeb/backend/src/server.ts (deleted)
+- PoliTopicsWeb/backend/src/types/fastify.d.ts (deleted)
+- PoliTopicsWeb/backend/tsconfig.json (deleted)
+- PoliTopicsWeb/changes.agent.md
+- PoliTopicsWeb/docker-compose.yml
+- PoliTopicsWeb/frontend/lib/config.ts
+- PoliTopicsWeb/jp/README.md
+- PoliTopicsWeb/package-lock.json
+- PoliTopicsWeb/package.json
+- PoliTopicsWeb/playwright.config.ts
+- PoliTopicsWeb/scripts/ensure-localstack.sh
+- PoliTopicsWeb/scripts/localstack_apply.sh
+- PoliTopicsWeb/scripts/test-e2e-localstack.sh
+- PoliTopicsWeb/tests/e2e/spa.spec.ts
+- PoliTopicsWeb/workers/backend/src/config.ts
+- PoliTopicsWeb/workers/backend/src/index.ts
+- PoliTopicsWeb/workers/backend/src/lib/dynamodb.ts
+- PoliTopicsWeb/workers/backend/src/lib/s3.ts
+- PoliTopicsWeb/workers/backend/src/repositories/articleRepository.ts
+- PoliTopicsWeb/workers/backend/src/types/article.ts
+- PoliTopicsWeb/workers/backend/src/types/env.ts
+- PoliTopicsWeb/workers/backend/wrangler.toml
+
+### Changes After Review
+- Added an automatic `npx playwright install` step to the LocalStack E2E script (opt-out with `SKIP_PLAYWRIGHT_INSTALL=true`).
+- Relaxed the SPA article detail E2E assertion to check the summary section contains the expected snippet.
+- Consolidated Web scripts to `dev:localstack` + `test:e2e:localstack`, and updated docs/tests to call direct commands instead of removed npm scripts.
+
+Agent: Codex
+Date/Time: 2026-01-26 18:46 JST
+Keywords: e2e, localstack, workers, ports, dependencies
+Topic: Stabilize LocalStack E2E backend startup
+Details:
+
+- Added backend worker dependency installation to the LocalStack E2E script to prevent wrangler's build from failing due to missing `@cloudflare/workers-types`.
+- Allowed the LocalStack E2E script to fall back to an available backend port when `127.0.0.1:4500` is already in use, while still honoring `E2E_BACKEND_URL` when set.
+- Made Playwright's webServer backend command derive the port from `E2E_BACKEND_URL` so the backend and tests stay aligned.
+- Injected AWS/LocalStack endpoint overrides into `wrangler dev` via `--var` flags when env vars are present, avoiding DNS failures on hosts where `localstack` is not resolvable (e.g., act/GHA runner).
+- Files changed:
+  - `PoliTopicsWeb/playwright.config.ts`
+  - `PoliTopicsWeb/scripts/test-e2e-localstack.sh`

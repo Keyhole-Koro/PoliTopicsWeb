@@ -9,7 +9,7 @@ type AppConfig = {
 
 const CONFIG_BY_ENV: Record<AppEnvironment, Omit<AppConfig, "environment">> = {
   local: {
-    apiBaseUrl: "http://localhost:45000",
+    apiBaseUrl: "http://localhost:4500",
   },
   stage: {
     apiBaseUrl: process.env.NEXT_PUBLIC_STAGE_BACKEND_API_URL as string,

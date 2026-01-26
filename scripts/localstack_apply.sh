@@ -44,27 +44,29 @@ require_cmd() {
 }
 
 require_cmd terraform
-require_cmd npm
 require_cmd aws
+
+require_cmd npm
 
 echo "==> Web: install dependencies"
 npm --prefix "$MODULE_DIR" ci
 
-echo "==> Web: build backend (local)"
-npm --prefix "$MODULE_DIR" run build:backend:local
-
 echo "==> Web: create state bucket"
 "$STATE_SCRIPT" "$ENVIRONMENT"
 
-echo "==> Web: terraform init"
-terraform -chdir="$TF_DIR" init -input=false -reconfigure -backend-config="backends/local.hcl"
+# Use CI backend config if LOCALSTACK_BACKEND is set, otherwise default to local.hcl
+BACKEND_CONFIG="${LOCALSTACK_BACKEND:-backends/local.hcl}"
+echo "==> Web: terraform init (backend: $BACKEND_CONFIG)"
+terraform -chdir="$TF_DIR" init -input=false -reconfigure -backend-config="$BACKEND_CONFIG"
 
 echo "==> Web: terraform import"
 "$IMPORT_SCRIPT" "$ENVIRONMENT"
 
-echo "==> Web: terraform plan"
+# Use CI tfvars if LOCALSTACK_TFVARS is set, otherwise default to localstack.tfvars
+TFVARS_FILE="${LOCALSTACK_TFVARS:-tfvars/localstack.tfvars}"
+echo "==> Web: terraform plan (tfvars: $TFVARS_FILE)"
 set +e
-terraform -chdir="$TF_DIR" plan -detailed-exitcode -var-file="tfvars/localstack.tfvars" -out=tfplan
+terraform -chdir="$TF_DIR" plan -detailed-exitcode -var-file="$TFVARS_FILE" -out=tfplan
 PLAN_EXIT_CODE=$?
 set -e
 

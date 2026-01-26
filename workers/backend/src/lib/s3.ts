@@ -1,10 +1,13 @@
 import { AwsClient } from "aws4fetch";
 import type { Env } from "../types/env";
+import { resolveAwsEndpoints } from "../config";
 
 export type S3ClientOptions = {
   region: string;
   accessKeyId: string;
   secretAccessKey: string;
+  endpoint?: string;
+  forcePathStyle?: boolean;
 };
 
 /**
@@ -13,6 +16,8 @@ export type S3ClientOptions = {
 export class S3Client {
   private aws: AwsClient;
   private region: string;
+  private endpoint?: string;
+  private forcePathStyle: boolean;
 
   constructor(options: S3ClientOptions) {
     this.aws = new AwsClient({
@@ -22,9 +27,18 @@ export class S3Client {
       service: "s3",
     });
     this.region = options.region;
+    this.endpoint = options.endpoint;
+    this.forcePathStyle = Boolean(options.forcePathStyle);
   }
 
   private getEndpoint(bucket: string): string {
+    if (this.endpoint) {
+      const base = this.endpoint.replace(/\/$/, "");
+      if (this.forcePathStyle) {
+        return `${base}/${bucket}`;
+      }
+      return `${base}/${bucket}`;
+    }
     return `https://${bucket}.s3.${this.region}.amazonaws.com`;
   }
 
@@ -65,9 +79,12 @@ export class S3Client {
  * Create an S3 client from the environment
  */
 export function createS3Client(env: Env): S3Client {
+  const { s3Endpoint, s3ForcePathStyle } = resolveAwsEndpoints(env);
   return new S3Client({
     region: env.AWS_REGION,
     accessKeyId: env.AWS_ACCESS_KEY_ID,
     secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+    endpoint: s3Endpoint,
+    forcePathStyle: s3ForcePathStyle,
   });
 }

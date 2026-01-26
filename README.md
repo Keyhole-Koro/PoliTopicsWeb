@@ -56,30 +56,28 @@ flowchart LR
 
 ## Commands
 - Install: `npm install --workspaces --include-workspace-root`
-- Dev SPA: `npm run dev:frontend` (port 3333)
-- Dev Worker: `npm run worker:dev:local` (port 8787, reads DynamoDB)
-- Ensure LocalStack resources: `npm run ensure:localstack`
-- E2E: `npm test` (build + sync to local R2 + Playwright)
-- Build SPA: `npm run build:frontend`
-- Build Worker: `npm run build` or `npm --prefix workers/backend run build`
+- Dev (LocalStack + Workers): `npm run dev:localstack` (ports 4500/8787)
+- E2E (LocalStack + Workers): `npm run test:e2e:localstack`
 
 ## Environment
 - Frontend: `NEXT_PUBLIC_APP_ENV`, `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_LOG_LEVEL`
-- Worker backend: `ACTIVE_ENVIRONMENT` (`local`|`stage`|`prod`|`localstack`|`localstackTest`), `DATA_MODE` (`dynamo`|`mock`), `ASSET_URL_TTL_SECONDS`, `DISABLE_NOTIFICATIONS`, `DISCORD_WEBHOOK_ERROR`, `DISCORD_WEBHOOK_WARN`, `DISCORD_WEBHOOK_ACCESS`
+- Backend worker (Hono):
+  - `APP_ENV` (`local`|`localstack`|`stage`|`prod`)
+  - AWS: `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `DYNAMODB_TABLE_NAME`, `S3_ASSET_BUCKET`
+  - LocalStack overrides: `LOCALSTACK_URL` or `AWS_ENDPOINT_URL`, plus optional `DYNAMODB_ENDPOINT_URL`, `S3_ENDPOINT_URL`, `S3_FORCE_PATH_STYLE`
 - Cache cron: uses AWS env + DynamoDB table + R2 SPA bucket (see `cacheCron/.env.example`)
 - Tip: `source ../scripts/export_test_env.sh` to load LocalStack defaults before running tests.
 
 ## Local flows
 Frontend + Worker:
 ```bash
-npm run dev:frontend
-npm run worker:dev:local
+npm run dev:localstack
 ```
 LocalStack DynamoDB must be running (root `docker-compose.yml`).
 
 Full LocalStack E2E:
 ```bash
-npm run test
+npm run test:e2e:localstack
 ```
 
 ## Deploy

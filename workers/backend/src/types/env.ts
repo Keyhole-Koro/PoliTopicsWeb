@@ -2,10 +2,10 @@
  * Environment bindings for Cloudflare Workers
  */
 export interface Env {
-  APP_ENV: "stage" | "prod";
+  APP_ENV?: "local" | "localstack" | "stage" | "prod";
   
   // Frontend URL
-  STAGE_FRONTEND_URL: string;
+  STAGE_FRONTEND_URL?: string;
 
   // AWS credentials (secrets)
   AWS_ACCESS_KEY_ID: string;
@@ -15,6 +15,14 @@ export interface Env {
   AWS_REGION: string;
   DYNAMODB_TABLE_NAME: string;
   S3_ASSET_BUCKET: string;
+
+  // Optional endpoints (LocalStack / custom)
+  AWS_ENDPOINT_URL?: string;
+  LOCALSTACK_URL?: string;
+  LOCALSTACK_ENDPOINT_URL?: string;
+  DYNAMODB_ENDPOINT_URL?: string;
+  S3_ENDPOINT_URL?: string;
+  S3_FORCE_PATH_STYLE?: string;
 
   // Discord webhooks (secrets)
   DISCORD_WEBHOOK_ERROR?: string;

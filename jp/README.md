@@ -56,30 +56,28 @@ flowchart LR
 
 ## コマンド
 - インストール: `npm install --workspaces --include-workspace-root`
-- SPA 開発: `npm run dev:frontend` (ポート 3333)
-- Worker 開発: `npm run worker:dev:local` (ポート 8787, DynamoDB を参照)
-- LocalStack リソース確認/作成: `npm run ensure:localstack`
-- E2E: `npm test` (ローカル R2 への同期 + Playwright)
-- SPA ビルド: `npm run build:frontend`
-- Worker ビルド: `npm run build` または `npm --prefix workers/backend run build`
+- LocalStack + Workers 起動: `npm run dev:localstack` (ポート 4500/8787)
+- E2E: `npm run test:e2e:localstack` (LocalStack + Workers + Playwright)
 
 ## 環境変数
 - フロントエンド: `NEXT_PUBLIC_APP_ENV`, `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_LOG_LEVEL`
-- Worker バックエンド: `ACTIVE_ENVIRONMENT` (`local`|`stage`|`prod`|`localstack`|`localstackTest`), `DATA_MODE` (`dynamo`|`mock`), `ASSET_URL_TTL_SECONDS`, `DISABLE_NOTIFICATIONS`, `DISCORD_WEBHOOK_ERROR`, `DISCORD_WEBHOOK_WARN`, `DISCORD_WEBHOOK_ACCESS`
+- Worker バックエンド (Hono):
+  - `APP_ENV` (`local`|`localstack`|`stage`|`prod`)
+  - AWS: `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `DYNAMODB_TABLE_NAME`, `S3_ASSET_BUCKET`
+  - LocalStack 上書き: `LOCALSTACK_URL` または `AWS_ENDPOINT_URL`, `DYNAMODB_ENDPOINT_URL`, `S3_ENDPOINT_URL`, `S3_FORCE_PATH_STYLE`
 - キャッシュ cron: AWS 環境 + DynamoDB テーブル + R2 SPA バケット（`cacheCron/.env.example` を参照）
 - ヒント: `source ../scripts/export_test_env.sh` を実行すると LocalStack 用デフォルトを一括設定できます。
 
 ## ローカルフロー
 フロント + Worker:
 ```bash
-npm run dev:frontend
-npm run worker:dev:local
+npm run dev:localstack
 ```
 LocalStack の DynamoDB を起動しておく（リポジトリルートの `docker-compose.yml`）。
 
 完全な LocalStack E2E:
 ```bash
-npm run test
+npm run test:e2e:localstack
 ```
 
 ## デプロイ

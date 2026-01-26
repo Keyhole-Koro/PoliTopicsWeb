@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { DialogViewer, type Dialog as TranscriptDialog } from "@/components/dialog-viewer"
 import { Markdown } from "@/components/markdown"
-import { Quote, Users, Tag, BookOpen, MessageSquare, Loader2 } from "lucide-react"
+import { Quote, Users, Tag, BookOpen, MessageSquare, Loader2, CheckCircle2 } from "lucide-react"
 
 type Props = {
   issueId: string
@@ -72,6 +72,7 @@ export function ArticleClient({ issueId }: Props) {
     summary: assetData?.summary ?? article.summary,
     soft_language_summary: assetData?.soft_language_summary ?? article.soft_language_summary,
     middle_summary: assetData?.middle_summary ?? article.middle_summary,
+    key_points: assetData?.key_points ?? article.key_points ?? [],
     dialogs: assetData?.dialogs ?? article.dialogs,
   }
 
@@ -89,12 +90,12 @@ export function ArticleClient({ issueId }: Props) {
   }))
 
   const hasDialogData = dialogEntries.length > 0
-  const summaryText =
-    mergedArticle.summary?.summary?.trim() && mergedArticle.summary.summary.length > 0
-      ? mergedArticle.summary.summary
-      : assetLoading ? "読み込み中..." : "詳細要約はまだ登録されていません。"
-  const softSummaryText =
-    mergedArticle.soft_language_summary?.summary?.trim() && mergedArticle.soft_language_summary.summary.length > 0
+      const summaryText =
+        mergedArticle.summary?.summary?.trim() && mergedArticle.summary.summary.length > 0
+          ? mergedArticle.summary.summary
+          : assetLoading ? "読み込み中..." : "詳細要約はまだ登録されていません。"
+    
+      const softSummaryText =    mergedArticle.soft_language_summary?.summary?.trim() && mergedArticle.soft_language_summary.summary.length > 0
       ? mergedArticle.soft_language_summary.summary
       : assetLoading ? "読み込み中..." : "簡潔な要約は準備中です。"
   const participantDetails = mergedArticle.participants ?? []
@@ -103,6 +104,8 @@ export function ArticleClient({ issueId }: Props) {
   const termDetails = mergedArticle.terms ?? []
   const hasKeywords = keywordDetails.length > 0
   const hasTerms = termDetails.length > 0
+  const keyPoints = (mergedArticle.key_points ?? []).map((point) => point.trim()).filter(Boolean)
+  const hasKeyPoints = keyPoints.length > 0
 
   return (
     <article className="space-y-10">
@@ -118,6 +121,23 @@ export function ArticleClient({ issueId }: Props) {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
+            <h4 className="mb-2 text-base font-semibold text-foreground">要点</h4>
+            {hasKeyPoints ? (
+              <ul className="space-y-2">
+                {keyPoints.map((point, index) => (
+                  <li key={`${point}-${index}`} className="flex items-start gap-2 text-sm text-foreground">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary shrink-0" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                {assetLoading ? "読み込み中..." : "要点は準備中です。"}
+              </p>
+            )}
+          </div>
+          <div className="border-t pt-4">
             <h4 className="mb-2 text-base font-semibold text-foreground">詳細要約</h4>
             <Markdown content={summaryText} terms={termDetails} />
           </div>

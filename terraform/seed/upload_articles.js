@@ -3,6 +3,12 @@
 /**
  * Upload mock PoliTopics articles into the LocalStack DynamoDB table.
  * Mirrors the TypeScript seed logic but is runnable as a standalone JS script.
+ * 
+ * Note on Endpoints:
+ * - endpoint / s3Endpoint: Internal URLs used by this script to connect to LocalStack
+ *   from within the DevContainer (e.g., http://localstack:4566).
+ * - assetBaseUrl: The external URL stored in the database that the browser uses
+ *   to fetch assets from the host machine via port forwarding (e.g., http://localhost:4566).
  */
 
 import fs from "node:fs";
@@ -31,6 +37,7 @@ const DEFAULTS = {
   region: "ap-northeast-3",
   endpoint: "http://localstack:4566",
   s3Endpoint: undefined,
+  assetBaseUrl: undefined,
   bucketName: "politopics-articles-local",
   accessKeyId: "test",
   secretAccessKey: "test",
@@ -66,11 +73,13 @@ function parseArgs() {
 function loadConfig(cli) {
   const endpoint = cli.endpoint || DEFAULTS.endpoint;
   const s3Endpoint = cli["s3-endpoint"] || endpoint || DEFAULTS.s3Endpoint;
+  const assetBaseUrl = cli["asset-base-url"] || DEFAULTS.assetBaseUrl;
   return {
     tableName: "politopics-local",
     region: "ap-northeast-3",
     endpoint,
     s3Endpoint,
+    assetBaseUrl,
     bucketName: "politopics-articles-local",
     accessKeyId: "test",
     secretAccessKey: "test",
@@ -186,9 +195,10 @@ function buildAssetKey(articleId) {
   return `articles/${articleId}.json`;
 }
 
-function buildAssetUrl({ bucket, key, endpoint, region }) {
-  if (endpoint) {
-    const normalized = endpoint.replace(/\/$/, "");
+function buildAssetUrl({ bucket, key, assetBaseUrl, endpoint, region }) {
+  const base = assetBaseUrl || endpoint;
+  if (base) {
+    const normalized = base.replace(/\/$/, "");
     return `${normalized}/${bucket}/${key}`;
   }
 
@@ -197,6 +207,7 @@ function buildAssetUrl({ bucket, key, endpoint, region }) {
 
 function buildArticleAsset(article) {
   return {
+    key_points: article.key_points ?? [],
     summary: article.summary,
     soft_language_summary: article.soft_language_summary,
     middle_summary: article.middle_summary,
@@ -328,6 +339,7 @@ async function main() {
   const articles = loadArticles(config.articlesPath);
   const total = await putItems(docClient, config.tableName, articles, s3Client, config.bucketName, {
     bucket: config.bucketName,
+    assetBaseUrl: config.assetBaseUrl,
     endpoint: config.s3Endpoint,
     region: config.region,
   });

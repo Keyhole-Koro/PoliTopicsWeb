@@ -1,5 +1,6 @@
 import { AwsClient } from "aws4fetch";
 import type { Env } from "../types/env";
+import { resolveAwsEndpoints } from "../config";
 
 /**
  * DynamoDB AttributeValue types
@@ -95,6 +96,7 @@ export type DynamoDBClientOptions = {
   region: string;
   accessKeyId: string;
   secretAccessKey: string;
+  endpoint?: string;
 };
 
 export type QueryParams = {
@@ -139,7 +141,7 @@ export class DynamoDBClient {
       region: options.region,
       service: "dynamodb",
     });
-    this.endpoint = `https://dynamodb.${options.region}.amazonaws.com`;
+    this.endpoint = options.endpoint ?? `https://dynamodb.${options.region}.amazonaws.com`;
   }
 
   private async send<T>(target: string, body: object): Promise<T> {
@@ -173,9 +175,11 @@ export class DynamoDBClient {
  * Create a DynamoDB client from the environment
  */
 export function createDynamoDBClient(env: Env): DynamoDBClient {
+  const { dynamodbEndpoint } = resolveAwsEndpoints(env);
   return new DynamoDBClient({
     region: env.AWS_REGION,
     accessKeyId: env.AWS_ACCESS_KEY_ID,
     secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+    endpoint: dynamodbEndpoint,
   });
 }

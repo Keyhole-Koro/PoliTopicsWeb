@@ -65,6 +65,7 @@ export interface Article extends ArticleSummary {
   summary?: Summary;
   soft_language_summary?: SoftLanguageSummary;
   middle_summary?: MiddleSummary[];
+  key_points?: string[];
   dialogs?: Dialog[];
   terms?: Term[];
 }

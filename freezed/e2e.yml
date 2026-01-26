@@ -1,0 +1,90 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    env:
+      LOCALSTACK_URL: http://localhost:4567
+      LOCALSTACK_ENDPOINT: http://localhost:4567
+      LOCALSTACK_BACKEND: backends/ghaTest.hcl
+      LOCALSTACK_TFVARS: tfvars/ghaTest.tfvars
+      AWS_ENDPOINT_URL: http://localhost:4567
+      DYNAMODB_ENDPOINT_URL: http://localhost:4567
+      S3_ENDPOINT_URL: http://localhost:4567
+      AWS_REGION: ap-northeast-3
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_PAGER: ""
+      NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Start LocalStack
+        run: docker compose -f docker-compose.yml up -d localstack
+
+      - name: Wait for LocalStack
+        run: |
+          for _ in {1..30}; do
+            if curl -s "$LOCALSTACK_URL/_localstack/health" | grep '"services":' >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "LocalStack failed to start" >&2
+          docker compose -f docker-compose.yml logs localstack || true
+          exit 1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y zip
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip -q awscliv2.zip
+          sudo ./aws/install --update || ./aws/install --update
+
+      - name: Install dependencies
+        env:
+          NODE_ENV: development
+        run: |
+          npm ci
+          npm install -g wrangler
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run E2E Tests
+        env:
+          DISCORD_WEBHOOK_ERROR: ${{ secrets.DISCORD_WEBHOOK_ERROR }}
+          DISCORD_WEBHOOK_WARN: ${{ secrets.DISCORD_WEBHOOK_WARN }}
+          DISCORD_WEBHOOK_ACCESS: ${{ secrets.DISCORD_WEBHOOK_ACCESS }}
+          SKIP_PLAYWRIGHT_INSTALL: "true"
+        run: bash scripts/test-e2e-localstack.sh
+
+      - name: Upload Playwright Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Teardown
+        if: always()
+        run: docker compose -f docker-compose.yml down -v
