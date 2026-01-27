@@ -1,6 +1,7 @@
 import type { Env } from "./types/env";
 
 export type AppEnvironment = "local" | "localstack" | "stage" | "prod";
+export type ArticleRepositoryMode = "dynamo" | "mock";
 
 export type AwsEndpoints = {
   dynamodbEndpoint?: string;
@@ -9,6 +10,7 @@ export type AwsEndpoints = {
 };
 
 const DEFAULT_LOCALSTACK_ENDPOINT = "http://localstack:4566";
+const DEFAULT_LOCAL_ASSET_BASE_URL = "http://localhost:4570";
 
 export function resolveAppEnvironment(env: Env): AppEnvironment {
   const raw = env.APP_ENV;
@@ -50,4 +52,21 @@ export function resolveAwsEndpoints(env: Env): AwsEndpoints {
     s3Endpoint,
     s3ForcePathStyle: forcePathStyle,
   };
+}
+
+export function resolveArticleRepositoryMode(env: Env): ArticleRepositoryMode {
+  return env.ARTICLE_REPOSITORY === "mock" ? "mock" : "dynamo";
+}
+
+export function resolveAssetBaseUrl(env: Env): string | undefined {
+  if (env.ASSET_BASE_URL) {
+    return env.ASSET_BASE_URL;
+  }
+
+  const appEnv = resolveAppEnvironment(env);
+  if (appEnv === "local" || appEnv === "localstack") {
+    return DEFAULT_LOCAL_ASSET_BASE_URL;
+  }
+
+  return undefined;
 }

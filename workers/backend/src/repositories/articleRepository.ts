@@ -71,10 +71,21 @@ export type HeadlinesResult = {
   hasMore: boolean;
 };
 
+export interface ArticleRepository {
+  getHeadlines(limit?: number, sort?: SearchFilters["sort"], offset?: number): Promise<HeadlinesResult>;
+  searchArticles(filters: SearchFilters): Promise<ArticleSummary[]>;
+  getArticle(id: string): Promise<Article | undefined>;
+  getSuggestions(
+    input: string,
+    limit?: number,
+    filters?: Pick<SearchFilters, "categories" | "houses" | "meetings" | "dateStart" | "dateEnd">
+  ): Promise<string[]>;
+}
+
 /**
  * Article repository for Cloudflare Workers
  */
-export class ArticleRepository {
+export class DynamoArticleRepository implements ArticleRepository {
   private dynamo: DynamoDBClient;
   private s3: S3Client;
   private tableName: string;
@@ -433,5 +444,9 @@ export class ArticleRepository {
  * Create an article repository from the environment
  */
 export function createArticleRepository(env: Env): ArticleRepository {
-  return new ArticleRepository(env);
+  return createDynamoArticleRepository(env);
+}
+
+export function createDynamoArticleRepository(env: Env): ArticleRepository {
+  return new DynamoArticleRepository(env);
 }

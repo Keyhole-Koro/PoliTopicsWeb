@@ -571,3 +571,98 @@ Details:
 - Files changed:
   - `PoliTopicsWeb/playwright.config.ts`
   - `PoliTopicsWeb/scripts/test-e2e-localstack.sh`
+
+Agent: Codex
+Date/Time: 2026-01-26 19:58 JST
+Keywords: frontend, dialog-viewer, scroll, ux
+Topic: Make meeting minutes pane scrollable
+Details:
+
+- Added a bounded scroll area to the dialog viewer tabs so 会議の議事録 stays within a fixed viewport while letting users scroll through dialogs.
+- Reused a single empty-state card across tabs to keep filter feedback consistent.
+- Tests: `npm --prefix frontend run build:local`
+- Files changed:
+  - `PoliTopicsWeb/frontend/components/dialog-viewer.tsx`
+  - `PoliTopicsWeb/changes.agent.md`
+
+### Changes After Review
+- Hid overflow in the shared ScrollArea component to prevent dialogs from bleeding outside the fixed-height pane.
+- Tests: `npm --prefix frontend run build:local`
+- Files changed:
+  - `PoliTopicsWeb/frontend/components/ui/scroll-area.tsx`
+
+- Locked dialog list height with explicit `h-[70vh]/[65vh]/[60vh]` breakpoints so the inner scroll area captures wheel/trackpad events instead of bubbling to the page.
+- Tests: `npm --prefix frontend run build:local`
+- Files changed:
+  - `PoliTopicsWeb/frontend/components/dialog-viewer.tsx`
+
+- Forced scrollbars to remain visible (`type="always"`) and ensured the viewport itself is `overflow-auto` so wheel/trackpad操作が確実に内部スクロールへ向かい、必要ならスクロールバーも表示される。
+- Tests: `npm --prefix frontend run build:local`
+- Files changed:
+  - `PoliTopicsWeb/frontend/components/ui/scroll-area.tsx`
+
+- Made dialog cards more compact (smaller avatar/dot, tighter gaps, reduced padding/line-height) so long lists are easier to scan in the fixed-height view.
+- Tests: `npm --prefix frontend run build:local`
+- Files changed:
+  - `PoliTopicsWeb/frontend/components/dialog-viewer.tsx`
+
+Agent: Codex
+Date/Time: 2026-01-26 23:51 JST
+Keywords: dev, localstack, workers, scripts
+Topic: Align dev-nextjs-honoserver with LocalStack backend
+Details:
+
+- dev-nextjs-honoserver now ensures LocalStack resources, seeds the DB, and starts the backend worker with the local env so DynamoDB/S3 use LocalStack like dev:localstack.
+- Tests: `npm --prefix workers/backend run build`
+- Files changed:
+  - `PoliTopicsWeb/scripts/dev-nextjs-honoserver.js`
+  - `PoliTopicsWeb/changes.agent.md`
+Agent: Codex
+Date/Time: 2026-01-26 20:05 JST
+Keywords: seed, dialogs, long-list, e2e
+Topic: Add long dialog seed for scroll verification
+Details:
+
+- Added a “long dialog” seed article with45発言分のダイアログを収録し、固定高さスクロールUIの動作確認に使えるようにした。
+- Keeps participants/keywords/terms filled for realistic rendering while focusing on大量発言の検証。
+- Tests: not run (seed data addition only).
+- Files changed:
+  - `PoliTopicsWeb/terraform/seed/articles.json`
+  - `PoliTopicsWeb/changes.agent.md`
+
+Agent: Codex
+Date/Time: 2026-01-27 10:18 JST
+Keywords: hono, mock, dev, e2e, scripts
+Topic: Add mock repo mode for Hono server and consolidate E2E scripts
+Details:
+
+- Added a Hono app factory and mock article repository sourced from `terraform/seed/articles.json`, with asset URLs derived from `ASSET_BASE_URL` for local asset server usage.
+- Updated the Node Hono server to select DynamoDB vs mock repositories via `ARTICLE_REPOSITORY` and log the active mode.
+- Switched `dev-nextjs-honoserver` to run the Node Hono server with mock data and local asset server, removing the LocalStack dependency from that flow.
+- Introduced `scripts/e2econfig.js` and `scripts/e2e.js` to centralize presets/env and execute the LocalStack Playwright pipeline; `test-e2e-localstack.sh` and the npm script now delegate to it.
+- Tests: `bash scripts/test_all.sh` (timed out during `PoliTopicsDataCollection` LocalStack provisioning/terraform plan).
+- Files changed:
+  - `PoliTopicsWeb/workers/backend/src/repositories/articleRepository.ts`
+  - `PoliTopicsWeb/workers/backend/src/repositories/mockArticleRepository.ts`
+  - `PoliTopicsWeb/workers/backend/src/config.ts`
+  - `PoliTopicsWeb/workers/backend/src/types/env.ts`
+  - `PoliTopicsWeb/workers/backend/src/index.ts`
+  - `PoliTopicsWeb/workers/backend/src/server.ts`
+  - `PoliTopicsWeb/scripts/dev-nextjs-honoserver.js`
+  - `PoliTopicsWeb/scripts/e2econfig.js`
+  - `PoliTopicsWeb/scripts/e2e.js`
+  - `PoliTopicsWeb/scripts/test-e2e-localstack.sh`
+  - `PoliTopicsWeb/package.json`
+  - `PoliTopicsWeb/changes.agent.md`
+
+Agent: Codex
+Date/Time: 2026-01-27 10:29 JST
+Keywords: frontend, dialog, mobile, scroll
+Topic: Reduce dialog list height on mobile
+Details:
+
+- Reduced the dialog list height on small screens and switched to `svh` units so the dialog scroll area fits the visible mobile viewport more reliably.
+- Tests: `npm --prefix PoliTopicsWeb/frontend run build:local`
+- Files changed:
+  - `PoliTopicsWeb/frontend/components/dialog-viewer.tsx`
+  - `PoliTopicsWeb/changes.agent.md`

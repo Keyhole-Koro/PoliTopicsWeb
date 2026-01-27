@@ -5,7 +5,7 @@
   "workspaces": [
     "frontend",
     "cacheCron",
-    "backend"
+    "workers/backend"
   ],
   "scripts": {
     "dev:localstack": "bash scripts/dev-localstack.sh",
@@ -16,7 +16,7 @@
     "test:e2e:localstack": "bash scripts/test-e2e-localstack.sh",
     
     "dev:assets": "node scripts/generate-local-assets.js && node scripts/local-asset-server.js",
-    "dev:nextjs:honoserver": "concurrently \"npm run dev --prefix frontend\" \"npm run dev --prefix backend -- --port 4500\" \"npm run dev:assets\""
+    "dev:nextjs:honoserver": "node scripts/dev-nextjs-honoserver.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.51.1",

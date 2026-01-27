@@ -3,6 +3,7 @@
  */
 export interface Env {
   APP_ENV?: "local" | "localstack" | "stage" | "prod";
+  ARTICLE_REPOSITORY?: "dynamo" | "mock";
   
   // Frontend URL
   STAGE_FRONTEND_URL?: string;
@@ -15,6 +16,7 @@ export interface Env {
   AWS_REGION: string;
   DYNAMODB_TABLE_NAME: string;
   S3_ASSET_BUCKET: string;
+  ASSET_BASE_URL?: string;
 
   // Optional endpoints (LocalStack / custom)
   AWS_ENDPOINT_URL?: string;

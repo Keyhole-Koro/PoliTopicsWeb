@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   User,
   Search,
@@ -247,8 +248,24 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
     setSelectedReaction("all")
   }
 
-  const summaryContent = (
-    <div className="grid gap-4">
+  const hasDialogs = filteredDialogs.length > 0
+  const dialogListHeightClass =
+    "h-[55svh] max-h-[55svh] min-h-[240px] sm:h-[60svh] sm:max-h-[60svh] md:h-[65vh] md:max-h-[65vh] lg:h-[60vh] lg:max-h-[60vh]"
+
+  const emptyState = (
+    <Card>
+      <CardContent className="pt-6 text-center">
+        <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+        <p className="text-muted-foreground">現在のフィルター条件に一致する発言がありません。</p>
+        <Button variant="outline" onClick={clearFilters} className="mt-4 bg-transparent">
+          フィルターをクリア
+        </Button>
+      </CardContent>
+    </Card>
+  )
+
+  const renderSummaryCards = () => (
+    <div className="grid gap-3 pr-2">
       {filteredDialogs.map((dialog) => {
         const isOriginalVisible = originalTextVisible.has(dialog.order)
         const originalText = dialog.original_text
@@ -261,13 +278,13 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
 
         return (
           <Card key={dialog.order} className="hover:shadow-md transition-shadow overflow-hidden">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4 min-w-0">
-                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-xs font-semibold text-primary">{dialog.order}</span>
+            <CardContent className="py-4">
+              <div className="flex items-start gap-3 min-w-0">
+                <div className="w-7 h-7 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-[11px] font-semibold text-primary">{dialog.order}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
                     <h4 className="font-semibold text-foreground truncate">{dialog.speaker}</h4>
                     {dialog.speaker_group ? (
                       <Badge variant="outline" className="text-xs">
@@ -278,22 +295,22 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
                       {viewMode === "original" ? "原文" : viewMode === "soft_summary" ? "やさしい" : "詳細"}
                     </Badge>
                   </div>
-                  <div className="text-sm text-muted-foreground leading-relaxed break-words">
+                  <div className="text-sm text-muted-foreground leading-snug break-words">
                     {highlightTerms(displayText, terms)}
                   </div>
                   {isOriginalVisible && viewMode !== "original" && (
-                    <div className="mt-4 pt-4 border-t border-border">
-                      <div className="flex items-center gap-2 mb-2">
+                    <div className="mt-3 pt-3 border-t border-border">
+                      <div className="flex items-center gap-2 mb-1">
                         <FileText className="w-4 h-4 text-muted-foreground" />
                         <span className="text-xs font-medium text-muted-foreground">原文</span>
                       </div>
-                      <div className="text-sm text-foreground leading-relaxed bg-muted/30 p-3 rounded-md">
+                      <div className="text-sm text-foreground leading-snug bg-muted/30 p-3 rounded-md">
                         {highlightTerms(originalText, terms)}
                       </div>
                     </div>
                   )}
                   {viewMode !== "original" && (
-                    <div className="flex justify-start pt-2">
+                    <div className="flex justify-start pt-1">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -315,7 +332,7 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
                     </div>
                   )}
                   {dialog.response_to.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t">
+                    <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t">
                       {dialog.response_to.map((response, index) => (
                         <span
                           key={index}
@@ -464,148 +481,149 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
           </TabsList>
 
           <TabsContent value="original" className="space-y-4">
-            {filteredDialogs.length === 0 ? (
-              <Card>
-                <CardContent className="pt-6 text-center">
-                  <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">現在のフィルター条件に一致する発言がありません。</p>
-                  <Button variant="outline" onClick={clearFilters} className="mt-4 bg-transparent">
-                    フィルターをクリア
-                  </Button>
-                </CardContent>
-              </Card>
+            {!hasDialogs ? (
+              emptyState
             ) : (
-              <div className="relative">
-                {/* Timeline line */}
-                <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border"></div>
+              <ScrollArea className={`${dialogListHeightClass} pr-1`}>
+                <div className="relative pr-2">
+                  {/* Timeline line */}
+                  <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border"></div>
 
-                {filteredDialogs.map((dialog, index) => {
-                  const isExpanded = expandedDialogs.has(dialog.order)
-                  const isOriginalVisible = originalTextVisible.has(dialog.order)
-                  const originalText = dialog.original_text
+                  {filteredDialogs.map((dialog) => {
+                    const isOriginalVisible = originalTextVisible.has(dialog.order)
+                    const originalText = dialog.original_text
 
-                  const displayText =
-                    viewMode === "original"
-                      ? dialog.original_text
-                      : viewMode === "soft_summary"
-                        ? dialog.soft_summary
-                        : dialog.summary
+                    const displayText =
+                      viewMode === "original"
+                        ? dialog.original_text
+                        : viewMode === "soft_summary"
+                          ? dialog.soft_summary
+                          : dialog.summary
 
-                  return (
-                    <div key={dialog.order} className="relative flex items-start gap-4 pb-6">
-                      {/* Timeline dot */}
-                      <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 relative z-10">
-                        <span className="text-sm font-semibold text-primary">{dialog.order}</span>
-                      </div>
+                    return (
+                      <div key={dialog.order} className="relative flex items-start gap-3 pb-4">
+                        {/* Timeline dot */}
+                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 relative z-10">
+                          <span className="text-xs font-semibold text-primary">{dialog.order}</span>
+                        </div>
 
-                      {/* Dialog content */}
-                      <Card className="flex-1 min-w-0 overflow-hidden">
-                        <CardContent className="pt-6">
-                          <div className="space-y-3">
-                            {/* Speaker info */}
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                              <div className="flex items-center gap-3 min-w-0">
-                                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                                  <User className="w-4 h-4 text-primary" />
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <h4 className="font-semibold text-foreground truncate">{dialog.speaker}</h4>
-                                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs text-muted-foreground">
-                                    {dialog.speaker_group ? (
-                                      <Badge variant="outline" className="text-xs w-fit">
-                                        {dialog.speaker_group}
-                                      </Badge>
-                                    ) : null}
-                                    {dialog.speaker_position ? <span className="truncate">{dialog.speaker_position}</span> : null}
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="flex items-center gap-2">
-                                <Badge variant="secondary" className="text-xs">
-                                  {viewMode === "original" ? "原文" : viewMode === "soft_summary" ? "やさしい" : "詳細"}
-                                </Badge>
-                              </div>
-                            </div>
-
-                            {/* Dialog content */}
+                        {/* Dialog content */}
+                        <Card className="flex-1 min-w-0 overflow-hidden">
+                          <CardContent className="py-4">
                             <div className="space-y-2">
-                              <div className="text-sm text-muted-foreground leading-relaxed">
-                                {highlightTerms(displayText, terms)}
-                              </div>
-
-                              {isOriginalVisible && viewMode !== "original" && (
-                                <div className="mt-4 pt-4 border-t border-border">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <FileText className="w-4 h-4 text-muted-foreground" />
-                                    <span className="text-xs font-medium text-muted-foreground">原文</span>
+                              {/* Speaker info */}
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <div className="w-7 h-7 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <User className="w-4 h-4 text-primary" />
                                   </div>
-                                  <div className="text-sm text-foreground leading-relaxed bg-muted/30 p-3 rounded-md">
-                                    {highlightTerms(originalText, terms)}
+                                  <div className="min-w-0 flex-1">
+                                    <h4 className="font-semibold text-foreground truncate">{dialog.speaker}</h4>
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs text-muted-foreground">
+                                      {dialog.speaker_group ? (
+                                        <Badge variant="outline" className="text-xs w-fit">
+                                          {dialog.speaker_group}
+                                        </Badge>
+                                      ) : null}
+                                      {dialog.speaker_position ? <span className="truncate">{dialog.speaker_position}</span> : null}
+                                    </div>
                                   </div>
                                 </div>
-                              )}
 
-                              <div className="flex justify-start pt-2">
-                                {viewMode !== "original" && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => toggleOriginalText(dialog.order)}
-                                    className="flex items-center gap-1 text-xs"
-                                  >
-                                    {isOriginalVisible ? (
-                                      <>
-                                        <ChevronUp className="w-4 h-4" />
-                                        原文を隠す
-                                      </>
-                                    ) : (
-                                      <>
-                                        <ChevronDown className="w-4 h-4" />
-                                        原文を表示
-                                      </>
-                                    )}
-                                  </Button>
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="secondary" className="text-xs">
+                                    {viewMode === "original" ? "原文" : viewMode === "soft_summary" ? "やさしい" : "詳細"}
+                                  </Badge>
+                                </div>
+                              </div>
+
+                              {/* Dialog content */}
+                              <div className="space-y-2">
+                                <div className="text-sm text-muted-foreground leading-snug">
+                                  {highlightTerms(displayText, terms)}
+                                </div>
+
+                                {isOriginalVisible && viewMode !== "original" && (
+                                  <div className="mt-3 pt-3 border-t border-border">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <FileText className="w-4 h-4 text-muted-foreground" />
+                                      <span className="text-xs font-medium text-muted-foreground">原文</span>
+                                    </div>
+                                    <div className="text-sm text-foreground leading-snug bg-muted/30 p-3 rounded-md">
+                                      {highlightTerms(originalText, terms)}
+                                    </div>
+                                  </div>
+                                )}
+
+                                <div className="flex justify-start pt-1">
+                                  {viewMode !== "original" && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => toggleOriginalText(dialog.order)}
+                                      className="flex items-center gap-1 text-xs"
+                                    >
+                                      {isOriginalVisible ? (
+                                        <>
+                                          <ChevronUp className="w-4 h-4" />
+                                          原文を隠す
+                                        </>
+                                      ) : (
+                                        <>
+                                          <ChevronDown className="w-4 h-4" />
+                                          原文を表示
+                                        </>
+                                      )}
+                                    </Button>
+                                  )}
+                                </div>
+
+                                {/* Response indicators */}
+                                {dialog.response_to.length > 0 && (
+                                  <div className="flex items-center gap-2 pt-2 border-t">
+                                    <span className="text-xs text-muted-foreground">応答:</span>
+                                    <div className="flex items-center gap-2">
+                                      {dialog.response_to.map((response, responseIndex) => (
+                                        <div
+                                          key={responseIndex}
+                                          className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${getReactionColor(
+                                            response.reaction,
+                                          )}`}
+                                        >
+                                          <span>{getReactionIcon(response.reaction)}</span>
+                                          <span>#{response.dialog_id}</span>
+                                          <span className="hidden sm:inline">{getReactionLabel(response.reaction)}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
                                 )}
                               </div>
-
-                              {/* Response indicators */}
-                              {dialog.response_to.length > 0 && (
-                                <div className="flex items-center gap-2 pt-2 border-t">
-                                  <span className="text-xs text-muted-foreground">応答:</span>
-                                  <div className="flex items-center gap-2">
-                                    {dialog.response_to.map((response, responseIndex) => (
-                                      <div
-                                        key={responseIndex}
-                                        className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${getReactionColor(
-                                          response.reaction,
-                                        )}`}
-                                      >
-                                        <span>{getReactionIcon(response.reaction)}</span>
-                                        <span>#{response.dialog_id}</span>
-                                        <span className="hidden sm:inline">{getReactionLabel(response.reaction)}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
                             </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  )
-                })}
-              </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    )
+                  })}
+                </div>
+              </ScrollArea>
             )}
           </TabsContent>
 
           <TabsContent value="soft_summary" className="space-y-4">
-            {summaryContent}
+            {!hasDialogs ? (
+              emptyState
+            ) : (
+              <ScrollArea className={`${dialogListHeightClass} pr-1`}>{renderSummaryCards()}</ScrollArea>
+            )}
           </TabsContent>
 
           <TabsContent value="summary" className="space-y-4">
-            {summaryContent}
+            {!hasDialogs ? (
+              emptyState
+            ) : (
+              <ScrollArea className={`${dialogListHeightClass} pr-1`}>{renderSummaryCards()}</ScrollArea>
+            )}
           </TabsContent>
         </Tabs>
       </div>
