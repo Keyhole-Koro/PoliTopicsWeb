@@ -1,6 +1,6 @@
 # PoliTopics Web
 
-[日本語版](./jp/README.md)
+[日本語版](./docs/jp/README.md)
 
 Next.js SPA on Cloudflare R2, Hono API on Cloudflare Workers (V8), with a daily cache cron on AWS Lambda. Assets are served from R2; metadata is read from DynamoDB.
 
