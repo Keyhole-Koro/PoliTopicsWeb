@@ -16,7 +16,8 @@
     "test:e2e:localstack": "bash scripts/test-e2e-localstack.sh",
     
     "dev:assets": "node scripts/generate-local-assets.js && node scripts/local-asset-server.js",
-    "dev:nextjs:honoserver": "node scripts/dev-nextjs-honoserver.js"
+    "dev:nextjs:honoserver": "node scripts/dev-nextjs-honoserver.js",
+    "build:cacheCron": "npm --prefix cacheCron run build"
   },
   "devDependencies": {
     "@playwright/test": "^1.51.1",
