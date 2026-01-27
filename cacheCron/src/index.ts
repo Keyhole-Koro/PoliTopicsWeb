@@ -68,7 +68,7 @@ export const handler: Handler = async () => {
     try {
 
       // 1. Download index.html
-      console.log(`[headlines-cron] Downloading ${config.bucket.indexHtmlKey} from S3...`)
+      console.log(`[headlines-cron] Downloading ${config.bucket.indexHtmlKey} from R2...`)
       const getHtmlCommand = new GetObjectCommand({
         Bucket: config.bucket.name,
         Key: config.bucket.indexHtmlKey,
@@ -103,32 +103,38 @@ export const handler: Handler = async () => {
         const scriptRegex = /(<script\s+id="headlines-cache"[^>]*>)([\s\S]*?)(<\/script>)/i
         const match = htmlContent.match(scriptRegex)
 
-        if (match) {
-          // match[1] is the opening tag
-          // match[2] is the old content (placeholder or JSON)
-          // match[3] is the closing tag
-          htmlContent = htmlContent.replace(scriptRegex, `$1${escapedJson}$3`)
-          
-          console.log(`[headlines-cron] new json content: ${escapedJson}.`)
-          console.log(`[headlines-cron] Injected headlines JSON into ${config.bucket.indexHtmlKey}.`)
-          console.log(`[headlines-cron] Modified HTML (first 200 chars): ${htmlContent.substring(0, 200)}...`)
-
-          // 3. Upload modified index.html
-          await s3.send(
-            new PutObjectCommand({
-              Bucket: config.bucket.name,
-              Key: config.bucket.indexHtmlKey,
-              Body: htmlContent,
-              ContentType: "text/html",
-              CacheControl: "no-cache, no-store, must-revalidate, max-age=0", // Ensure fresh HTML
-            }),
-          )
-          console.log(`[headlines-cron] Uploaded modified ${config.bucket.indexHtmlKey} to S3.`)
-        } else {
-          console.log(`[headlines-cron] Script tag with id="headlines-cache" not found in ${config.bucket.indexHtmlKey}. HTML injection skipped.`)
+        if (!match) {
+          const message = `Script tag with id="headlines-cache" not found in ${config.bucket.indexHtmlKey}.`
+          console.error(`[headlines-cron] ${message}`)
+          await notifyError(new Error(message))
+          throw new Error(message)
         }
+
+        // match[1] is the opening tag
+        // match[2] is the old content (placeholder or JSON)
+        // match[3] is the closing tag
+        htmlContent = htmlContent.replace(scriptRegex, `$1${escapedJson}$3`)
+
+        console.log(`[headlines-cron] new json content: ${escapedJson}.`)
+        console.log(`[headlines-cron] Injected headlines JSON into ${config.bucket.indexHtmlKey}.`)
+        console.log(`[headlines-cron] Modified HTML (first 200 chars): ${htmlContent.substring(0, 200)}...`)
+
+        // 3. Upload modified index.html
+        await s3.send(
+          new PutObjectCommand({
+            Bucket: config.bucket.name,
+            Key: config.bucket.indexHtmlKey,
+            Body: htmlContent,
+            ContentType: "text/html",
+            CacheControl: "no-cache, no-store, must-revalidate, max-age=0", // Ensure fresh HTML
+          }),
+        )
+        console.log(`[headlines-cron] Uploaded modified ${config.bucket.indexHtmlKey} to R2.`)
       } else {
-        console.log(`[headlines-cron] No body received for ${config.bucket.indexHtmlKey}. HTML injection skipped.`)
+        const message = `No body received for ${config.bucket.indexHtmlKey}.`
+        console.error(`[headlines-cron] ${message}`)
+        await notifyError(new Error(message))
+        throw new Error(message)
       }
     } catch (htmlErr: any) {
       console.error(`[headlines-cron] Error during HTML injection (Key: ${config.bucket.indexHtmlKey}):`, htmlErr)

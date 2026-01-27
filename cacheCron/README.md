@@ -1,4 +1,5 @@
 # PoliTopics Cache Cron
+[日本語版](./jp/README.md)
 
 Scheduled Lambda that fetches `/headlines` and writes a JSON snapshot to S3/R2.
 

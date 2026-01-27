@@ -16,5 +16,6 @@ test("home renders hero and search entry", async ({ page }) => {
 test("article detail loads from backend api", async ({ page }) => {
   await page.goto(`/article/${articleId}`)
   await expect(page.getByRole("heading", { name: articleTitle })).toBeVisible()
-  await expect(page.getByText(articleDetailSnippet)).toBeVisible()
+  const summarySection = page.getByRole("heading", { name: "詳細要約" }).locator("..")
+  await expect(summarySection).toContainText(articleDetailSnippet)
 })

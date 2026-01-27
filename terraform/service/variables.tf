@@ -188,7 +188,7 @@ variable "headlines_job_path" {
 variable "headlines_job_schedule_expression" {
   description = "EventBridge/Cron schedule expression for the headlines snapshot job"
   type        = string
-  default     = "cron(0 18 * * ? *)" # 03:00 JST
+  default     = "cron(0 22 * * ? *)" # 07:00 JST
 }
 
 variable "headlines_job_cache_control" {

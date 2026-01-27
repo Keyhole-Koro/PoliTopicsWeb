@@ -1,4 +1,5 @@
 # Terraform Infrastructure
+[日本語版](./jp/README.md)
 
 This directory contains the Terraform code for deploying the PoliTopics application infrastructure on AWS.
 

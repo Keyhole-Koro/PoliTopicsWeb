@@ -2,48 +2,26 @@
   "name": "politopicsweb",
   "version": "0.1.0",
   "private": true,
-  "workspaces": ["frontend", "backend", "cacheCron"],
+  "workspaces": [
+    "frontend",
+    "cacheCron",
+    "workers/backend"
+  ],
   "scripts": {
-    "// dev": "",
-    "dev": "bash -c 'npm run dev:backend & npm run dev:frontend'",
-    "dev:frontend": "npm --prefix frontend run dev:local",
-    "dev:backend": "npm --prefix backend run dev:local",
-    "dev:backend:mock": "cd backend && DISABLE_NOTIFICATIONS=true DATA_MODE=mock ACTIVE_ENVIRONMENT=local npm run dev",
-
-    "// build": "",
-    "build": "npm run build:frontend && npm run build:backend && npm run build:cacheCron",
-    "build:frontend": "npm --prefix frontend run build",
+    "dev:localstack": "bash scripts/dev-localstack.sh",
     "build:frontend:local": "npm --prefix frontend run build:local",
-    "build:backend": "npm --prefix backend run build",
-    "build:backend:local": "npm --prefix backend run build:local",
-    "build:cacheCron": "npm --prefix cacheCron run build",
-
-    "// lint": "",
-    "lint": "npm run lint:frontend",
-    "lint:frontend": "npm --prefix frontend run lint",
-
-    "// r2 / worker": "",
-    "r2:sync:local": "node scripts/r2-sync-local.mjs",
-    "worker:dev:local": "npx --yes wrangler dev --local --env local --config wrangler.toml --port 8787 --ip 127.0.0.1",
-
-    "// e2e": "",
-    "setup:e2e": "npx playwright install && sudo env \"PATH=$PATH\" npx playwright install-deps",
-    "e2e:prepare": "npm run build:frontend:local && npm run r2:sync:local",
-    "test:e2e": "npm run e2e:prepare && npx playwright test",
-    "test:e2e:quick": "npx playwright test",
-    "test:e2e:backend": "npx playwright test tests/e2e/backend.spec.ts",
+    "r2:local:sync": "node scripts/sync-frontend-to-r2-local.mjs",
+    "r2:asset:cors": "bash scripts/r2-asset-configure-cors.sh",
+    "db:seed:local": "node terraform/seed/upload_articles.js --endpoint http://localstack:4566 --asset-base-url http://localhost:4570",
     "test:e2e:localstack": "bash scripts/test-e2e-localstack.sh",
-    "r2:sync:local:fast": "bash scripts/r2-sync-bulk.sh",
-
-    "// deploy": "",
-    "deploy:localstack": "npm run build:backend:local && cd terraform && terraform apply -auto-approve -var-file=tfvars/localstack.tfvars",
-
-    "// meta": "",
-    "pretest": "bash scripts/ensure-localstack.sh",
-    "test": "ACTIVE_ENVIRONMENT=localstackTest npm run test:e2e",
-    "ensure:localstack": "bash scripts/ensure-localstack.sh"
+    
+    "dev:assets": "node scripts/generate-local-assets.js && node scripts/local-asset-server.js",
+    "dev:nextjs:honoserver": "node scripts/dev-nextjs-honoserver.js"
   },
   "devDependencies": {
-    "@playwright/test": "^1.51.1"
+    "@playwright/test": "^1.51.1",
+    "concurrently": "^9.2.1",
+    "dotenv": "^17.2.3",
+    "tsx": "^4.21.0"
   }
 }

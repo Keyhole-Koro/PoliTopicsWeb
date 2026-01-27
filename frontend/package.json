@@ -7,10 +7,7 @@
     "build:local": "NEXT_PUBLIC_APP_ENV=local next build",
     "build:prod": "NEXT_PUBLIC_APP_ENV=prod next build",
     "build:stage": "NEXT_PUBLIC_APP_ENV=stage NEXT_PUBLIC_APP_ENV=stage dotenv -e .env.stage -- next build",
-    "dev:local": "NEXT_PUBLIC_APP_ENV=local next dev -p 3333 -H 0.0.0.0",
-    "dev:stage": "NEXT_PUBLIC_APP_ENV=stage dotenv -e .env.stage -- next dev -p 3333 -H 0.0.0.0",
-    "lint": "eslint .",
-    "start": "next start -p 3333"
+    "dev": "NEXT_PUBLIC_APP_ENV=local next dev -p 3333 -H 0.0.0.0"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

@@ -1,0 +1,50 @@
+name = "politopics-backend"
+main = "src/index.ts"
+compatibility_date = "2024-09-02"
+compatibility_flags = ["nodejs_compat"]
+
+[build]
+command = "npm run build"
+
+[vars]
+AWS_REGION = "ap-northeast-3"
+
+# Secrets (set via `wrangler secret put` or GHA):
+# - AWS_ACCESS_KEY_ID
+# - AWS_SECRET_ACCESS_KEY
+# - DYNAMODB_TABLE_NAME
+# - S3_ASSET_BUCKET
+# - DISCORD_WEBHOOK_ERROR
+# - DISCORD_WEBHOOK_WARN
+# - DISCORD_WEBHOOK_ACCESS
+
+[env.local]
+name = "politopics-backend-local"
+[env.local.vars]
+APP_ENV = "local"
+AWS_REGION = "ap-northeast-3"
+DYNAMODB_TABLE_NAME = "politopics-local"
+S3_ASSET_BUCKET = "politopics-articles-local"
+AWS_ACCESS_KEY_ID = "test"
+AWS_SECRET_ACCESS_KEY = "test"
+LOCALSTACK_ENDPOINT_URL = "http://localstack:4566"
+S3_FORCE_PATH_STYLE = "true"
+
+[env.stage]
+name = "politopics-backend-stage"
+[env.stage.vars]
+APP_ENV = "stage"
+AWS_REGION = "ap-northeast-3"
+DYNAMODB_TABLE_NAME = "politopics-stage"
+S3_ASSET_BUCKET = "politopics-articles-stage"
+
+[env.prod]
+name = "politopics-backend-prod"
+routes = [
+  { pattern = "api.politopics.net", custom_domain = true }
+]
+[env.prod.vars]
+APP_ENV = "prod"
+AWS_REGION = "ap-northeast-3"
+DYNAMODB_TABLE_NAME = "politopics-prod"
+S3_ASSET_BUCKET = "politopics-articles-prod"

@@ -1,4 +1,4 @@
-import type { Article, ArticleSummary, SearchFilters } from "@shared/types/article"
+import type { Article, ArticleSummary, ArticleAssetData, SearchFilters } from "@shared/types/article"
 import { appConfig } from "./config"
 import { debugLog } from "./logger"
 
@@ -123,6 +123,39 @@ export async function fetchArticle(id: string) {
   return apiFetch<{ article: Article }>(`/article/${encodeURIComponent(id)}`)
 }
 
+/**
+ * Fetch article asset data directly from R2 via the public URL.
+ * Assets include summary, dialogs, etc.
+ */
+export async function fetchArticleAsset(assetUrl: string): Promise<ArticleAssetData | null> {
+  if (!assetUrl || assetUrl.startsWith("s3://")) {
+    // Legacy s3:// URLs cannot be fetched directly
+    debugLog(`[api] Cannot fetch asset from legacy URL: ${assetUrl}`)
+    return null
+  }
+
+  try {
+    debugLog(`[api] Fetching asset: ${assetUrl}`)
+    const response = await fetch(assetUrl, {
+      headers: {
+        "Accept": "application/json",
+      },
+    })
+
+    if (!response.ok) {
+      console.warn(`[api] Asset fetch failed: ${response.status} ${response.statusText}`)
+      return null
+    }
+
+    const data = (await response.json()) as ArticleAssetData
+    debugLog(`[api] Asset loaded successfully`, data)
+    return data
+  } catch (error) {
+    console.warn(`[api] Asset fetch error:`, error)
+    return null
+  }
+}
+
 type SuggestionOptions = {
   limit?: number
   filters?: Partial<SearchFilters>
@@ -161,6 +194,7 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   try {
     const response = await fetch(url, {
       ...init,
+      cache: "no-store",
       headers: {
         "Content-Type": "application/json",
         ...(init.headers ?? {}),

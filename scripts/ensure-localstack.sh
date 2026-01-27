@@ -4,7 +4,7 @@ set -euo pipefail
 # Ensures LocalStack resources for the Web module exist before running tests.
 # Resource checks live here; root verify wraps this script.
 
-ENVIRONMENT="${WEB_LOCALSTACK_ENV:-localstack}"
+ENVIRONMENT="${WEB_LOCALSTACK_ENV:-local}"
 CHECK_ONLY=false
 
 for arg in "$@"; do
@@ -17,6 +17,10 @@ for arg in "$@"; do
       ;;
   esac
 done
+
+if [[ "$ENVIRONMENT" == "localstack" ]]; then
+  ENVIRONMENT="local"
+fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MODULE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -66,38 +70,11 @@ check_table() {
   fi
 }
 
-check_lambda() {
-  local name="$1"
-  if aws "${AWS_ARGS[@]}" lambda get-function --function-name "$name" >/dev/null 2>&1; then
-    echo "[OK] lambda: $name"
-  else
-    echo "[MISSING] lambda: $name"
-    failures=$((failures + 1))
-  fi
-}
-
-check_rest_api() {
-  local name="$1"
-  local api_id
-  api_id="$(aws "${AWS_ARGS[@]}" apigateway get-rest-apis --query "items[?name=='$name'].id" --output text 2>/dev/null | tr -d '\r' || true)"
-  if [[ -n "$api_id" && "$api_id" != "None" ]]; then
-    echo "[OK] api gateway (rest): $name (id: $api_id)"
-    if ! aws "${AWS_ARGS[@]}" apigateway get-stages --rest-api-id "$api_id" --query "item[?stageName=='localstack'].stageName" --output text >/dev/null 2>&1; then
-      echo "[WARN] api gateway stage 'localstack' not found for $name"
-    fi
-  else
-    echo "[MISSING] api gateway (rest): $name"
-    failures=$((failures + 1))
-  fi
-}
-
 echo "[ensure-localstack] Checking Web LocalStack resources at $LOCALSTACK_URL"
 check_bucket "politopics-frontend-localstack"
 check_bucket "politopics-articles-local"
 check_bucket "politopics-web-local-state-bucket"
 check_table "politopics-local"
-check_lambda "politopics-backend-localstack"
-check_rest_api "politopics-api-localstack"
 
 if [[ $failures -eq 0 ]]; then
   echo "[ensure-localstack] Resources already present."

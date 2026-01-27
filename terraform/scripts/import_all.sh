@@ -11,20 +11,25 @@ fi
 
 ENVIRONMENT_NAME="$1"
 
-case "$ENVIRONMENT_NAME" in
-  local)
-    VAR_FILE_INPUT="$TFVARS_DIR/localstack.tfvars"
-    ;;
-  stage)
-    VAR_FILE_INPUT="$TFVARS_DIR/stage.tfvars"
-    ;;
-  prod)
-    VAR_FILE_INPUT="$TFVARS_DIR/prod.tfvars"
-    ;;
-  *)
-    VAR_FILE_INPUT="$TFVARS_DIR/${ENVIRONMENT_NAME}.tfvars"
-    ;;
-esac
+# Allow override via LOCALSTACK_TFVARS environment variable
+if [[ -n "${LOCALSTACK_TFVARS:-}" ]]; then
+  VAR_FILE_INPUT="$TF_DIR/$LOCALSTACK_TFVARS"
+else
+  case "$ENVIRONMENT_NAME" in
+    local)
+      VAR_FILE_INPUT="$TFVARS_DIR/localstack.tfvars"
+      ;;
+    stage)
+      VAR_FILE_INPUT="$TFVARS_DIR/stage.tfvars"
+      ;;
+    prod)
+      VAR_FILE_INPUT="$TFVARS_DIR/prod.tfvars"
+      ;;
+    *)
+      VAR_FILE_INPUT="$TFVARS_DIR/${ENVIRONMENT_NAME}.tfvars"
+      ;;
+  esac
+fi
 
 if [[ ! -f "$VAR_FILE_INPUT" ]]; then
   echo "Variable file not found: $VAR_FILE_INPUT" >&2
@@ -132,7 +137,7 @@ emit("HEADLINES_JOB_ERROR_WEBHOOK", headlines_job_error_webhook)
 PY
 )"
 
-for required in ENVIRONMENT FRONTEND_BUCKET ARTICLE_ASSET_URL_BUCKET ARTICLES_TABLE LAMBDA_NAME; do
+for required in ENVIRONMENT FRONTEND_BUCKET ARTICLE_ASSET_URL_BUCKET ARTICLES_TABLE; do
   if [[ -z "${!required:-}" ]]; then
     echo "Missing required value for $required (check $VAR_FILE)" >&2
     exit 1
@@ -174,7 +179,12 @@ if [[ "$ENVIRONMENT" == "localstack" ]]; then
   BACKEND_NAME="local"
 fi
 
-BACKEND_FILE="$TF_DIR/backends/${BACKEND_NAME}.hcl"
+# Allow override via LOCALSTACK_BACKEND environment variable
+if [[ -n "${LOCALSTACK_BACKEND:-}" ]]; then
+  BACKEND_FILE="$TF_DIR/$LOCALSTACK_BACKEND"
+else
+  BACKEND_FILE="$TF_DIR/backends/${BACKEND_NAME}.hcl"
+fi
 if [[ ! -f "$BACKEND_FILE" ]]; then
   echo "Backend config not found: $BACKEND_FILE" >&2
   exit 1
@@ -242,15 +252,6 @@ fi
 echo "Importing DynamoDB resources for ${ARTICLES_TABLE}..."
 DDB_MOD="module.service.module.dynamodb"
 run_import "$DDB_MOD.aws_dynamodb_table.politopics" "$ARTICLES_TABLE"
-
-echo "Importing Lambda IAM role and policies for ${LAMBDA_NAME}..."
-LAMBDA_MOD="module.service.module.lambda"
-CUSTOM_POLICY_ARN="arn:aws:iam::${ACCOUNT_ID}:policy/${LAMBDA_NAME}-data-access"
-
-run_import "$LAMBDA_MOD.aws_iam_role.backend_lambda" "${LAMBDA_NAME}-role"
-run_import "$LAMBDA_MOD.aws_iam_policy.backend_data_access" "$CUSTOM_POLICY_ARN"
-run_import "$LAMBDA_MOD.aws_iam_role_policy_attachment.backend_data_access" "${LAMBDA_NAME}-role/$CUSTOM_POLICY_ARN"
-run_import "$LAMBDA_MOD.aws_iam_role_policy_attachment.backend_basic_execution" "${LAMBDA_NAME}-role/arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 
 if [[ "${HEADLINES_JOB_ENABLED}" == "true" ]]; then
   echo "Importing Headlines cron Lambda resources for ${HEADLINES_JOB_NAME}..."
