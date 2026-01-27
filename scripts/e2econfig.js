@@ -6,6 +6,17 @@ const PRESETS = {
     e2eBaseUrl: "http://127.0.0.1:8787",
     backendDefaultPort: 4500,
     appEnv: "local",
+    articleRepository: "dynamo",
+  },
+  mock: {
+    name: "mock",
+    localstackUrl: "http://localhost:4566",
+    localstackEndpoint: "http://localhost:4566",
+    e2eBaseUrl: "http://localhost:3000",
+    backendDefaultPort: 4500,
+    appEnv: "local",
+    articleRepository: "mock",
+    assetBaseUrl: "http://localhost:4570",
   },
 };
 
@@ -13,6 +24,8 @@ function resolvePreset(presetName) {
   if (presetName && PRESETS[presetName]) {
     return PRESETS[presetName];
   }
+  // Default to localstack if unknown, or maybe we should default to mock for simpler dev?
+  // Keeping localstack as default to match existing behavior.
   return PRESETS.localstack;
 }
 
@@ -27,14 +40,17 @@ function resolveConfig(options = {}) {
     env.LOCALSTACK_PUBLIC_URL ||
     env.LOCALSTACK_URL ||
     preset.localstackEndpoint;
-  return {
+
+  const config = {
     preset: preset.name,
     localstackUrl,
     localstackEndpoint,
     e2eBaseUrl: env.E2E_BASE_URL || preset.e2eBaseUrl,
     backendDefaultPort: Number(env.E2E_BACKEND_PORT || preset.backendDefaultPort),
+    assetBaseUrl: env.ASSET_BASE_URL || preset.assetBaseUrl,
     env: {
       APP_ENV: env.APP_ENV || preset.appEnv,
+      ARTICLE_REPOSITORY: env.ARTICLE_REPOSITORY || preset.articleRepository,
       AWS_REGION: env.AWS_REGION || "ap-northeast-3",
       AWS_ACCESS_KEY_ID: env.AWS_ACCESS_KEY_ID || "test",
       AWS_SECRET_ACCESS_KEY: env.AWS_SECRET_ACCESS_KEY || "test",
@@ -47,6 +63,12 @@ function resolveConfig(options = {}) {
       STAGE_FRONTEND_URL: env.STAGE_FRONTEND_URL,
     },
   };
+
+  if (config.assetBaseUrl) {
+    config.env.ASSET_BASE_URL = config.assetBaseUrl;
+  }
+
+  return config;
 }
 
 module.exports = {
