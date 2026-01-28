@@ -373,7 +373,7 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
                       {viewMode === "original" ? "原文" : viewMode === "soft_summary" ? "やさしい" : "詳細"}
                     </Badge>
                   </div>
-                  <div className="text-xs text-muted-foreground leading-snug break-words">
+                  <div className="text-sm text-muted-foreground leading-snug break-words">
                     {highlightTerms(displayText, terms)}
                   </div>
                   {isOriginalVisible && viewMode !== "original" && (
@@ -382,7 +382,7 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
                         <FileText className="w-4 h-4 text-muted-foreground" />
                         <span className="text-xs font-medium text-muted-foreground">原文</span>
                       </div>
-                      <div className="text-xs text-foreground leading-snug bg-muted/30 p-3 rounded-md">
+                      <div className="text-sm text-foreground leading-snug bg-muted/30 p-3 rounded-md">
                         {highlightTerms(originalText, terms)}
                       </div>
                     </div>
