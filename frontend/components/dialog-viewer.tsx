@@ -562,7 +562,9 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
             {!hasDialogs ? (
               emptyState
             ) : (
-              <div ref={(node) => (scrollContainersRef.current.original = node)}>
+              <div ref={(node) => {
+                scrollContainersRef.current.original = node
+              }}>
                 <ScrollArea className={`${dialogListHeightClass} pr-1`}>{renderSummaryCards()}</ScrollArea>
               </div>
             )}
@@ -572,7 +574,9 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
             {!hasDialogs ? (
               emptyState
             ) : (
-              <div ref={(node) => (scrollContainersRef.current.soft_summary = node)}>
+              <div ref={(node) => {
+                scrollContainersRef.current.soft_summary = node
+              }}>
                 <ScrollArea className={`${dialogListHeightClass} pr-1`}>{renderSummaryCards()}</ScrollArea>
               </div>
             )}
@@ -582,7 +586,9 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
             {!hasDialogs ? (
               emptyState
             ) : (
-              <div ref={(node) => (scrollContainersRef.current.summary = node)}>
+              <div ref={(node) => {
+                scrollContainersRef.current.summary = node
+              }}>
                 <ScrollArea className={`${dialogListHeightClass} pr-1`}>{renderSummaryCards()}</ScrollArea>
               </div>
             )}
