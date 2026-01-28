@@ -19,10 +19,11 @@ jobs:
       contents: read
       id-token: write
     env:
-      ENV: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'prod' && 'prod' || startsWith(github.ref, 'refs/heads/prod') && 'prod' || 'stage' }}
+      DEPLOY_BRANCH: ${{ github.event.workflow_run.head_branch || github.ref_name }}
+      ENV: ${{ (github.event.workflow_run.head_branch || github.ref_name) == 'prod' && 'prod' || 'stage' }}
       NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
       AWS_REGION: ${{ vars.AWS_REGION || 'ap-northeast-3' }}
-      AWS_ROLE_TO_ASSUME: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'prod') || startsWith(github.ref, 'refs/heads/prod') && secrets.PROD_ROLE_TO_ASSUME || secrets.STAGE_ROLE_TO_ASSUME }}
+      AWS_ROLE_TO_ASSUME: ${{ ((github.event.workflow_run.head_branch || github.ref_name) == 'prod') && secrets.PROD_ROLE_TO_ASSUME || secrets.STAGE_ROLE_TO_ASSUME }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
