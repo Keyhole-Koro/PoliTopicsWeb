@@ -51,6 +51,7 @@ export type ArticleSummary = {
   description: string;
   date: string;
   month: string;
+  prompt_version?: string;
   categories: string[];
   participants: Participant[];
   keywords: Keyword[];

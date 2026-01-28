@@ -8,16 +8,23 @@
     "workers/backend"
   ],
   "scripts": {
+   
+    "--dev:localstack:description": "uses emulators to run localstack(s3, dynamodb) and wrangler(workers)",
     "dev:localstack": "bash scripts/dev-localstack.sh",
+
+    "--dev:nextjs:honoserver:description": "uses other frameworks to run front, back, asset ''faster''; uses mock instead of dynamodb",
+    "dev:nextjs:honoserver": "node scripts/dev-nextjs-honoserver.js",
+
+
+    "test:e2e:localstack": "bash scripts/test-e2e-localstack.sh",
+
+    "": "utilities mainly system uses",
     "build:frontend:local": "npm --prefix frontend run build:local",
+    "build:cacheCron": "npm --prefix cacheCron run build",
+    "dev:assets": "node scripts/generate-local-assets.js && node scripts/local-asset-server.js",
     "r2:local:sync": "node scripts/sync-frontend-to-r2-local.mjs",
     "r2:asset:cors": "bash scripts/r2-asset-configure-cors.sh",
-    "db:seed:local": "node terraform/seed/upload_articles.js --endpoint http://localstack:4566 --asset-base-url http://localhost:4570",
-    "test:e2e:localstack": "bash scripts/test-e2e-localstack.sh",
-    
-    "dev:assets": "node scripts/generate-local-assets.js && node scripts/local-asset-server.js",
-    "dev:nextjs:honoserver": "node scripts/dev-nextjs-honoserver.js",
-    "build:cacheCron": "npm --prefix cacheCron run build"
+    "db:seed:local": "node terraform/seed/upload_articles.js --endpoint http://localstack:4566 --asset-base-url http://localhost:4570"
   },
   "devDependencies": {
     "@playwright/test": "^1.51.1",
