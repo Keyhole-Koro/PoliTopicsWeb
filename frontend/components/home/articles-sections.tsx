@@ -3,6 +3,7 @@ import { CalendarIcon, Clock, Loader2, MessageSquare, Search, Target, Users } fr
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Markdown } from "@/components/markdown"
 
 type CommonHandlers = {
   onCategoryClick: (category: string) => void
@@ -64,7 +65,7 @@ export function FeaturedArticleCard({
               )}
             </div>
             <h3 className="text-2xl font-semibold text-foreground">{article.title}</h3>
-            <p className="text-sm text-muted-foreground">{article.description}</p>
+            <Markdown content={article.description} className="text-xs sm:text-xs" tone="muted" />
             <div className="flex flex-wrap gap-2">
               {(article.participants ?? []).slice(0, 3).map((participant) => (
                 <Badge
@@ -145,7 +146,7 @@ export function LatestArticlesRow({ articles, onCategoryClick, onKeywordClick, o
                 <CardTitle className="text-base">{article.title}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <p className="text-sm text-muted-foreground line-clamp-3">{article.description}</p>
+                <Markdown content={article.description} className="text-xs sm:text-xs line-clamp-3" tone="muted" />
                 <div className="flex flex-wrap gap-1">
                   {(article.keywords ?? []).slice(0, 2).map((keyword) => (
                     <Badge
@@ -278,7 +279,7 @@ export function ArticleGridSection({
                     <CardTitle className="text-lg">{article.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <p className="text-sm text-muted-foreground line-clamp-4">{article.description}</p>
+                    <Markdown content={article.description} className="text-xs sm:text-xs line-clamp-4" tone="muted" />
                     <div className="space-y-2 text-xs">
                       {(article.participants?.length ?? 0) > 0 && (
                         <div>

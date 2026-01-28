@@ -15,6 +15,7 @@ type MarkdownProps = {
   content: string
   className?: string
   terms?: Term[]
+  tone?: "default" | "muted"
 }
 
 function escapeRegExp(string: string) {
@@ -87,7 +88,7 @@ const processChildren = (
   return children
 }
 
-export function Markdown({ content, className, terms = [] }: MarkdownProps) {
+export function Markdown({ content, className, terms = [], tone = "default" }: MarkdownProps) {
   const components: Components = useMemo(
     () => ({
       a: ({ node: _node, ...props }) => (
@@ -112,6 +113,7 @@ export function Markdown({ content, className, terms = [] }: MarkdownProps) {
         "markdown-body text-sm leading-relaxed sm:text-base",
         className
       )}
+      data-tone={tone}
     >
       <ReactMarkdown
         components={components}

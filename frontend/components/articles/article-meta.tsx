@@ -1,6 +1,7 @@
 import type { Article } from "@shared/types/article"
 import { Badge } from "@/components/ui/badge"
 import { formatAsDate } from "@/lib/format"
+import { Markdown } from "@/components/markdown"
 import { Calendar, Hash, Building, Users, Clock } from "lucide-react"
 
 type Props = {
@@ -60,7 +61,11 @@ export function ArticleMeta({ article }: Props) {
       </div>
 
       {article.description ? (
-        <p className="text-lg leading-relaxed text-muted-foreground">{article.description}</p>
+        <Markdown
+          content={article.description}
+          className="text-sm leading-relaxed sm:text-sm"
+          tone="muted"
+        />
       ) : null}
     </div>
   )

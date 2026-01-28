@@ -3,6 +3,7 @@ import type { ArticleSummary } from "@shared/types/article"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { formatAsDate } from "@/lib/format"
+import { Markdown } from "@/components/markdown"
 
 type Props = {
   article: ArticleSummary
@@ -26,7 +27,11 @@ export function ArticleCard({ article }: Props) {
         <p className="text-sm text-muted-foreground">{formatAsDate(article.date)}</p>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-sm text-muted-foreground line-clamp-4">{article.description}</p>
+        <Markdown
+          content={article.description}
+          className="text-xs sm:text-xs line-clamp-4"
+          tone="muted"
+        />
         <div className="flex flex-wrap gap-2">
           {article.keywords.slice(0, 3).map((keyword) => (
             <Badge key={keyword.keyword} variant="secondary">

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users } from "lucide-react"
 import type { PersonInsight } from "@/lib/home-utils"
+import { Markdown } from "@/components/markdown"
 
 type Props = {
   selectedPerson: string | null
@@ -44,7 +45,11 @@ export function PersonInsightCard({ selectedPerson, insight, onKeywordClick }: P
           <div>
             <h4 className="mb-2 text-sm font-semibold text-foreground">最新の記事</h4>
             <p className="text-sm font-medium text-foreground">{insight.latest.title}</p>
-            <p className="mt-2 text-xs text-muted-foreground line-clamp-3">{insight.latest.description}</p>
+            <Markdown
+              content={insight.latest.description}
+              className="mt-2 text-[11px] sm:text-[11px] line-clamp-3"
+              tone="muted"
+            />
             <Button variant="ghost" size="sm" className="mt-3" asChild>
               <Link href={`/article/${encodeURIComponent(insight.latest.id)}`}>記事を読む</Link>
             </Button>
