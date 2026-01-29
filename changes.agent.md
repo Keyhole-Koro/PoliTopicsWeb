@@ -666,3 +666,13 @@ Details:
 - Files changed:
   - `PoliTopicsWeb/frontend/components/dialog-viewer.tsx`
   - `PoliTopicsWeb/changes.agent.md`
+
+Agent: Codex
+Date/Time: 2026-01-29 13:34 JST
+Keywords: frontend, copy, hero
+Topic: Refresh homepage hero copy
+Details:
+
+- Rewrote the hero description to emphasize plain-language AI summaries, speaker focus, and balanced coverage, with a note about backfilling past minutes.
+- Files changed:
+  - `PoliTopicsWeb/frontend/components/home/hero-section.tsx`
