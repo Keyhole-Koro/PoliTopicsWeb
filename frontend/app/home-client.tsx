@@ -475,10 +475,10 @@ export function HomeClient() {
   )
 
   const statsSection = (
-    <>
+    <div className="grid gap-4 lg:grid-cols-2">
       <KeywordTrends stats={keywordStats} onKeywordClick={handleKeywordClick} />
       <KeyParticipants stats={participantStats} onParticipantClick={handleParticipantClick} />
-    </>
+    </div>
   )
 
   const gridSection = (

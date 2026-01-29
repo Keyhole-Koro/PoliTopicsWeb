@@ -12,8 +12,8 @@ export function KeywordTrends({ stats, onKeywordClick }: KeywordProps) {
   if (stats.length === 0) return null
 
   return (
-    <section>
-      <Card>
+    <section className="h-full">
+      <Card className="h-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary" />
@@ -51,8 +51,8 @@ export function KeyParticipants({ stats, onParticipantClick }: ParticipantProps)
   if (stats.length === 0) return null
 
   return (
-    <section>
-      <Card>
+    <section className="h-full">
+      <Card className="h-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5 text-primary" />

@@ -676,3 +676,18 @@ Details:
 - Rewrote the hero description to emphasize plain-language AI summaries, speaker focus, and balanced coverage, with a note about backfilling past minutes.
 - Files changed:
   - `PoliTopicsWeb/frontend/components/home/hero-section.tsx`
+
+Agent: Codex
+Date/Time: 2026-01-29 15:09 JST
+Keywords: frontend, layout, home
+Topic: Split keyword and participant cards into two columns
+Details:
+
+- Placed 注目キーワード and 主要な発言者 cards side-by-side on large screens to reduce excess whitespace.
+- Files changed:
+  - `PoliTopicsWeb/frontend/app/home-client.tsx`
+
+### Changes After Review
+- Matched card heights between 注目キーワード and 主要な発言者 on large screens.
+- Files changed:
+  - `PoliTopicsWeb/frontend/components/home/stats-sections.tsx`
