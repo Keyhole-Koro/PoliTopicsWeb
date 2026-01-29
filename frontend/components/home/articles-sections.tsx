@@ -118,13 +118,13 @@ export function LatestArticlesRow({ articles, onCategoryClick, onKeywordClick, o
         <div className="h-6 w-1 rounded-full bg-primary" />
         <h2 className="text-2xl font-semibold text-foreground">最新の審議</h2>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory">
         {articles.map((article) => {
           const category = article.categories?.[0]
           return (
             <Card
               key={article.id}
-              className="flex h-full flex-col justify-between"
+              className="flex h-full flex-col justify-between w-[85vw] sm:w-[350px] shrink-0 snap-center"
               onClick={() => onNavigate(`/article/${encodeURIComponent(article.id)}`)}
             >
               <CardHeader>
