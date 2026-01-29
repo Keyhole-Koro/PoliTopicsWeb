@@ -450,6 +450,56 @@ export function HomeClient() {
     dateEnd,
   }
 
+  const featuredSection = (
+    <FeaturedArticleCard
+      article={featuredArticle}
+      onCategoryClick={handleCategoryClick}
+      onParticipantClick={handleParticipantClick}
+      onKeywordClick={handleKeywordClick}
+      onHouseClick={handleHouseClick}
+      onMeetingClick={handleMeetingClick}
+      onNavigate={spaNavigate}
+    />
+  )
+
+  const latestSection = (
+    <LatestArticlesRow
+      articles={latestArticles}
+      onCategoryClick={handleCategoryClick}
+      onParticipantClick={handleParticipantClick}
+      onKeywordClick={handleKeywordClick}
+      onHouseClick={handleHouseClick}
+      onMeetingClick={handleMeetingClick}
+      onNavigate={spaNavigate}
+    />
+  )
+
+  const statsSection = (
+    <>
+      <KeywordTrends stats={keywordStats} onKeywordClick={handleKeywordClick} />
+      <KeyParticipants stats={participantStats} onParticipantClick={handleParticipantClick} />
+    </>
+  )
+
+  const gridSection = (
+    <ArticleGridSection
+      title={hasActiveFilters ? "検索結果" : "すべての審議"}
+      articles={visibleGridArticles}
+      hasActiveFilters={hasActiveFilters}
+      onClearFilters={handleClearFilters}
+      onCategoryClick={handleCategoryClick}
+      onParticipantClick={handleParticipantClick}
+      onKeywordClick={handleKeywordClick}
+      onHouseClick={handleHouseClick}
+      onMeetingClick={handleMeetingClick}
+      onNavigate={spaNavigate}
+      canLoadMore={canLoadMore}
+      onLoadMore={handleLoadMore}
+      isLoading={isLoadingArticles}
+      isLoadingMore={isLoadingMoreArticles}
+    />
+  )
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <HomeHeader showAbout={showAbout} onToggleAbout={() => setShowAbout((value) => !value)} />
@@ -510,49 +560,20 @@ export function HomeClient() {
             onKeywordClick={handleKeywordClick}
           />
 
-          <FeaturedArticleCard
-            article={featuredArticle}
-            onCategoryClick={handleCategoryClick}
-            onParticipantClick={handleParticipantClick}
-            onKeywordClick={handleKeywordClick}
-            onHouseClick={handleHouseClick}
-            onMeetingClick={handleMeetingClick}
-            onNavigate={spaNavigate}
-          />
-
-          <LatestArticlesRow
-            articles={latestArticles}
-            onCategoryClick={handleCategoryClick}
-            onParticipantClick={handleParticipantClick}
-            onKeywordClick={handleKeywordClick}
-            onHouseClick={handleHouseClick}
-            onMeetingClick={handleMeetingClick}
-            onNavigate={spaNavigate}
-          />
-
-          {!searchTerm && !hasActiveFilters && (
+          {hasActiveFilters ? (
             <>
-              <KeywordTrends stats={keywordStats} onKeywordClick={handleKeywordClick} />
-              <KeyParticipants stats={participantStats} onParticipantClick={handleParticipantClick} />
+              {gridSection}
+              {featuredSection}
+              {latestSection}
+            </>
+          ) : (
+            <>
+              {featuredSection}
+              {latestSection}
+              {statsSection}
+              {gridSection}
             </>
           )}
-
-          <ArticleGridSection
-            title={hasActiveFilters ? "検索結果" : "すべての審議"}
-            articles={visibleGridArticles}
-            hasActiveFilters={hasActiveFilters}
-            onClearFilters={handleClearFilters}
-            onCategoryClick={handleCategoryClick}
-            onParticipantClick={handleParticipantClick}
-            onKeywordClick={handleKeywordClick}
-            onHouseClick={handleHouseClick}
-            onMeetingClick={handleMeetingClick}
-            onNavigate={spaNavigate}
-            canLoadMore={canLoadMore}
-            onLoadMore={handleLoadMore}
-            isLoading={isLoadingArticles}
-            isLoadingMore={isLoadingMoreArticles}
-          />
         </div>
       </div>
 
