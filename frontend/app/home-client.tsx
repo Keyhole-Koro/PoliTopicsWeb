@@ -563,8 +563,6 @@ export function HomeClient() {
           {hasActiveFilters ? (
             <>
               {gridSection}
-              {featuredSection}
-              {latestSection}
             </>
           ) : (
             <>
