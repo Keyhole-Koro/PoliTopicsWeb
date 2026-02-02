@@ -35,8 +35,10 @@ export interface Dialog {
   speaker_position: string
   speaker_role: string
   summary: string
+  summary_sections?: DialogSection[]
   original_text: string
   soft_summary: string
+  soft_language_sections?: DialogSection[]
   reaction?: ViewerReaction
   qa?: {
     ask: {
@@ -61,6 +63,20 @@ export interface Dialog {
 export interface ResponseTo {
   dialog_id: number
   reaction: ViewerReaction
+}
+
+export type DialogSectionTitle =
+  | "主張"
+  | "説明"
+  | "質問"
+  | "回答"
+  | "根拠"
+  | "影響"
+  | "次の対応"
+
+export interface DialogSection {
+  title: DialogSectionTitle
+  bullets: string[]
 }
 
 interface Term {
@@ -249,6 +265,77 @@ function renderTextWithOrders(
   return <>{nodes}</>
 }
 
+function normalizeSections(sections?: DialogSection[]): DialogSection[] {
+  if (!Array.isArray(sections)) return []
+  return sections
+    .map((section) => ({
+      title: typeof section.title === "string" ? section.title.trim() : "",
+      bullets: Array.isArray(section.bullets)
+        ? section.bullets.map((bullet) => bullet.trim()).filter(Boolean)
+        : [],
+    }))
+    .filter((section) => section.title.length > 0 || section.bullets.length > 0)
+}
+
+function getSectionSearchText(sections?: DialogSection[]): string {
+  return normalizeSections(sections)
+    .map((section) => [section.title, ...section.bullets].join(" ").trim())
+    .filter(Boolean)
+    .join(" ")
+}
+
+function renderSectionedText(
+  sections: DialogSection[],
+  terms: Term[],
+  onOrdersClick: (orders: number[]) => void,
+): JSX.Element {
+  const normalizedSections = normalizeSections(sections)
+  if (normalizedSections.length === 0) {
+    return <></>
+  }
+
+  const sectionTone: Record<DialogSectionTitle, { base: string; dot: string }> = {
+    主張: { base: "border-amber-200/70 bg-amber-50/70", dot: "bg-amber-400/70" },
+    説明: { base: "border-sky-200/70 bg-sky-50/70", dot: "bg-sky-400/70" },
+    質問: { base: "border-blue-200/70 bg-blue-50/70", dot: "bg-blue-400/70" },
+    回答: { base: "border-purple-200/70 bg-purple-50/70", dot: "bg-purple-400/70" },
+    根拠: { base: "border-emerald-200/70 bg-emerald-50/70", dot: "bg-emerald-400/70" },
+    影響: { base: "border-rose-200/70 bg-rose-50/70", dot: "bg-rose-400/70" },
+    次の対応: { base: "border-lime-200/70 bg-lime-50/70", dot: "bg-lime-400/70" },
+  }
+
+  return (
+    <div className="space-y-3">
+      {normalizedSections.map((section, sectionIndex) => {
+        const tone = sectionTone[section.title]
+        return (
+        <div
+          key={`section-${sectionIndex}`}
+          className={`mt-3 rounded-md border p-3 text-xs ${tone?.base ?? "border-primary/10 bg-primary/5"}`}
+        >
+          {section.title ? (
+            <Badge variant="outline" className="text-[11px] px-2 py-0.5">
+              {section.title}
+            </Badge>
+          ) : null}
+          <ul className="mt-2 space-y-1 text-muted-foreground">
+            {section.bullets.map((bullet, bulletIndex) => (
+              <li key={`section-${sectionIndex}-bullet-${bulletIndex}`} className="flex items-start gap-2">
+                <span
+                  className={`mt-1.5 h-1.5 w-1.5 rounded-full ${
+                    tone?.dot ?? "bg-muted-foreground/60"
+                  }`}
+                />
+                <span className="flex-1">{renderTextWithOrders(bullet, terms, onOrdersClick)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )})}
+    </div>
+  )
+}
+
 export function DialogViewer({
   dialogs,
   terms = [],
@@ -321,13 +408,20 @@ export function DialogViewer({
       const qaText = qaItems
         .map((qa) => `${qa.ask?.question ?? ""} ${qa.ask?.who ?? ""} ${qa.answer ?? ""}`)
         .join(" ")
+      const sectionText = [
+        getSectionSearchText(dialog.summary_sections),
+        getSectionSearchText(dialog.soft_language_sections),
+      ]
+        .join(" ")
+        .trim()
       const matchesSearch =
         searchTerm === "" ||
         dialog.summary.toLowerCase().includes(normalizedSearch) ||
         dialog.speaker.toLowerCase().includes(normalizedSearch) ||
         dialog.soft_summary.toLowerCase().includes(normalizedSearch) ||
         dialog.original_text.toLowerCase().includes(normalizedSearch) ||
-        qaText.toLowerCase().includes(normalizedSearch)
+        qaText.toLowerCase().includes(normalizedSearch) ||
+        sectionText.toLowerCase().includes(normalizedSearch)
 
       const matchesSpeaker = selectedSpeaker === "all" || dialog.speaker === selectedSpeaker
 
@@ -509,6 +603,17 @@ export function DialogViewer({
             : viewMode === "soft_summary"
               ? dialog.soft_summary
               : dialog.summary
+        const rawSections =
+          viewMode === "soft_summary"
+            ? dialog.soft_language_sections
+            : viewMode === "summary"
+              ? dialog.summary_sections
+              : undefined
+        const normalizedSections = normalizeSections(rawSections)
+        const renderedContent =
+          normalizedSections.length > 0
+            ? renderSectionedText(normalizedSections, terms, applyOrderFilter)
+            : renderTextWithOrders(displayText, terms, applyOrderFilter)
 
         return (
           <Card
@@ -536,7 +641,7 @@ export function DialogViewer({
                     </Badge>
                   </div>
                   <div className="text-sm text-muted-foreground leading-snug break-words whitespace-pre-line">
-                    {renderTextWithOrders(displayText, terms, applyOrderFilter)}
+                    {renderedContent}
                   </div>
                   {hasQa && (
                     <div className="mt-3 rounded-md border border-primary/10 bg-primary/5 p-3 text-xs">

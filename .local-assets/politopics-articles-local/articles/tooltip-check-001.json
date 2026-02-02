@@ -20,8 +20,8 @@
   "dialogs": [
     {
       "order": 1,
-      "summary": "- テスト太郎はポリトピックスについて発言した。 [[orders:1]]",
-      "soft_language": "- テスト太郎がポリトピックスについて話した。 [[orders:1]]",
+      "summary": "- セクションに要点を整理しました。",
+      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "回答",
       "speaker": "テスト太郎",
       "position": "テスト役職",
@@ -51,6 +51,36 @@
           "answer": "次はUI表示と検索の挙動を確認します。",
           "answer_orders": [
             1
+          ]
+        }
+      ],
+      "summary_sections": [
+        {
+          "title": "回答",
+          "bullets": [
+            "質疑の主語と意図を整理した。",
+            "発言の要点を短く整理した。"
+          ]
+        },
+        {
+          "title": "質問",
+          "bullets": [
+            "質問の焦点を整理した。"
+          ]
+        }
+      ],
+      "soft_language_sections": [
+        {
+          "title": "回答",
+          "bullets": [
+            "質問のねらいを短くまとめた。",
+            "話のポイントを短くまとめた。"
+          ]
+        },
+        {
+          "title": "質問",
+          "bullets": [
+            "質問のポイントを短くまとめた。"
           ]
         }
       ]

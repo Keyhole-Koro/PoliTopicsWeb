@@ -703,3 +703,30 @@ Details:
   - `PoliTopicsWeb/frontend/components/markdown.tsx`
   - `PoliTopicsWeb/frontend/app/article/article-client.tsx`
   - `PoliTopicsWeb/frontend/components/dialog-viewer.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-02 20:58 JST
+Keywords: frontend, dialog, ui, schema
+Topic: Render sectioned dialog summaries
+Details:
+- Added support for sectioned dialog summaries (summary_sections / soft_language_sections) in the dialog viewer and search.
+- Wired article dialog mapping to pass section arrays through to the viewer.
+- Updated shared/backend types to include dialog section arrays.
+- Files changed:
+  - `PoliTopicsWeb/frontend/components/dialog-viewer.tsx`
+  - `PoliTopicsWeb/frontend/app/article/article-client.tsx`
+  - `PoliTopicsWeb/shared/types/article.d.ts`
+  - `PoliTopicsWeb/workers/backend/src/types/article.ts`
+  - `PoliTopicsWeb/changes.agent.md`
+
+### Changes After Review
+- Constrained dialog section titles to a fixed schema enum and rendered section titles as badges.
+- Added sectioned dialog data to the Terraform seed articles for UI verification.
+- Adjusted seed dialog section titles based on reactions and set non-overlapping summary/soft_language placeholders.
+- Expanded seed dialog sections to include multiple titles/bullets for richer UI testing.
+- Added per-section background tones and bullet accents for quicker visual scanning.
+- Files changed:
+  - `PoliTopicsWeb/frontend/components/dialog-viewer.tsx`
+  - `PoliTopicsWeb/shared/types/article.d.ts`
+  - `PoliTopicsWeb/workers/backend/src/types/article.ts`
+  - `PoliTopicsWeb/terraform/seed/articles.json`
