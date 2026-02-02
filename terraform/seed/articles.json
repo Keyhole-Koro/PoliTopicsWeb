@@ -33,8 +33,8 @@
     "dialogs": [
       {
         "order": 1,
-        "summary": "- テスト太郎はポリトピックスについて発言した。",
-        "soft_language": "- テスト太郎がポリトピックスについて話した。",
+        "summary": "- テスト太郎はポリトピックスについて発言した。 [[orders:1]]",
+        "soft_language": "- テスト太郎がポリトピックスについて話した。 [[orders:1]]",
         "reaction": "回答",
         "speaker": "テスト太郎",
         "position": "テスト役職",

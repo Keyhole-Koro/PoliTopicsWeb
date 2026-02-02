@@ -170,6 +170,84 @@ function highlightTerms(text: string, terms: Term[] = []): JSX.Element {
   )
 }
 
+const ORDER_TOKEN_REGEX = /\[\[orders:([0-9,\-]+)\]\]/g
+
+function parseOrderSpec(spec: string): number[] {
+  const orders: number[] = []
+  const parts = spec.split(",")
+  for (const part of parts) {
+    const trimmed = part.trim()
+    if (!trimmed) continue
+    const rangeMatch = trimmed.split("-")
+    if (rangeMatch.length === 2) {
+      const start = Number(rangeMatch[0])
+      const end = Number(rangeMatch[1])
+      if (!Number.isFinite(start) || !Number.isFinite(end)) continue
+      const from = Math.min(start, end)
+      const to = Math.max(start, end)
+      for (let i = from; i <= to; i += 1) {
+        orders.push(i)
+      }
+    } else {
+      const value = Number(trimmed)
+      if (!Number.isFinite(value)) continue
+      orders.push(value)
+    }
+  }
+  return Array.from(new Set(orders)).sort((a, b) => a - b)
+}
+
+function renderTextWithOrders(
+  text: string,
+  terms: Term[],
+  onOrdersClick: (orders: number[]) => void,
+): JSX.Element {
+  const matches = text.match(ORDER_TOKEN_REGEX)
+  if (!matches) {
+    return highlightTerms(text, terms)
+  }
+
+  const nodes: JSX.Element[] = []
+  let lastIndex = 0
+  let nodeIndex = 0
+  ORDER_TOKEN_REGEX.lastIndex = 0
+  let match: RegExpExecArray | null
+
+  while ((match = ORDER_TOKEN_REGEX.exec(text)) !== null) {
+    const [fullMatch, spec] = match
+    const before = text.slice(lastIndex, match.index)
+    if (before) {
+      nodes.push(
+        <span key={`text-${nodeIndex += 1}`}>{highlightTerms(before, terms)}</span>,
+      )
+    }
+    const orders = parseOrderSpec(spec)
+    if (orders.length > 0) {
+      nodes.push(
+        <button
+          key={`orders-${nodeIndex += 1}`}
+          type="button"
+          onClick={() => onOrdersClick(orders)}
+          className="mx-1 inline-flex items-center rounded bg-amber-100 px-1.5 py-0.5 text-[11px] font-semibold text-amber-800 hover:bg-amber-200"
+        >
+          orders:{spec}
+        </button>,
+      )
+    } else {
+      nodes.push(<span key={`text-${nodeIndex += 1}`}>{fullMatch}</span>)
+    }
+    lastIndex = match.index + fullMatch.length
+  }
+
+  if (lastIndex < text.length) {
+    nodes.push(
+      <span key={`text-${nodeIndex += 1}`}>{highlightTerms(text.slice(lastIndex), terms)}</span>,
+    )
+  }
+
+  return <>{nodes}</>
+}
+
 export function DialogViewer({
   dialogs,
   terms = [],
@@ -182,6 +260,7 @@ export function DialogViewer({
   const [selectedSpeaker, setSelectedSpeaker] = useState<string>("all")
   const [selectedGroup, setSelectedGroup] = useState<string>("all")
   const [selectedReaction, setSelectedReaction] = useState<ViewerReaction | "all">("all")
+  const [orderFilter, setOrderFilter] = useState<number[]>([])
   const [viewMode, setViewMode] = useState<ViewMode>("summary")
   const [expandedDialogs, setExpandedDialogs] = useState<Set<number>>(new Set())
   const [hasHydrated, setHasHydrated] = useState(false)
@@ -260,9 +339,12 @@ export function DialogViewer({
         dialog.reaction === selectedReaction ||
         dialog.response_to.some((response) => response.reaction === selectedReaction)
 
-      return matchesSearch && matchesSpeaker && matchesGroup && matchesReaction
+      const matchesOrder =
+        orderFilter.length === 0 || orderFilter.includes(dialog.order)
+
+      return matchesSearch && matchesSpeaker && matchesGroup && matchesReaction && matchesOrder
     })
-  }, [dialogs, searchTerm, selectedSpeaker, selectedGroup, selectedReaction])
+  }, [dialogs, searchTerm, selectedSpeaker, selectedGroup, selectedReaction, orderFilter])
 
   const toggleDialogExpansion = (dialogOrder: number) => {
     const newExpanded = new Set(expandedDialogs)
@@ -289,6 +371,18 @@ export function DialogViewer({
     setSelectedSpeaker("all")
     setSelectedGroup("all")
     setSelectedReaction("all")
+    setOrderFilter([])
+  }
+
+  const applyOrderFilter = (orders: number[]) => {
+    if (orders.length === 0) return
+    setSearchTerm("")
+    setSelectedSpeaker("all")
+    setSelectedGroup("all")
+    setSelectedReaction("all")
+    setOrderFilter(orders)
+    const primary = orders[0]
+    requestAnimationFrame(() => scrollToOrder(primary))
   }
 
   const scrollToOrder = (order: number) => {
@@ -448,7 +542,7 @@ export function DialogViewer({
                     </Badge>
                   </div>
                   <div className="text-sm text-muted-foreground leading-snug break-words whitespace-pre-line">
-                    {highlightTerms(displayText, terms)}
+                    {renderTextWithOrders(displayText, terms, applyOrderFilter)}
                   </div>
                   {hasQa && (
                     <div className="mt-3 rounded-md border border-primary/10 bg-primary/5 p-3 text-xs">
@@ -660,6 +754,16 @@ export function DialogViewer({
                   フィルタークリア
                 </Button>
               </div>
+              {orderFilter.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                  <span>発言番号フィルター:</span>
+                  {orderFilter.map((order) => (
+                    <Badge key={`order-filter-${order}`} variant="secondary" className="text-[11px]">
+                      #{order}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
