@@ -45,7 +45,15 @@ export interface Dialog {
     }
     answer: string
     answer_orders?: number[]
-  }
+  } | {
+    ask: {
+      question: string
+      who: string
+      orders: number[]
+    }
+    answer: string
+    answer_orders?: number[]
+  }[]
   response_to: ResponseTo[]
 }
 
@@ -225,9 +233,14 @@ export function DialogViewer({
     const normalizedSearch = searchTerm.toLowerCase()
 
     return dialogs.filter((dialog) => {
-      const qaText = dialog.qa
-        ? `${dialog.qa.ask?.question ?? ""} ${dialog.qa.ask?.who ?? ""} ${dialog.qa.answer ?? ""}`
-        : ""
+      const qaItems = Array.isArray(dialog.qa)
+        ? dialog.qa
+        : dialog.qa
+          ? [dialog.qa]
+          : []
+      const qaText = qaItems
+        .map((qa) => `${qa.ask?.question ?? ""} ${qa.ask?.who ?? ""} ${qa.answer ?? ""}`)
+        .join(" ")
       const matchesSearch =
         searchTerm === "" ||
         dialog.summary.toLowerCase().includes(normalizedSearch) ||
@@ -396,8 +409,12 @@ export function DialogViewer({
         const isOriginalVisible = originalTextVisible.has(dialog.order)
         const isHighlighted = highlightedOrders.has(dialog.order)
         const originalText = dialog.original_text
-        const qa = dialog.qa
-        const hasQa = Boolean(qa?.ask?.question && qa?.answer)
+        const qaItems = Array.isArray(dialog.qa)
+          ? dialog.qa
+          : dialog.qa
+            ? [dialog.qa]
+            : []
+        const hasQa = qaItems.some((qa) => qa.ask?.question && qa.answer)
         const displayText =
           viewMode === "original"
             ? dialog.original_text
@@ -433,49 +450,53 @@ export function DialogViewer({
                   <div className="text-sm text-muted-foreground leading-snug break-words whitespace-pre-line">
                     {highlightTerms(displayText, terms)}
                   </div>
-                  {hasQa && qa && (
+                  {hasQa && (
                     <div className="mt-3 rounded-md border border-primary/10 bg-primary/5 p-3 text-xs">
-                      <div className="flex items-start gap-2">
-                        <span className="font-semibold text-blue-600">Q</span>
-                        <div className="space-y-1">
-                          <p className="font-medium text-foreground">{qa.ask.question}</p>
-                          <p className="text-muted-foreground">質問者: {qa.ask.who}</p>
-                          {qa.ask.orders?.length ? (
-                            <div className="flex flex-wrap gap-1">
-                              {qa.ask.orders.map((order) => (
-                                <button
-                                  key={`ask-${dialog.order}-${order}`}
-                                  type="button"
-                                  onClick={() => scrollToOrder(order)}
-                                  className="rounded bg-blue-100 px-2 py-0.5 text-[11px] text-blue-700 hover:bg-blue-200"
-                                >
-                                  #{order}
-                                </button>
-                              ))}
+                      {qaItems.map((qa, index) => (
+                        <div key={`qa-${dialog.order}-${index}`} className={index === 0 ? "" : "mt-3"}>
+                          <div className="flex items-start gap-2">
+                            <span className="font-semibold text-blue-600">Q</span>
+                            <div className="space-y-1">
+                              <p className="font-medium text-foreground">{qa.ask.question}</p>
+                              <p className="text-muted-foreground">質問者: {qa.ask.who}</p>
+                              {qa.ask.orders?.length ? (
+                                <div className="flex flex-wrap gap-1">
+                                  {qa.ask.orders.map((order) => (
+                                    <button
+                                      key={`ask-${dialog.order}-${index}-${order}`}
+                                      type="button"
+                                      onClick={() => scrollToOrder(order)}
+                                      className="rounded bg-blue-100 px-2 py-0.5 text-[11px] text-blue-700 hover:bg-blue-200"
+                                    >
+                                      #{order}
+                                    </button>
+                                  ))}
+                                </div>
+                              ) : null}
                             </div>
-                          ) : null}
-                        </div>
-                      </div>
-                      <div className="mt-2 flex items-start gap-2">
-                        <span className="font-semibold text-purple-600">A</span>
-                        <div className="space-y-1">
-                          <p className="text-foreground">{qa.answer}</p>
-                          {qa.answer_orders?.length ? (
-                            <div className="flex flex-wrap gap-1">
-                              {qa.answer_orders.map((order) => (
-                                <button
-                                  key={`answer-${dialog.order}-${order}`}
-                                  type="button"
-                                  onClick={() => scrollToOrder(order)}
-                                  className="rounded bg-purple-100 px-2 py-0.5 text-[11px] text-purple-700 hover:bg-purple-200"
-                                >
-                                  #{order}
-                                </button>
-                              ))}
+                          </div>
+                          <div className="mt-2 flex items-start gap-2">
+                            <span className="font-semibold text-purple-600">A</span>
+                            <div className="space-y-1">
+                              <p className="text-foreground">{qa.answer}</p>
+                              {qa.answer_orders?.length ? (
+                                <div className="flex flex-wrap gap-1">
+                                  {qa.answer_orders.map((order) => (
+                                    <button
+                                      key={`answer-${dialog.order}-${index}-${order}`}
+                                      type="button"
+                                      onClick={() => scrollToOrder(order)}
+                                      className="rounded bg-purple-100 px-2 py-0.5 text-[11px] text-purple-700 hover:bg-purple-200"
+                                    >
+                                      #{order}
+                                    </button>
+                                  ))}
+                                </div>
+                              ) : null}
                             </div>
-                          ) : null}
+                          </div>
                         </div>
-                      </div>
+                      ))}
                     </div>
                   )}
                   {isOriginalVisible && viewMode !== "original" && (
