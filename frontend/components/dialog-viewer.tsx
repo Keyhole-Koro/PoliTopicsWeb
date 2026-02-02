@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { OrderChip } from "@/components/order-chip"
 import {
   Search,
   Filter,
@@ -170,11 +171,13 @@ function highlightTerms(text: string, terms: Term[] = []): JSX.Element {
   )
 }
 
-const ORDER_TOKEN_REGEX = /\[\[orders:([0-9,\-]+)\]\]/g
+const ORDER_TOKEN_REGEX = /\[\[orders:([0-9,\s-]+)\]\]/g
 
 function parseOrderSpec(spec: string): number[] {
+  const cleaned = spec.replace(/\s+/g, "")
+  if (!cleaned) return []
   const orders: number[] = []
-  const parts = spec.split(",")
+  const parts = cleaned.split(",")
   for (const part of parts) {
     const trimmed = part.trim()
     if (!trimmed) continue
@@ -224,14 +227,12 @@ function renderTextWithOrders(
     const orders = parseOrderSpec(spec)
     if (orders.length > 0) {
       nodes.push(
-        <button
+        <OrderChip
           key={`orders-${nodeIndex += 1}`}
-          type="button"
-          onClick={() => onOrdersClick(orders)}
-          className="mx-1 inline-flex items-center rounded bg-amber-100 px-1.5 py-0.5 text-[11px] font-semibold text-amber-800 hover:bg-amber-200"
-        >
-          orders:{spec}
-        </button>,
+          orders={orders}
+          label={`#${spec}`}
+          onClick={onOrdersClick}
+        />,
       )
     } else {
       nodes.push(<span key={`text-${nodeIndex += 1}`}>{fullMatch}</span>)
@@ -472,17 +473,10 @@ export function DialogViewer({
 
   useEffect(() => {
     if (!jumpToken || jumpOrders.length === 0) return
-    clearFilters()
+    applyOrderFilter(jumpOrders)
     setHighlightedOrders(new Set(jumpOrders))
-    const primary = jumpOrders[0]
-    const handle = requestAnimationFrame(() => {
-      scrollToOrder(primary)
-    })
     const timeout = window.setTimeout(() => setHighlightedOrders(new Set()), 3500)
-    return () => {
-      cancelAnimationFrame(handle)
-      clearTimeout(timeout)
-    }
+    return () => clearTimeout(timeout)
   }, [jumpToken, jumpOrders])
 
   const emptyState = (

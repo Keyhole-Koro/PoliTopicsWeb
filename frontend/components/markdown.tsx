@@ -4,6 +4,7 @@ import remarkGfm from "remark-gfm"
 
 import { cn } from "@/lib/utils"
 import type { Term } from "@shared/types/article"
+import { OrderChip } from "@/components/order-chip"
 import {
   Tooltip,
   TooltipContent,
@@ -63,24 +64,8 @@ function highlightTerms(text: string, terms: Term[]) {
 
 const ORDER_TAG_PATTERN = /\[\[orders:([0-9,\s-]+)\]\]/gi
 
-function normalizeOrderSpec(spec: string): string {
-  return spec.replace(/\s+/g, "")
-}
-
-function injectOrderLinks(content: string, enableLinks: boolean): string {
-  if (!content) return ""
-  return content.replace(ORDER_TAG_PATTERN, (_match, spec) => {
-    const cleaned = normalizeOrderSpec(spec)
-    if (!cleaned) return ""
-    if (enableLinks) {
-      return `[↳発言${cleaned}](order:${cleaned})`
-    }
-    return `（発言${cleaned}）`
-  })
-}
-
 function parseOrderSpec(spec: string): number[] {
-  const cleaned = normalizeOrderSpec(spec)
+  const cleaned = spec.replace(/\s+/g, "")
   if (!cleaned) return []
   const orders: number[] = []
   for (const token of cleaned.split(",")) {
@@ -103,16 +88,65 @@ function parseOrderSpec(spec: string): number[] {
   return Array.from(new Set(orders))
 }
 
+function renderTextWithOrders(
+  text: string,
+  terms: Term[],
+  onOrderClick?: (orders: number[]) => void,
+): React.ReactNode {
+  if (!onOrderClick) {
+    return highlightTerms(text, terms)
+  }
+
+  const nodes: React.ReactNode[] = []
+  let lastIndex = 0
+  ORDER_TAG_PATTERN.lastIndex = 0
+  let match: RegExpExecArray | null
+
+  while ((match = ORDER_TAG_PATTERN.exec(text)) !== null) {
+    const fullMatch = match[0]
+    const spec = match[1]
+    const before = text.slice(lastIndex, match.index)
+    if (before) {
+      nodes.push(
+        <span key={`text-${lastIndex}`}>{highlightTerms(before, terms)}</span>,
+      )
+    }
+    const orders = parseOrderSpec(spec)
+    if (orders.length > 0) {
+      nodes.push(
+        <OrderChip
+          key={`orders-${match.index}`}
+          orders={orders}
+          label={`#${spec.replace(/\s+/g, "")}`}
+          onClick={onOrderClick}
+        />,
+      )
+    } else {
+      nodes.push(<span key={`orders-${match.index}`}>{fullMatch}</span>)
+    }
+    lastIndex = match.index + fullMatch.length
+  }
+
+  if (lastIndex < text.length) {
+    nodes.push(
+      <span key={`text-${lastIndex}`}>{highlightTerms(text.slice(lastIndex), terms)}</span>,
+    )
+  }
+
+  return nodes.length === 1 ? nodes[0] : <>{nodes}</>
+}
+
 const processChildren = (
   children: React.ReactNode,
-  terms: Term[]
+  terms: Term[],
+  onOrderClick?: (orders: number[]) => void,
 ): React.ReactNode => {
   if (typeof children === "string") {
-    return highlightTerms(children, terms)
+    return renderTextWithOrders(children, terms, onOrderClick)
   }
   if (Array.isArray(children)) {
     return React.Children.map(children, (child) =>
-      processChildren(child, terms)
+      processChildren(child, terms, onOrderClick)
     )
   }
   if (React.isValidElement(children)) {
@@ -123,7 +157,7 @@ const processChildren = (
     if (props && props.children) {
       return React.cloneElement(children, {
         ...props,
-        children: processChildren(props.children, terms),
+        children: processChildren(props.children, terms, onOrderClick),
       } as any)
     }
     return children
@@ -132,16 +166,13 @@ const processChildren = (
 }
 
 export function Markdown({ content, className, terms = [], tone = "default", onOrderClick }: MarkdownProps) {
-  const preparedContent = useMemo(
-    () => injectOrderLinks(content ?? "", Boolean(onOrderClick)),
-    [content, onOrderClick],
-  )
   const components: Components = useMemo(
     () => ({
       a: ({ node: _node, ...props }) => {
         const href = typeof props.href === "string" ? props.href : ""
-        if (href.startsWith("order:")) {
-          const spec = href.replace("order:", "")
+        const isOrderLink = href.toLowerCase().startsWith("order:")
+        if (isOrderLink) {
+          const spec = href.slice("order:".length)
           const orders = parseOrderSpec(spec)
           if (orders.length && onOrderClick) {
             return (
@@ -163,10 +194,10 @@ export function Markdown({ content, className, terms = [], tone = "default", onO
         )
       },
       p: ({ node: _node, children, ...props }) => (
-        <p {...props}>{processChildren(children, terms)}</p>
+        <p {...props}>{processChildren(children, terms, onOrderClick)}</p>
       ),
       li: ({ node: _node, children, ...props }) => (
-        <li {...props}>{processChildren(children, terms)}</li>
+        <li {...props}>{processChildren(children, terms, onOrderClick)}</li>
       ),
       // Add other elements if needed, but p and li cover most narrative text
     }),
@@ -186,7 +217,7 @@ export function Markdown({ content, className, terms = [], tone = "default", onO
         remarkPlugins={[remarkGfm]}
         skipHtml
       >
-        {preparedContent}
+        {content ?? ""}
       </ReactMarkdown>
     </div>
   )
