@@ -691,3 +691,15 @@ Details:
 - Matched card heights between 注目キーワード and 主要な発言者 on large screens.
 - Files changed:
   - `PoliTopicsWeb/frontend/components/home/stats-sections.tsx`
+
+Agent: Codex
+Date/Time: 2026-01-29 16:05 JST
+Keywords: frontend, markdown, dialog, ux
+Topic: Link summary order tags to dialog highlights
+Details:
+
+- Added `[[orders:...]]` parsing in Markdown and wired order links to scroll/highlight matching dialog entries.
+- Files changed:
+  - `PoliTopicsWeb/frontend/components/markdown.tsx`
+  - `PoliTopicsWeb/frontend/app/article/article-client.tsx`
+  - `PoliTopicsWeb/frontend/components/dialog-viewer.tsx`

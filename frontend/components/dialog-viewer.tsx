@@ -37,6 +37,15 @@ export interface Dialog {
   original_text: string
   soft_summary: string
   reaction?: ViewerReaction
+  qa?: {
+    ask: {
+      question: string
+      who: string
+      orders: number[]
+    }
+    answer: string
+    answer_orders?: number[]
+  }
   response_to: ResponseTo[]
 }
 
@@ -55,6 +64,8 @@ interface DialogViewerProps {
   terms?: Term[]
   title?: string
   className?: string
+  jumpOrders?: number[]
+  jumpToken?: number
 }
 
 function getReactionIcon(reaction?: ViewerReaction): string {
@@ -151,7 +162,14 @@ function highlightTerms(text: string, terms: Term[] = []): JSX.Element {
   )
 }
 
-export function DialogViewer({ dialogs, terms = [], title = "会議の議事録", className = "" }: DialogViewerProps) {
+export function DialogViewer({
+  dialogs,
+  terms = [],
+  title = "会議の議事録",
+  className = "",
+  jumpOrders = [],
+  jumpToken = 0,
+}: DialogViewerProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedSpeaker, setSelectedSpeaker] = useState<string>("all")
   const [selectedGroup, setSelectedGroup] = useState<string>("all")
@@ -160,6 +178,7 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
   const [expandedDialogs, setExpandedDialogs] = useState<Set<number>>(new Set())
   const [hasHydrated, setHasHydrated] = useState(false)
   const [originalTextVisible, setOriginalTextVisible] = useState<Set<number>>(new Set())
+  const [highlightedOrders, setHighlightedOrders] = useState<Set<number>>(new Set())
   const scrollTopRef = useRef(0)
   const anchorOrderRef = useRef<number | null>(null)
   const scrollContainersRef = useRef<Record<ViewMode, HTMLDivElement | null>>({
@@ -206,12 +225,16 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
     const normalizedSearch = searchTerm.toLowerCase()
 
     return dialogs.filter((dialog) => {
+      const qaText = dialog.qa
+        ? `${dialog.qa.ask?.question ?? ""} ${dialog.qa.ask?.who ?? ""} ${dialog.qa.answer ?? ""}`
+        : ""
       const matchesSearch =
         searchTerm === "" ||
         dialog.summary.toLowerCase().includes(normalizedSearch) ||
         dialog.speaker.toLowerCase().includes(normalizedSearch) ||
         dialog.soft_summary.toLowerCase().includes(normalizedSearch) ||
-        dialog.original_text.toLowerCase().includes(normalizedSearch)
+        dialog.original_text.toLowerCase().includes(normalizedSearch) ||
+        qaText.toLowerCase().includes(normalizedSearch)
 
       const matchesSpeaker = selectedSpeaker === "all" || dialog.speaker === selectedSpeaker
 
@@ -253,6 +276,16 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
     setSelectedSpeaker("all")
     setSelectedGroup("all")
     setSelectedReaction("all")
+  }
+
+  const scrollToOrder = (order: number) => {
+    const viewport = getScrollViewport(viewMode)
+    if (!viewport) return
+    const target = viewport.querySelector(`[data-dialog-order="${order}"]`) as HTMLElement | null
+    if (!target) return
+    const viewportRect = viewport.getBoundingClientRect()
+    const targetRect = target.getBoundingClientRect()
+    viewport.scrollTop += targetRect.top - viewportRect.top - 12
   }
 
   const getScrollViewport = (mode: ViewMode) => {
@@ -330,6 +363,21 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
     return () => cancelAnimationFrame(handle)
   }, [viewMode, hasDialogs])
 
+  useEffect(() => {
+    if (!jumpToken || jumpOrders.length === 0) return
+    clearFilters()
+    setHighlightedOrders(new Set(jumpOrders))
+    const primary = jumpOrders[0]
+    const handle = requestAnimationFrame(() => {
+      scrollToOrder(primary)
+    })
+    const timeout = window.setTimeout(() => setHighlightedOrders(new Set()), 3500)
+    return () => {
+      cancelAnimationFrame(handle)
+      clearTimeout(timeout)
+    }
+  }, [jumpToken, jumpOrders])
+
   const emptyState = (
     <Card>
       <CardContent className="pt-6 text-center">
@@ -346,7 +394,10 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
     <div className="grid gap-2 pr-2">
       {filteredDialogs.map((dialog) => {
         const isOriginalVisible = originalTextVisible.has(dialog.order)
+        const isHighlighted = highlightedOrders.has(dialog.order)
         const originalText = dialog.original_text
+        const qa = dialog.qa
+        const hasQa = Boolean(qa?.ask?.question && qa?.answer)
         const displayText =
           viewMode === "original"
             ? dialog.original_text
@@ -355,7 +406,13 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
               : dialog.summary
 
         return (
-          <Card key={dialog.order} data-dialog-order={dialog.order} className="hover:shadow-md transition-shadow overflow-hidden py-2">
+          <Card
+            key={dialog.order}
+            data-dialog-order={dialog.order}
+            className={`hover:shadow-md transition-shadow overflow-hidden py-2 ${
+              isHighlighted ? "ring-2 ring-primary/40 bg-primary/5" : ""
+            }`}
+          >
             <CardContent className="py-3">
               <div className="flex items-start gap-2 min-w-0">
                 <div className="w-7 h-7 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
@@ -373,16 +430,61 @@ export function DialogViewer({ dialogs, terms = [], title = "会議の議事録"
                       {viewMode === "original" ? "原文" : viewMode === "soft_summary" ? "やさしい" : "詳細"}
                     </Badge>
                   </div>
-                  <div className="text-sm text-muted-foreground leading-snug break-words">
+                  <div className="text-sm text-muted-foreground leading-snug break-words whitespace-pre-line">
                     {highlightTerms(displayText, terms)}
                   </div>
+                  {hasQa && qa && (
+                    <div className="mt-3 rounded-md border border-primary/10 bg-primary/5 p-3 text-xs">
+                      <div className="flex items-start gap-2">
+                        <span className="font-semibold text-blue-600">Q</span>
+                        <div className="space-y-1">
+                          <p className="font-medium text-foreground">{qa.ask.question}</p>
+                          <p className="text-muted-foreground">質問者: {qa.ask.who}</p>
+                          {qa.ask.orders?.length ? (
+                            <div className="flex flex-wrap gap-1">
+                              {qa.ask.orders.map((order) => (
+                                <button
+                                  key={`ask-${dialog.order}-${order}`}
+                                  type="button"
+                                  onClick={() => scrollToOrder(order)}
+                                  className="rounded bg-blue-100 px-2 py-0.5 text-[11px] text-blue-700 hover:bg-blue-200"
+                                >
+                                  #{order}
+                                </button>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                      <div className="mt-2 flex items-start gap-2">
+                        <span className="font-semibold text-purple-600">A</span>
+                        <div className="space-y-1">
+                          <p className="text-foreground">{qa.answer}</p>
+                          {qa.answer_orders?.length ? (
+                            <div className="flex flex-wrap gap-1">
+                              {qa.answer_orders.map((order) => (
+                                <button
+                                  key={`answer-${dialog.order}-${order}`}
+                                  type="button"
+                                  onClick={() => scrollToOrder(order)}
+                                  className="rounded bg-purple-100 px-2 py-0.5 text-[11px] text-purple-700 hover:bg-purple-200"
+                                >
+                                  #{order}
+                                </button>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   {isOriginalVisible && viewMode !== "original" && (
                     <div className="mt-2 pt-2 border-t border-border">
                       <div className="flex items-center gap-2 mb-1">
                         <FileText className="w-4 h-4 text-muted-foreground" />
                         <span className="text-xs font-medium text-muted-foreground">原文</span>
                       </div>
-                      <div className="text-sm text-foreground leading-snug bg-muted/30 p-3 rounded-md">
+                      <div className="text-sm text-foreground leading-snug bg-muted/30 p-3 rounded-md whitespace-pre-line">
                         {highlightTerms(originalText, terms)}
                       </div>
                     </div>

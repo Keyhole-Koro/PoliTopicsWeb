@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import type { Article, ArticleAssetData } from "@shared/types/article"
 import { fetchArticle, fetchArticleAsset } from "@/lib/api"
@@ -21,6 +21,9 @@ export function ArticleClient({ issueId }: Props) {
   const [assetData, setAssetData] = useState<ArticleAssetData | null>(null)
   const [assetLoading, setAssetLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [jumpOrders, setJumpOrders] = useState<number[]>([])
+  const [jumpToken, setJumpToken] = useState(0)
+  const dialogSectionRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     fetchArticle(issueId)
@@ -86,6 +89,7 @@ export function ArticleClient({ issueId }: Props) {
     original_text: dialog.original_text,
     soft_summary: dialog.soft_language,
     reaction: dialog.reaction,
+    qa: dialog.qa,
     response_to: [],
   }))
 
@@ -106,6 +110,12 @@ export function ArticleClient({ issueId }: Props) {
   const hasTerms = termDetails.length > 0
   const keyPoints = (mergedArticle.key_points ?? []).map((point) => point.trim()).filter(Boolean)
   const hasKeyPoints = keyPoints.length > 0
+  const handleOrderJump = (orders: number[]) => {
+    if (orders.length === 0) return
+    setJumpOrders(orders)
+    setJumpToken(Date.now())
+    dialogSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
 
   return (
     <article className="space-y-10">
@@ -139,30 +149,43 @@ export function ArticleClient({ issueId }: Props) {
           </div>
           <div className="border-t pt-4">
             <h4 className="mb-2 text-base font-semibold text-foreground">詳細要約</h4>
-            <Markdown content={summaryText} terms={termDetails} />
+            <Markdown content={summaryText} terms={termDetails} onOrderClick={handleOrderJump} />
           </div>
           <div className="border-t pt-4">
             <h4 className="mb-2 text-base font-semibold text-foreground">簡潔要約</h4>
-            <Markdown content={softSummaryText} className="italic text-muted-foreground" terms={termDetails} />
+            <Markdown
+              content={softSummaryText}
+              className="italic text-muted-foreground"
+              terms={termDetails}
+              onOrderClick={handleOrderJump}
+            />
           </div>
         </CardContent>
       </Card>
 
-      {hasDialogData ? (
-        <DialogViewer dialogs={dialogEntries} title="会議の議事録" terms={termDetails} />
-      ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 font-serif">
-              <MessageSquare className="h-5 w-5 text-primary" />
-              会議の議事録
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">議事録データは現在準備中です。</p>
-          </CardContent>
-        </Card>
-      )}
+      <div ref={dialogSectionRef}>
+        {hasDialogData ? (
+          <DialogViewer
+            dialogs={dialogEntries}
+            title="会議の議事録"
+            terms={termDetails}
+            jumpOrders={jumpOrders}
+            jumpToken={jumpToken}
+          />
+        ) : (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 font-serif">
+                <MessageSquare className="h-5 w-5 text-primary" />
+                会議の議事録
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">議事録データは現在準備中です。</p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       <Card>
         <CardHeader>

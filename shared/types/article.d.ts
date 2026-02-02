@@ -11,6 +11,15 @@ export type Dialog = {
     summary: string;
     soft_language: string;
     reaction: Reaction;
+    qa?: {
+        ask: {
+            question: string;
+            who: string;
+            orders: number[];
+        };
+        answer: string;
+        answer_orders: number[];
+    };
     original_text: string;
     speaker?: string;
     position?: string;
