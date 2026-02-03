@@ -23,8 +23,6 @@
   "dialogs": [
     {
       "order": 1,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "黒澤由衣",
       "position": "委員長、技術流出対策の強化を指示",
@@ -60,8 +58,6 @@
     },
     {
       "order": 2,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "久遠真",
       "position": "経産副大臣、供給網補助の詳細を説明",
@@ -97,8 +93,6 @@
     },
     {
       "order": 3,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "経済産業委員会 議長",
       "position": "参議院",

@@ -23,8 +23,6 @@
   "dialogs": [
     {
       "order": 1,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "海老原結衣",
       "position": "環境副大臣、監視データを共有するAPIを開発と説明",
@@ -60,8 +58,6 @@
     },
     {
       "order": 2,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "波多野碧",
       "position": "野党理事、港湾管理者の費用負担を懸念",
@@ -97,8 +93,6 @@
     },
     {
       "order": 3,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "海洋プラスチック対策特別委員会 議長",
       "position": "参議院",

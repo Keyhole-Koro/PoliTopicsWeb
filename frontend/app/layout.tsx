@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter, Manrope } from "next/font/google"
 import "./globals.css"
+import { MaintenancePopup } from "@/components/maintenance-popup"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,6 +33,7 @@ export default function RootLayout({
           type="application/json"
           dangerouslySetInnerHTML={{ __html: '"__HEADLINES_CACHE__"' }}
         />
+        <MaintenancePopup />
         {children}
       </body>
     </html>

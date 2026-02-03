@@ -23,8 +23,6 @@
   "dialogs": [
     {
       "order": 1,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "宮尾慎",
       "position": "与党筆頭理事、自治体操作研修の拡充を要望",
@@ -60,8 +58,6 @@
     },
     {
       "order": 2,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "佐伯玲奈",
       "position": "気象庁審議官、データ統合の仕様を説明",
@@ -97,8 +93,6 @@
     },
     {
       "order": 3,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "災害対策特別委員会 議長",
       "position": "参議院",

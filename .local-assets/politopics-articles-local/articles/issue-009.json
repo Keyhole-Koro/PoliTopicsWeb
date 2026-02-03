@@ -23,8 +23,6 @@
   "dialogs": [
     {
       "order": 1,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "石坂真緒",
       "position": "委員長、地域局のコスト負担を懸念",
@@ -60,8 +58,6 @@
     },
     {
       "order": 2,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "成瀬祐真",
       "position": "総務副大臣、助成制度を検討と回答",
@@ -97,8 +93,6 @@
     },
     {
       "order": 3,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "総務委員会 議長",
       "position": "衆議院",

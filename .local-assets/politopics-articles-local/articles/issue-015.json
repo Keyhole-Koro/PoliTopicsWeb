@@ -23,8 +23,6 @@
   "dialogs": [
     {
       "order": 1,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "千秋遥",
       "position": "観光副大臣、実証経費の1/2を国が補助と説明",
@@ -60,8 +58,6 @@
     },
     {
       "order": 2,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "夏目遼",
       "position": "野党理事、地域事業者の費用負担を質す",
@@ -97,8 +93,6 @@
     },
     {
       "order": 3,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "地域観光再生調査会 議長",
       "position": "衆議院",

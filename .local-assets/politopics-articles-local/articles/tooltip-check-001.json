@@ -20,8 +20,6 @@
   "dialogs": [
     {
       "order": 1,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "回答",
       "speaker": "テスト太郎",
       "position": "テスト役職",

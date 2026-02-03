@@ -28,8 +28,6 @@
   "dialogs": [
     {
       "order": 1,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "賛成",
       "speaker": "長尾 真",
       "position": "与党議員",
@@ -65,8 +63,6 @@
     },
     {
       "order": 2,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "反対",
       "speaker": "小林 紗季",
       "position": "野党議員",
@@ -102,8 +98,6 @@
     },
     {
       "order": 3,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "質問",
       "speaker": "田中 麗奈",
       "position": "参考人",
@@ -139,8 +133,6 @@
     },
     {
       "order": 4,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "回答",
       "speaker": "森本 啓介",
       "position": "委員長",
@@ -176,8 +168,6 @@
     },
     {
       "order": 5,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "大島 優",
       "position": "政府参考人",
@@ -213,8 +203,6 @@
     },
     {
       "order": 6,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "賛成",
       "speaker": "長尾 真",
       "position": "与党議員",
@@ -250,8 +238,6 @@
     },
     {
       "order": 7,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "反対",
       "speaker": "小林 紗季",
       "position": "野党議員",
@@ -287,8 +273,6 @@
     },
     {
       "order": 8,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "質問",
       "speaker": "田中 麗奈",
       "position": "参考人",
@@ -324,8 +308,6 @@
     },
     {
       "order": 9,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "回答",
       "speaker": "森本 啓介",
       "position": "委員長",
@@ -361,8 +343,6 @@
     },
     {
       "order": 10,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "大島 優",
       "position": "政府参考人",
@@ -398,8 +378,6 @@
     },
     {
       "order": 11,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "賛成",
       "speaker": "長尾 真",
       "position": "与党議員",
@@ -435,8 +413,6 @@
     },
     {
       "order": 12,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "反対",
       "speaker": "小林 紗季",
       "position": "野党議員",
@@ -472,8 +448,6 @@
     },
     {
       "order": 13,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "質問",
       "speaker": "田中 麗奈",
       "position": "参考人",
@@ -509,8 +483,6 @@
     },
     {
       "order": 14,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "回答",
       "speaker": "森本 啓介",
       "position": "委員長",
@@ -546,8 +518,6 @@
     },
     {
       "order": 15,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "大島 優",
       "position": "政府参考人",
@@ -583,8 +553,6 @@
     },
     {
       "order": 16,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "賛成",
       "speaker": "長尾 真",
       "position": "与党議員",
@@ -620,8 +588,6 @@
     },
     {
       "order": 17,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "反対",
       "speaker": "小林 紗季",
       "position": "野党議員",
@@ -657,8 +623,6 @@
     },
     {
       "order": 18,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "質問",
       "speaker": "田中 麗奈",
       "position": "参考人",
@@ -694,8 +658,6 @@
     },
     {
       "order": 19,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "回答",
       "speaker": "森本 啓介",
       "position": "委員長",
@@ -731,8 +693,6 @@
     },
     {
       "order": 20,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "大島 優",
       "position": "政府参考人",
@@ -768,8 +728,6 @@
     },
     {
       "order": 21,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "賛成",
       "speaker": "長尾 真",
       "position": "与党議員",
@@ -805,8 +763,6 @@
     },
     {
       "order": 22,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "反対",
       "speaker": "小林 紗季",
       "position": "野党議員",
@@ -842,8 +798,6 @@
     },
     {
       "order": 23,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "質問",
       "speaker": "田中 麗奈",
       "position": "参考人",
@@ -879,8 +833,6 @@
     },
     {
       "order": 24,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "回答",
       "speaker": "森本 啓介",
       "position": "委員長",
@@ -916,8 +868,6 @@
     },
     {
       "order": 25,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "大島 優",
       "position": "政府参考人",
@@ -953,8 +903,6 @@
     },
     {
       "order": 26,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "賛成",
       "speaker": "長尾 真",
       "position": "与党議員",
@@ -990,8 +938,6 @@
     },
     {
       "order": 27,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "反対",
       "speaker": "小林 紗季",
       "position": "野党議員",
@@ -1027,8 +973,6 @@
     },
     {
       "order": 28,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "質問",
       "speaker": "田中 麗奈",
       "position": "参考人",
@@ -1064,8 +1008,6 @@
     },
     {
       "order": 29,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "回答",
       "speaker": "森本 啓介",
       "position": "委員長",
@@ -1101,8 +1043,6 @@
     },
     {
       "order": 30,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "大島 優",
       "position": "政府参考人",
@@ -1138,8 +1078,6 @@
     },
     {
       "order": 31,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "賛成",
       "speaker": "長尾 真",
       "position": "与党議員",
@@ -1175,8 +1113,6 @@
     },
     {
       "order": 32,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "反対",
       "speaker": "小林 紗季",
       "position": "野党議員",
@@ -1212,8 +1148,6 @@
     },
     {
       "order": 33,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "質問",
       "speaker": "田中 麗奈",
       "position": "参考人",
@@ -1249,8 +1183,6 @@
     },
     {
       "order": 34,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "回答",
       "speaker": "森本 啓介",
       "position": "委員長",
@@ -1286,8 +1218,6 @@
     },
     {
       "order": 35,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "大島 優",
       "position": "政府参考人",
@@ -1323,8 +1253,6 @@
     },
     {
       "order": 36,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "賛成",
       "speaker": "長尾 真",
       "position": "与党議員",
@@ -1360,8 +1288,6 @@
     },
     {
       "order": 37,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "反対",
       "speaker": "小林 紗季",
       "position": "野党議員",
@@ -1397,8 +1323,6 @@
     },
     {
       "order": 38,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "質問",
       "speaker": "田中 麗奈",
       "position": "参考人",
@@ -1434,8 +1358,6 @@
     },
     {
       "order": 39,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "回答",
       "speaker": "森本 啓介",
       "position": "委員長",
@@ -1471,8 +1393,6 @@
     },
     {
       "order": 40,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "大島 優",
       "position": "政府参考人",
@@ -1508,8 +1428,6 @@
     },
     {
       "order": 41,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "賛成",
       "speaker": "長尾 真",
       "position": "与党議員",
@@ -1545,8 +1463,6 @@
     },
     {
       "order": 42,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "反対",
       "speaker": "小林 紗季",
       "position": "野党議員",
@@ -1582,8 +1498,6 @@
     },
     {
       "order": 43,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "質問",
       "speaker": "田中 麗奈",
       "position": "参考人",
@@ -1619,8 +1533,6 @@
     },
     {
       "order": 44,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "回答",
       "speaker": "森本 啓介",
       "position": "委員長",
@@ -1656,8 +1568,6 @@
     },
     {
       "order": 45,
-      "summary": "- セクションに要点を整理しました。",
-      "soft_language": "- セクションでやさしく整理しました。",
       "reaction": "中立",
       "speaker": "大島 優",
       "position": "政府参考人",
