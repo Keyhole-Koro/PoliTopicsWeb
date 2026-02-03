@@ -14,7 +14,6 @@ export type Reaction = "賛成" | "反対" | "質問" | "回答" | "中立";
 export type Dialog = {
     order: number;
     summary_sections: DialogSection[];
-    soft_language_sections: DialogSection[];
     reaction: Reaction;
     qa?: {
         ask: {

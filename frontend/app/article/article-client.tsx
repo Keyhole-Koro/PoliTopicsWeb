@@ -87,7 +87,6 @@ export function ArticleClient({ issueId }: Props) {
     speaker_role: dialog.position ?? "発言者",
     summary_sections: dialog.summary_sections ?? [],
     original_text: dialog.original_text,
-    soft_language_sections: dialog.soft_language_sections ?? [],
     reaction: dialog.reaction,
     qa: dialog.qa,
     response_to: [],

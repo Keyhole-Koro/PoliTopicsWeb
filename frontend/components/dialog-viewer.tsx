@@ -18,13 +18,12 @@ import {
   ChevronDown,
   ChevronUp,
   FileText,
-  Zap,
   BookOpen,
 } from "lucide-react"
 import type { JSX } from "react/jsx-runtime"
 
 type ViewerReaction = ArticleReaction
-type ViewMode = "original" | "soft_summary" | "summary"
+type ViewMode = "original" | "summary"
 
 const VIEW_MODE_STORAGE_KEY = "politopics_dialog_view_mode"
 
@@ -36,7 +35,6 @@ export interface Dialog {
   speaker_role: string
   summary_sections: DialogSection[]
   original_text: string
-  soft_language_sections: DialogSection[]
   reaction?: ViewerReaction
   qa?: {
     ask: {
@@ -370,14 +368,15 @@ export function DialogViewer({
   const anchorOrderRef = useRef<number | null>(null)
   const scrollContainersRef = useRef<Record<ViewMode, HTMLDivElement | null>>({
     original: null,
-    soft_summary: null,
     summary: null,
   })
 
   useEffect(() => {
     try {
       const stored = localStorage.getItem(VIEW_MODE_STORAGE_KEY)
-      if (stored === "original" || stored === "soft_summary" || stored === "summary") {
+      if (stored === "soft_summary") {
+        setViewMode("summary")
+      } else if (stored === "original" || stored === "summary") {
         setViewMode(stored)
       }
     } catch {
@@ -422,7 +421,6 @@ export function DialogViewer({
         .join(" ")
       const sectionText = [
         getSectionSearchText(dialog.summary_sections),
-        getSectionSearchText(dialog.soft_language_sections),
       ]
         .join(" ")
         .trim()
@@ -608,11 +606,9 @@ export function DialogViewer({
             : []
         const hasQa = qaItems.some((qa) => qa.ask?.question && qa.answer)
         const rawSections =
-          viewMode === "soft_summary"
-            ? dialog.soft_language_sections
-            : viewMode === "summary"
-              ? dialog.summary_sections
-              : undefined
+          viewMode === "summary"
+            ? dialog.summary_sections
+            : undefined
         const normalizedSections = normalizeSections(rawSections)
         const renderedContent =
           viewMode === "original"
@@ -645,7 +641,7 @@ export function DialogViewer({
                       </Badge>
                     ) : null}
                     <Badge variant="secondary" className="text-xs">
-                      {viewMode === "original" ? "原文" : viewMode === "soft_summary" ? "やさしい" : "詳細"}
+                      {viewMode === "original" ? "原文" : "詳細"}
                     </Badge>
                   </div>
                   <div className="text-sm text-muted-foreground leading-snug break-words whitespace-pre-line">
@@ -841,12 +837,6 @@ export function DialogViewer({
                         原文
                       </div>
                     </SelectItem>
-                    <SelectItem value="soft_summary">
-                      <div className="flex items-center gap-2">
-                        <Zap className="w-4 h-4" />
-                        やさしい言葉
-                      </div>
-                    </SelectItem>
                     <SelectItem value="summary">
                       <div className="flex items-center gap-2">
                         <BookOpen className="w-4 h-4" />
@@ -877,14 +867,10 @@ export function DialogViewer({
 
         {/* View Mode Tabs */}
         <Tabs value={viewMode} onValueChange={(value) => handleViewModeChange(value as ViewMode)}>
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="original" className="flex items-center gap-2">
               <FileText className="w-4 h-4" />
               原文表示
-            </TabsTrigger>
-            <TabsTrigger value="soft_summary" className="flex items-center gap-2">
-              <Zap className="w-4 h-4" />
-              やさしい言葉
             </TabsTrigger>
             <TabsTrigger value="summary" className="flex items-center gap-2">
               <BookOpen className="w-4 h-4" />
@@ -898,18 +884,6 @@ export function DialogViewer({
             ) : (
               <div ref={(node) => {
                 scrollContainersRef.current.original = node
-              }}>
-                <ScrollArea className={`${dialogListHeightClass} pr-1`}>{renderSummaryCards()}</ScrollArea>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="soft_summary" className="space-y-4">
-            {!hasDialogs ? (
-              emptyState
-            ) : (
-              <div ref={(node) => {
-                scrollContainersRef.current.soft_summary = node
               }}>
                 <ScrollArea className={`${dialogListHeightClass} pr-1`}>{renderSummaryCards()}</ScrollArea>
               </div>
