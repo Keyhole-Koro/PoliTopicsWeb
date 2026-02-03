@@ -266,14 +266,26 @@ function renderTextWithOrders(
 
 function normalizeSections(sections?: DialogSection[]): DialogSection[] {
   if (!Array.isArray(sections)) return []
+  const isDialogSectionTitle = (value: unknown): value is DialogSectionTitle =>
+    value === "主張" ||
+    value === "説明" ||
+    value === "質問" ||
+    value === "回答" ||
+    value === "根拠" ||
+    value === "影響" ||
+    value === "次の対応" ||
+    value === "決定"
   return sections
-    .map((section) => ({
-      title: typeof section.title === "string" ? section.title.trim() : "",
-      bullets: Array.isArray(section.bullets)
+    .map((section) => {
+      const title = typeof section.title === "string" ? section.title.trim() : ""
+      const bullets = Array.isArray(section.bullets)
         ? section.bullets.map((bullet) => bullet.trim()).filter(Boolean)
-        : [],
-    }))
-    .filter((section) => section.title.length > 0 || section.bullets.length > 0)
+        : []
+      return { title, bullets }
+    })
+    .filter((section): section is DialogSection => {
+      return isDialogSectionTitle(section.title) && section.bullets.length > 0
+    })
 }
 
 function getSectionSearchText(sections?: DialogSection[]): string {
