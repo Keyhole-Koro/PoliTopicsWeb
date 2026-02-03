@@ -4,12 +4,12 @@ import { useEffect, useState } from "react"
 
 
 export function MaintenancePopup() {
-  const [visible, setVisible] = useState(true)
+  const [visible, setVisible] = useState(false)
 
   useEffect(() => {
     const env = process.env.NEXT_PUBLIC_APP_ENV
 
-    setVisible(true)
+    setVisible(false)
   }, [])
 
   if (!visible) return null

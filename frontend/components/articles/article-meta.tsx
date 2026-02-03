@@ -34,9 +34,6 @@ export function ArticleMeta({ article }: Props) {
             第{article.session}回国会
           </div>
         ) : null}
-        <Badge variant="outline" className="text-xs uppercase tracking-[0.2em]">
-          ISSUE {article.id}
-        </Badge>
       </div>
 
       <h1 className="text-4xl font-serif font-bold leading-tight text-foreground">{article.title}</h1>

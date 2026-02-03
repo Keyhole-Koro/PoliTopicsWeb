@@ -367,16 +367,16 @@ function renderSectionedText(
                   }`}
                 />
                 <div className="flex-1 space-y-1">
-                  <div className="text-xs text-foreground">
+                  <div className="text-sm text-foreground">
                     {renderTextWithOrders(bullet.point, terms, onOrdersClick)}
                   </div>
                   {bullet.quote ? (
-                    <div className="rounded-md border border-border/60 bg-background/70 px-2 py-1 text-[11px] italic text-muted-foreground">
+                    <div className="rounded-md border border-border/60 bg-background/70 px-3 py-2 text-xs italic text-muted-foreground">
                       「{renderTextWithOrders(bullet.quote, terms, onOrdersClick)}」
                     </div>
                   ) : null}
                   {bullet.detail ? (
-                    <div className="text-[11px] text-muted-foreground">
+                    <div className="text-xs text-muted-foreground">
                       {renderTextWithOrders(bullet.detail, terms, onOrdersClick)}
                     </div>
                   ) : null}
