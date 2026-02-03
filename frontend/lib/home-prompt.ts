@@ -20,10 +20,11 @@ export const HOME_PROMPT = `以下の会話内容をもとに、次の形式で�
 5. **発言ごとの要約（Dialogs）**  
 　各発言について、以下の情報を含めて記述してください：
 
-　- \`summary\`: その発言の主旨を簡潔に要約してください。  
-　- \`soft_language\`: 一般読者にも伝わるように、やさしく丁寧に言い換えてください。話者の意図や背景も補足すると親切です。  
-　- \`order\`, \`speaker\`, \`speaker_group\`, \`speaker_position\`, \`speaker_role\`：それぞれの発言者情報を記載してください。  
-　- \`response_to\`: この発言がどの発言に対する反応かを明示してください（例：質問、賛同、反論など）。
+　- `summary_sections` / `soft_language_sections`: セクション配列で要点を整理してください。  
+　　`title` は「主張 / 説明 / 質問 / 回答 / 根拠 / 影響 / 次の対応 / 決定」のいずれかを使用してください。  
+　　`soft_language_sections` は `summary_sections` をやさしく言い換えた内容にしてください。  
+　- `order`, `speaker`, `speaker_group`, `speaker_position`, `speaker_role`：それぞれの発言者情報を記載してください。  
+　- `response_to`: この発言がどの発言に対する反応かを明示してください（例：質問、賛同、反論など）。
 
 6. **参加者情報（Participants）**  
 　主な話者ごとに、名前・役職・発言内容の要旨をまとめてください。
@@ -72,8 +73,12 @@ export const HOME_PROMPT = `以下の会話内容をもとに、次の形式で�
       "speaker_group": "所属",
       "speaker_position": "役職",
       "speaker_role": "役割",
-      "summary": "発言内容の要約",
-      "soft_language": "発言の内容を、政治に詳しくない人でも理解できるように説明した文章",
+      "summary_sections": [
+        { "title": "主張", "bullets": ["発言内容の要約"] }
+      ],
+      "soft_language_sections": [
+        { "title": "主張", "bullets": ["やさしく言い換えた要約"] }
+      ],
       "response_to": [
         {
           "id": 発言ID,

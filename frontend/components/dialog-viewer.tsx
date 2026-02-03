@@ -34,11 +34,9 @@ export interface Dialog {
   speaker_group: string
   speaker_position: string
   speaker_role: string
-  summary: string
-  summary_sections?: DialogSection[]
+  summary_sections: DialogSection[]
   original_text: string
-  soft_summary: string
-  soft_language_sections?: DialogSection[]
+  soft_language_sections: DialogSection[]
   reaction?: ViewerReaction
   qa?: {
     ask: {
@@ -73,6 +71,7 @@ export type DialogSectionTitle =
   | "根拠"
   | "影響"
   | "次の対応"
+  | "決定"
 
 export interface DialogSection {
   title: DialogSectionTitle
@@ -302,6 +301,7 @@ function renderSectionedText(
     根拠: { base: "border-emerald-200/70 bg-emerald-50/70", dot: "bg-emerald-400/70" },
     影響: { base: "border-rose-200/70 bg-rose-50/70", dot: "bg-rose-400/70" },
     次の対応: { base: "border-lime-200/70 bg-lime-50/70", dot: "bg-lime-400/70" },
+    決定: { base: "border-teal-200/70 bg-teal-50/70", dot: "bg-teal-400/70" },
   }
 
   return (
@@ -416,9 +416,7 @@ export function DialogViewer({
         .trim()
       const matchesSearch =
         searchTerm === "" ||
-        dialog.summary.toLowerCase().includes(normalizedSearch) ||
         dialog.speaker.toLowerCase().includes(normalizedSearch) ||
-        dialog.soft_summary.toLowerCase().includes(normalizedSearch) ||
         dialog.original_text.toLowerCase().includes(normalizedSearch) ||
         qaText.toLowerCase().includes(normalizedSearch) ||
         sectionText.toLowerCase().includes(normalizedSearch)
@@ -597,12 +595,6 @@ export function DialogViewer({
             ? [dialog.qa]
             : []
         const hasQa = qaItems.some((qa) => qa.ask?.question && qa.answer)
-        const displayText =
-          viewMode === "original"
-            ? dialog.original_text
-            : viewMode === "soft_summary"
-              ? dialog.soft_summary
-              : dialog.summary
         const rawSections =
           viewMode === "soft_summary"
             ? dialog.soft_language_sections
@@ -611,9 +603,13 @@ export function DialogViewer({
               : undefined
         const normalizedSections = normalizeSections(rawSections)
         const renderedContent =
-          normalizedSections.length > 0
-            ? renderSectionedText(normalizedSections, terms, applyOrderFilter)
-            : renderTextWithOrders(displayText, terms, applyOrderFilter)
+          viewMode === "original"
+            ? renderTextWithOrders(originalText, terms, applyOrderFilter)
+            : normalizedSections.length > 0
+              ? renderSectionedText(normalizedSections, terms, applyOrderFilter)
+              : (
+                <span className="text-muted-foreground">要約セクションは準備中です。</span>
+              )
 
         return (
           <Card

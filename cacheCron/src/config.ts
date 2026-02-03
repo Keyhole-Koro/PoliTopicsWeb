@@ -33,7 +33,7 @@ export type AppConfig = {
 export const APP_CONFIG: Record<AppEnvironment, AppConfig> = {
   local: {
     environment: "local",
-    api: { url: "http://127.0.0.1:4500", path: "/headlines", limit: 50, requestTimeoutMs: 10_000 },
+    api: { url: "http://127.0.0.1:4500", path: "/headlines", limit: 25, requestTimeoutMs: 10_000 },
     bucket: {
       name: "politopics-frontend-local",
       indexHtmlKey: "index.html",
@@ -49,7 +49,7 @@ export const APP_CONFIG: Record<AppEnvironment, AppConfig> = {
     api: {
       url: "",
       path: "/headlines",
-      limit: 50,
+      limit: 25,
       requestTimeoutMs: 10_000,
     },
     bucket: {
@@ -64,7 +64,7 @@ export const APP_CONFIG: Record<AppEnvironment, AppConfig> = {
   },
   prod: {
     environment: "prod",
-    api: { url: "https://api.politopics.net", path: "/headlines", limit: 50, requestTimeoutMs: 10_000 },
+    api: { url: "https://api.politopics.net", path: "/headlines", limit: 25, requestTimeoutMs: 10_000 },
     bucket: {
       name: "politopics-frontend-prod",
       indexHtmlKey: "index.html",

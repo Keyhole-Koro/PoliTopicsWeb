@@ -33,8 +33,6 @@
     "dialogs": [
       {
         "order": 1,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "回答",
         "speaker": "テスト太郎",
         "position": "テスト役職",
@@ -151,8 +149,6 @@
     "dialogs": [
       {
         "order": 1,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "河野桜",
         "position": "環境大臣、太陽光ストレージ導入を推進",
@@ -188,8 +184,6 @@
       },
       {
         "order": 2,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "山崎拓海",
         "position": "野党筆頭理事、需要家データ活用を提案",
@@ -225,8 +219,6 @@
       },
       {
         "order": 3,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "環境委員会 議長",
         "position": "参議院",
@@ -327,8 +319,6 @@
     "dialogs": [
       {
         "order": 1,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "早瀬詩央",
         "position": "内閣府特命担当相、自治体との共有基盤を構築と説明",
@@ -364,8 +354,6 @@
       },
       {
         "order": 2,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "蓮見翔太",
         "position": "与党理事、国内ファイバーの敷設進捗を報告",
@@ -401,8 +389,6 @@
       },
       {
         "order": 3,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "科学技術・イノベーション特別委員会 議長",
         "position": "衆議院",
@@ -506,8 +492,6 @@
     "dialogs": [
       {
         "order": 1,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "黒崎環",
         "position": "国交副大臣、基金枠の増額と共済調整を説明",
@@ -543,8 +527,6 @@
       },
       {
         "order": 2,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "新藤空",
         "position": "野党理事、被災証明の簡素化を要請",
@@ -580,8 +562,6 @@
       },
       {
         "order": 3,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "国土交通委員会 議長",
         "position": "参議院",
@@ -685,8 +665,6 @@
     "dialogs": [
       {
         "order": 1,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "如月瞳",
         "position": "厚労副大臣、医療情報監査ログの可視化を説明",
@@ -722,8 +700,6 @@
       },
       {
         "order": 2,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "仁科湊人",
         "position": "与党理事、救急現場の端末更新費を示す",
@@ -759,8 +735,6 @@
       },
       {
         "order": 3,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "厚生労働委員会 議長",
         "position": "衆議院",
@@ -864,8 +838,6 @@
     "dialogs": [
       {
         "order": 1,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "海老原結衣",
         "position": "環境副大臣、監視データを共有するAPIを開発と説明",
@@ -901,8 +873,6 @@
       },
       {
         "order": 2,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "波多野碧",
         "position": "野党理事、港湾管理者の費用負担を懸念",
@@ -938,8 +908,6 @@
       },
       {
         "order": 3,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "海洋プラスチック対策特別委員会 議長",
         "position": "参議院",
@@ -1043,8 +1011,6 @@
     "dialogs": [
       {
         "order": 1,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "千秋遥",
         "position": "観光副大臣、実証経費の1/2を国が補助と説明",
@@ -1080,8 +1046,6 @@
       },
       {
         "order": 2,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "夏目遼",
         "position": "野党理事、地域事業者の費用負担を質す",
@@ -1117,8 +1081,6 @@
       },
       {
         "order": 3,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "地域観光再生調査会 議長",
         "position": "衆議院",
@@ -1218,8 +1180,6 @@
     "dialogs": [
       {
         "order": 1,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "白川つかさ",
         "position": "委員長、物価高騰の影響を指摘",
@@ -1255,8 +1215,6 @@
       },
       {
         "order": 2,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "市川航",
         "position": "与党理事、農水省と連携した食材確保を説明",
@@ -1292,8 +1250,6 @@
       },
       {
         "order": 3,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "子ども政策特別委員会 議長",
         "position": "衆議院",
@@ -1393,8 +1349,6 @@
     "dialogs": [
       {
         "order": 1,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "田代蓮",
         "position": "PT座長、自治体毎のダッシュボード提供を示唆",
@@ -1430,8 +1384,6 @@
       },
       {
         "order": 2,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "松浦梢",
         "position": "国交政務官、地方創生交付金で支援すると表明",
@@ -1467,8 +1419,6 @@
       },
       {
         "order": 3,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "交通政策調査会PT 議長",
         "position": "衆議院",
@@ -1568,8 +1518,6 @@
     "dialogs": [
       {
         "order": 1,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "宮尾慎",
         "position": "与党筆頭理事、自治体操作研修の拡充を要望",
@@ -1605,8 +1553,6 @@
       },
       {
         "order": 2,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "佐伯玲奈",
         "position": "気象庁審議官、データ統合の仕様を説明",
@@ -1642,8 +1588,6 @@
       },
       {
         "order": 3,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "災害対策特別委員会 議長",
         "position": "参議院",
@@ -1743,8 +1687,6 @@
     "dialogs": [
       {
         "order": 1,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "榊原渚",
         "position": "委員長、国産技術移転の道筋を質問",
@@ -1780,8 +1722,6 @@
       },
       {
         "order": 2,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "遠藤魁",
         "position": "防衛副大臣、国際共同研究の工程を説明",
@@ -1817,8 +1757,6 @@
       },
       {
         "order": 3,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "外交防衛委員会 議長",
         "position": "参議院",
@@ -1918,8 +1856,6 @@
     "dialogs": [
       {
         "order": 1,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "高橋令",
         "position": "与党理事、利用者安全基準の策定を示唆",
@@ -1955,8 +1891,6 @@
       },
       {
         "order": 2,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "折坂空",
         "position": "野党理事、地方中小事業者の伴走支援を要望",
@@ -1992,8 +1926,6 @@
       },
       {
         "order": 3,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "厚生労働委員会 議長",
         "position": "衆議院",
@@ -2093,8 +2025,6 @@
     "dialogs": [
       {
         "order": 1,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "新名司",
         "position": "デジタル大臣、副作用リスク評価を強調",
@@ -2130,8 +2060,6 @@
       },
       {
         "order": 2,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "上谷りか",
         "position": "参考人、OSSライセンス管理の支援を求める",
@@ -2167,8 +2095,6 @@
       },
       {
         "order": 3,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "デジタル特別委員会 議長",
         "position": "衆議院",
@@ -2268,8 +2194,6 @@
     "dialogs": [
       {
         "order": 1,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "黒澤由衣",
         "position": "委員長、技術流出対策の強化を指示",
@@ -2305,8 +2229,6 @@
       },
       {
         "order": 2,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "久遠真",
         "position": "経産副大臣、供給網補助の詳細を説明",
@@ -2342,8 +2264,6 @@
       },
       {
         "order": 3,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "経済産業委員会 議長",
         "position": "参議院",
@@ -2443,8 +2363,6 @@
     "dialogs": [
       {
         "order": 1,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "石坂真緒",
         "position": "委員長、地域局のコスト負担を懸念",
@@ -2480,8 +2398,6 @@
       },
       {
         "order": 2,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "成瀬祐真",
         "position": "総務副大臣、助成制度を検討と回答",
@@ -2517,8 +2433,6 @@
       },
       {
         "order": 3,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "総務委員会 議長",
         "position": "衆議院",
@@ -2618,8 +2532,6 @@
     "dialogs": [
       {
         "order": 1,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "相原悠",
         "position": "農水相、備蓄管理のデジタル化を説明",
@@ -2655,8 +2567,6 @@
       },
       {
         "order": 2,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "佐々木歩",
         "position": "野党代表、農地確保支援の継続を求める",
@@ -2692,8 +2602,6 @@
       },
       {
         "order": 3,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "本会議 議長",
         "position": "衆議院",
@@ -2804,8 +2712,6 @@
     "dialogs": [
       {
         "order": 1,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "賛成",
         "speaker": "長尾 真",
         "position": "与党議員",
@@ -2841,8 +2747,6 @@
       },
       {
         "order": 2,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "反対",
         "speaker": "小林 紗季",
         "position": "野党議員",
@@ -2878,8 +2782,6 @@
       },
       {
         "order": 3,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "質問",
         "speaker": "田中 麗奈",
         "position": "参考人",
@@ -2915,8 +2817,6 @@
       },
       {
         "order": 4,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "回答",
         "speaker": "森本 啓介",
         "position": "委員長",
@@ -2952,8 +2852,6 @@
       },
       {
         "order": 5,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "大島 優",
         "position": "政府参考人",
@@ -2989,8 +2887,6 @@
       },
       {
         "order": 6,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "賛成",
         "speaker": "長尾 真",
         "position": "与党議員",
@@ -3026,8 +2922,6 @@
       },
       {
         "order": 7,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "反対",
         "speaker": "小林 紗季",
         "position": "野党議員",
@@ -3063,8 +2957,6 @@
       },
       {
         "order": 8,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "質問",
         "speaker": "田中 麗奈",
         "position": "参考人",
@@ -3100,8 +2992,6 @@
       },
       {
         "order": 9,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "回答",
         "speaker": "森本 啓介",
         "position": "委員長",
@@ -3137,8 +3027,6 @@
       },
       {
         "order": 10,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "大島 優",
         "position": "政府参考人",
@@ -3174,8 +3062,6 @@
       },
       {
         "order": 11,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "賛成",
         "speaker": "長尾 真",
         "position": "与党議員",
@@ -3211,8 +3097,6 @@
       },
       {
         "order": 12,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "反対",
         "speaker": "小林 紗季",
         "position": "野党議員",
@@ -3248,8 +3132,6 @@
       },
       {
         "order": 13,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "質問",
         "speaker": "田中 麗奈",
         "position": "参考人",
@@ -3285,8 +3167,6 @@
       },
       {
         "order": 14,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "回答",
         "speaker": "森本 啓介",
         "position": "委員長",
@@ -3322,8 +3202,6 @@
       },
       {
         "order": 15,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "大島 優",
         "position": "政府参考人",
@@ -3359,8 +3237,6 @@
       },
       {
         "order": 16,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "賛成",
         "speaker": "長尾 真",
         "position": "与党議員",
@@ -3396,8 +3272,6 @@
       },
       {
         "order": 17,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "反対",
         "speaker": "小林 紗季",
         "position": "野党議員",
@@ -3433,8 +3307,6 @@
       },
       {
         "order": 18,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "質問",
         "speaker": "田中 麗奈",
         "position": "参考人",
@@ -3470,8 +3342,6 @@
       },
       {
         "order": 19,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "回答",
         "speaker": "森本 啓介",
         "position": "委員長",
@@ -3507,8 +3377,6 @@
       },
       {
         "order": 20,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "大島 優",
         "position": "政府参考人",
@@ -3544,8 +3412,6 @@
       },
       {
         "order": 21,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "賛成",
         "speaker": "長尾 真",
         "position": "与党議員",
@@ -3581,8 +3447,6 @@
       },
       {
         "order": 22,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "反対",
         "speaker": "小林 紗季",
         "position": "野党議員",
@@ -3618,8 +3482,6 @@
       },
       {
         "order": 23,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "質問",
         "speaker": "田中 麗奈",
         "position": "参考人",
@@ -3655,8 +3517,6 @@
       },
       {
         "order": 24,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "回答",
         "speaker": "森本 啓介",
         "position": "委員長",
@@ -3692,8 +3552,6 @@
       },
       {
         "order": 25,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "大島 優",
         "position": "政府参考人",
@@ -3729,8 +3587,6 @@
       },
       {
         "order": 26,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "賛成",
         "speaker": "長尾 真",
         "position": "与党議員",
@@ -3766,8 +3622,6 @@
       },
       {
         "order": 27,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "反対",
         "speaker": "小林 紗季",
         "position": "野党議員",
@@ -3803,8 +3657,6 @@
       },
       {
         "order": 28,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "質問",
         "speaker": "田中 麗奈",
         "position": "参考人",
@@ -3840,8 +3692,6 @@
       },
       {
         "order": 29,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "回答",
         "speaker": "森本 啓介",
         "position": "委員長",
@@ -3877,8 +3727,6 @@
       },
       {
         "order": 30,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "大島 優",
         "position": "政府参考人",
@@ -3914,8 +3762,6 @@
       },
       {
         "order": 31,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "賛成",
         "speaker": "長尾 真",
         "position": "与党議員",
@@ -3951,8 +3797,6 @@
       },
       {
         "order": 32,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "反対",
         "speaker": "小林 紗季",
         "position": "野党議員",
@@ -3988,8 +3832,6 @@
       },
       {
         "order": 33,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "質問",
         "speaker": "田中 麗奈",
         "position": "参考人",
@@ -4025,8 +3867,6 @@
       },
       {
         "order": 34,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "回答",
         "speaker": "森本 啓介",
         "position": "委員長",
@@ -4062,8 +3902,6 @@
       },
       {
         "order": 35,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "大島 優",
         "position": "政府参考人",
@@ -4099,8 +3937,6 @@
       },
       {
         "order": 36,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "賛成",
         "speaker": "長尾 真",
         "position": "与党議員",
@@ -4136,8 +3972,6 @@
       },
       {
         "order": 37,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "反対",
         "speaker": "小林 紗季",
         "position": "野党議員",
@@ -4173,8 +4007,6 @@
       },
       {
         "order": 38,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "質問",
         "speaker": "田中 麗奈",
         "position": "参考人",
@@ -4210,8 +4042,6 @@
       },
       {
         "order": 39,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "回答",
         "speaker": "森本 啓介",
         "position": "委員長",
@@ -4247,8 +4077,6 @@
       },
       {
         "order": 40,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "大島 優",
         "position": "政府参考人",
@@ -4284,8 +4112,6 @@
       },
       {
         "order": 41,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "賛成",
         "speaker": "長尾 真",
         "position": "与党議員",
@@ -4321,8 +4147,6 @@
       },
       {
         "order": 42,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "反対",
         "speaker": "小林 紗季",
         "position": "野党議員",
@@ -4358,8 +4182,6 @@
       },
       {
         "order": 43,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "質問",
         "speaker": "田中 麗奈",
         "position": "参考人",
@@ -4395,8 +4217,6 @@
       },
       {
         "order": 44,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "回答",
         "speaker": "森本 啓介",
         "position": "委員長",
@@ -4432,8 +4252,6 @@
       },
       {
         "order": 45,
-        "summary": "- セクションに要点を整理しました。",
-        "soft_language": "- セクションでやさしく整理しました。",
         "reaction": "中立",
         "speaker": "大島 優",
         "position": "政府参考人",

@@ -85,11 +85,9 @@ export function ArticleClient({ issueId }: Props) {
     speaker_group: dialog.position ?? "",
     speaker_position: dialog.position ?? "",
     speaker_role: dialog.position ?? "発言者",
-    summary: dialog.summary,
-    summary_sections: dialog.summary_sections,
+    summary_sections: dialog.summary_sections ?? [],
     original_text: dialog.original_text,
-    soft_summary: dialog.soft_language,
-    soft_language_sections: dialog.soft_language_sections,
+    soft_language_sections: dialog.soft_language_sections ?? [],
     reaction: dialog.reaction,
     qa: dialog.qa,
     response_to: [],
@@ -203,7 +201,12 @@ export function ArticleClient({ issueId }: Props) {
                 <div key={participant.name} className="space-y-1 border-b pb-3 last:border-b-0 last:pb-0">
                   <p className="font-semibold text-foreground">{participant.name}</p>
                   {participant.position && <p className="text-xs text-muted-foreground">{participant.position}</p>}
-                  <p className="text-sm text-muted-foreground">{participant.summary}</p>
+                  <Markdown
+                    content={participant.summary ?? ""}
+                    className="text-sm text-muted-foreground"
+                    terms={termDetails}
+                    onOrderClick={handleOrderJump}
+                  />
                 </div>
               ))}
             </div>

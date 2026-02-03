@@ -19,7 +19,8 @@ export type DialogSectionTitle =
   | "回答"
   | "根拠"
   | "影響"
-  | "次の対応";
+  | "次の対応"
+  | "決定";
 
 export type DialogSection = {
   title: DialogSectionTitle;
@@ -30,10 +31,8 @@ export type Reaction = "賛成" | "反対" | "質問" | "回答" | "中立";
 
 export type Dialog = {
   order: number;
-  summary: string;
-  summary_sections?: DialogSection[];
-  soft_language: string;
-  soft_language_sections?: DialogSection[];
+  summary_sections: DialogSection[];
+  soft_language_sections: DialogSection[];
   reaction: Reaction;
   original_text: string;
   speaker?: string;
