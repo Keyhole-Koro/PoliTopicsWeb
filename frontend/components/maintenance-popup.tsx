@@ -22,7 +22,7 @@ export function MaintenancePopup() {
           <h2 className="text-3xl font-semibold text-foreground">現在メンテナンス中です</h2>
           <p className="text-base leading-relaxed text-muted-foreground">
             ただいまシステムの更新作業を行っています。<br />
-            本日午後3時に終わる予定です。
+            本日午後6時に終わる予定です。
           </p>
           <button
             type="button"

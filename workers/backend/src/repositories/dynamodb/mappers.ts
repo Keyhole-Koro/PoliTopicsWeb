@@ -16,6 +16,7 @@ export function mapIndexToSummary(item: DynamoIndexItem): ArticleSummary | undef
 
   return {
     id: item.articleId ?? item.PK?.split("#").pop() ?? "",
+    issueID: item.issueID,
     title: item.title ?? "",
     description: item.description ?? "",
     date: item.date ?? "",
@@ -37,6 +38,7 @@ export function mapItemToArticle(item: DynamoArticleItem, asset?: ArticleAssetDa
   const id = rawId ? rawId.replace("A#", "") : "";
   return {
     id,
+    issueID: item.issueID,
     title: item.title ?? "",
     description: item.description ?? "",
     date: item.date ?? "",
@@ -63,6 +65,7 @@ export function mapItemToArticle(item: DynamoArticleItem, asset?: ArticleAssetDa
 export function toSummary(article: Article): ArticleSummary {
   return {
     id: article.id,
+    issueID: article.issueID,
     title: article.title,
     description: article.description,
     date: article.date,

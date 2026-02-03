@@ -12,6 +12,7 @@ import type {
 export type DynamoArticleItem = {
   PK: string;
   SK: string;
+  issueID?: string;
   title: string;
   description: string;
   date: string;
@@ -37,6 +38,7 @@ export type DynamoArticleItem = {
 export type DynamoIndexItem = {
   PK: string;
   SK: string;
+  issueID?: string;
   articleId: string;
   title: string;
   description?: string;

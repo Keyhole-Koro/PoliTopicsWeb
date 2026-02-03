@@ -61,6 +61,7 @@ export type ArticleImageKind = "会議録" | "目次" | "索引" | "附録" | "�
 
 export type ArticleSummary = {
   id: string;
+  issueID?: string;
   title: string;
   description: string;
   date: string;
