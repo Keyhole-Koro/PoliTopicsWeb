@@ -73,7 +73,13 @@ export type DialogSectionTitle =
 
 export interface DialogSection {
   title: DialogSectionTitle
-  bullets: string[]
+  bullets: DialogSectionBullet[]
+}
+
+export interface DialogSectionBullet {
+  point: string
+  quote?: string
+  detail?: string
 }
 
 interface Term {
@@ -277,7 +283,9 @@ function normalizeSections(sections?: DialogSection[]): DialogSection[] {
     .map((section) => {
       const title = typeof section.title === "string" ? section.title.trim() : ""
       const bullets = Array.isArray(section.bullets)
-        ? section.bullets.map((bullet) => bullet.trim()).filter(Boolean)
+        ? section.bullets
+          .map((bullet) => normalizeBullet(bullet))
+          .filter((bullet): bullet is DialogSectionBullet => Boolean(bullet))
         : []
       return { title, bullets }
     })
@@ -286,9 +294,31 @@ function normalizeSections(sections?: DialogSection[]): DialogSection[] {
     })
 }
 
+function normalizeBullet(bullet: DialogSectionBullet | string | null | undefined): DialogSectionBullet | null {
+  if (!bullet) return null
+  if (typeof bullet === "string") {
+    const point = bullet.trim()
+    return point ? { point } : null
+  }
+  const point = typeof bullet.point === "string" ? bullet.point.trim() : ""
+  if (!point) return null
+  const quote = typeof bullet.quote === "string" ? bullet.quote.trim() : undefined
+  const detail = typeof bullet.detail === "string" ? bullet.detail.trim() : undefined
+  const normalizedQuote = quote || undefined
+  const normalizedDetail = detail && detail !== "補足は後で整備" ? detail : undefined
+  return {
+    point,
+    quote: normalizedQuote,
+    detail: normalizedDetail,
+  }
+}
+
 function getSectionSearchText(sections?: DialogSection[]): string {
   return normalizeSections(sections)
-    .map((section) => [section.title, ...section.bullets].join(" ").trim())
+    .map((section) => [
+      section.title,
+      ...section.bullets.map((bullet) => `${bullet.point} ${bullet.quote ?? ""} ${bullet.detail ?? ""}`.trim()),
+    ].join(" ").trim())
     .filter(Boolean)
     .join(" ")
 }
@@ -328,7 +358,7 @@ function renderSectionedText(
               {section.title}
             </Badge>
           ) : null}
-          <ul className="mt-2 space-y-1 text-muted-foreground">
+          <ul className="mt-2 space-y-2 text-muted-foreground">
             {section.bullets.map((bullet, bulletIndex) => (
               <li key={`section-${sectionIndex}-bullet-${bulletIndex}`} className="flex items-start gap-2">
                 <span
@@ -336,7 +366,21 @@ function renderSectionedText(
                     tone?.dot ?? "bg-muted-foreground/60"
                   }`}
                 />
-                <span className="flex-1">{renderTextWithOrders(bullet, terms, onOrdersClick)}</span>
+                <div className="flex-1 space-y-1">
+                  <div className="text-xs text-foreground">
+                    {renderTextWithOrders(bullet.point, terms, onOrdersClick)}
+                  </div>
+                  {bullet.quote ? (
+                    <div className="rounded-md border border-border/60 bg-background/70 px-2 py-1 text-[11px] italic text-muted-foreground">
+                      「{renderTextWithOrders(bullet.quote, terms, onOrdersClick)}」
+                    </div>
+                  ) : null}
+                  {bullet.detail ? (
+                    <div className="text-[11px] text-muted-foreground">
+                      {renderTextWithOrders(bullet.detail, terms, onOrdersClick)}
+                    </div>
+                  ) : null}
+                </div>
               </li>
             ))}
           </ul>

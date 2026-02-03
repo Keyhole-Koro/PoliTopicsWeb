@@ -4,7 +4,7 @@ import type {
   ArticleSummary,
   SearchFilters,
 } from "../../types/article";
-import { createDynamoDBClient, unmarshall, M, type DynamoDBClient } from "../../lib/dynamodb";
+import { createDynamoDBClient, unmarshall, M, type AttributeValue, type DynamoDBClient } from "../../lib/dynamodb";
 import type { ArticleRepository, HeadlinesResult } from "../articleRepository";
 import type { DynamoArticleItem, DynamoIndexItem } from "./types";
 import {
@@ -213,7 +213,7 @@ export class DynamoArticleRepository implements ArticleRepository {
   }
 }
 
-function encodeCursor(lastEvaluatedKey: Record<string, unknown>): string {
+function encodeCursor(lastEvaluatedKey: Record<string, AttributeValue>): string {
   const payload = JSON.stringify(lastEvaluatedKey);
   if (typeof Buffer !== "undefined") {
     return Buffer.from(payload, "utf8").toString("base64");
@@ -221,16 +221,42 @@ function encodeCursor(lastEvaluatedKey: Record<string, unknown>): string {
   return btoa(payload);
 }
 
-function decodeCursor(cursor?: string): Record<string, unknown> | undefined {
+function decodeCursor(cursor?: string): Record<string, AttributeValue> | undefined {
   if (!cursor) return undefined;
   try {
     const decoded = typeof Buffer !== "undefined" ? Buffer.from(cursor, "base64").toString("utf8") : atob(cursor);
-    const parsed = JSON.parse(decoded);
-    if (parsed && typeof parsed === "object") {
-      return parsed as Record<string, unknown>;
+    const parsed = JSON.parse(decoded) as Record<string, unknown> | null;
+    if (parsed && typeof parsed === "object" && isAttributeValueMap(parsed)) {
+      return parsed;
     }
   } catch {
     return undefined;
   }
   return undefined;
+}
+
+function isAttributeValueMap(value: Record<string, unknown>): value is Record<string, AttributeValue> {
+  return Object.values(value).every((entry) => isAttributeValue(entry));
+}
+
+function isAttributeValue(value: unknown): value is AttributeValue {
+  if (!value || typeof value !== "object") return false;
+  if ("S" in value) return typeof (value as { S: unknown }).S === "string";
+  if ("N" in value) return typeof (value as { N: unknown }).N === "string";
+  if ("B" in value) return typeof (value as { B: unknown }).B === "string";
+  if ("BOOL" in value) return typeof (value as { BOOL: unknown }).BOOL === "boolean";
+  if ("NULL" in value) return (value as { NULL: unknown }).NULL === true;
+  if ("SS" in value) return Array.isArray((value as { SS: unknown }).SS);
+  if ("NS" in value) return Array.isArray((value as { NS: unknown }).NS);
+  if ("BS" in value) return Array.isArray((value as { BS: unknown }).BS);
+  if ("L" in value) {
+    const list = (value as { L: unknown }).L;
+    return Array.isArray(list) && list.every((entry) => isAttributeValue(entry));
+  }
+  if ("M" in value) {
+    const map = (value as { M: unknown }).M;
+    if (!map || typeof map !== "object") return false;
+    return Object.values(map as Record<string, unknown>).every((entry) => isAttributeValue(entry));
+  }
+  return false;
 }

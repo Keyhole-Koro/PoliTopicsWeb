@@ -6,9 +6,14 @@ export type Summary = BaseSummary;
 export type SoftLanguageSummary = BaseSummary;
 export type MiddleSummary = BaseSummary;
 export type DialogSectionTitle = "主張" | "説明" | "質問" | "回答" | "根拠" | "影響" | "次の対応" | "決定";
+export type DialogSectionBullet = {
+    point: string;
+    quote?: string;
+    detail?: string;
+};
 export type DialogSection = {
     title: DialogSectionTitle;
-    bullets: string[];
+    bullets: DialogSectionBullet[];
 };
 export type Reaction = "賛成" | "反対" | "質問" | "回答" | "中立";
 export type Dialog = {

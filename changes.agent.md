@@ -790,3 +790,14 @@ Details:
   - `PoliTopicsWeb/frontend/lib/api.ts`
   - `PoliTopicsWeb/frontend/app/home-client.tsx`
   - `PoliTopicsWeb/cacheCron/src/index.ts`
+
+Agent: Codex
+Date/Time: 2026-02-03 11:25 JST
+Keywords: dialogs, ui, schema
+Topic: Render structured dialog bullets
+Details:
+- Updated dialog section bullet rendering to handle point/quote/detail objects (with legacy string fallback).
+- Files changed:
+  - `PoliTopicsWeb/frontend/components/dialog-viewer.tsx`
+  - `PoliTopicsWeb/shared/types/article.d.ts`
+  - `PoliTopicsWeb/workers/backend/src/types/article.ts`

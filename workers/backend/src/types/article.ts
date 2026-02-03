@@ -22,9 +22,15 @@ export type DialogSectionTitle =
   | "次の対応"
   | "決定";
 
+export type DialogSectionBullet = {
+  point: string;
+  quote?: string;
+  detail?: string;
+};
+
 export type DialogSection = {
   title: DialogSectionTitle;
-  bullets: string[];
+  bullets: DialogSectionBullet[];
 };
 
 export type Reaction = "賛成" | "反対" | "質問" | "回答" | "中立";
