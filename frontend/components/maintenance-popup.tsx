@@ -2,24 +2,12 @@
 
 import { useEffect, useState } from "react"
 
-const STORAGE_KEY = "politopics_maintenance_dismissed"
-
 export function MaintenancePopup() {
-  const [visible, setVisible] = useState(false)
 
   useEffect(() => {
     const env = process.env.NEXT_PUBLIC_APP_ENV
     if (env !== "prod") return
-    try {
-      const dismissed = window.localStorage.getItem(STORAGE_KEY)
-      if (dismissed === "true") return
-    } catch {
-      // ignore storage errors
-    }
-    setVisible(true)
   }, [])
-
-  if (!visible) return null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
@@ -35,11 +23,9 @@ export function MaintenancePopup() {
             type="button"
             onClick={() => {
               try {
-                window.localStorage.setItem(STORAGE_KEY, "true")
               } catch {
                 // ignore storage errors
               }
-              setVisible(false)
             }}
             className="mt-4 inline-flex items-center justify-center rounded-full border border-red-200 bg-red-50 px-6 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100"
           >
