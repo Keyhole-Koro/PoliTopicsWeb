@@ -42,20 +42,22 @@ export function createApp(createRepository: ArticleRepositoryFactory = createDyn
   // Headlines endpoint
   app.get("/headlines", async (c) => {
     const query = c.req.query();
-    const start = Math.max(0, Math.trunc(toNumber(query.start, 0)));
+    const cursor = query.cursor;
     let limit = Math.min(50, Math.max(1, Math.trunc(toNumber(query.limit, 6))));
 
     if (query.end !== undefined) {
+      const start = Math.max(0, Math.trunc(toNumber(query.start, 0)));
       const requestedEnd = Math.max(start, Math.trunc(toNumber(query.end, start + limit)));
       limit = Math.min(50, Math.max(1, requestedEnd - start));
     }
 
-    console.log(`[WorkerBackend] /headlines req: start=${start}, limit=${limit}, end=${query.end}`);
-    const { items, hasMore } = await c.get("articleRepository").getHeadlines(limit, "date_desc", start);
-    const end = start + items.length;
+    console.log(`[WorkerBackend] /headlines req: cursor=${cursor ?? "none"}, limit=${limit}, end=${query.end}`);
+    const { items, hasMore, nextCursor } = await c.get("articleRepository").getHeadlines(limit, "date_desc", cursor);
+    const start = 0;
+    const end = items.length;
     console.log(`[WorkerBackend] /headlines res: items=${items.length}, hasMore=${hasMore}`);
 
-    return c.json({ items, limit, start, end, hasMore });
+    return c.json({ items, limit, start, end, hasMore, nextCursor });
   });
 
   // Search endpoint
@@ -121,6 +123,24 @@ export function createApp(createRepository: ArticleRepositoryFactory = createDyn
     }
   });
 
+  // Timeline by issue ID
+  app.get("/issue/:issueId/timeline", async (c) => {
+    const issueId = (c.req.param("issueId") ?? "").trim();
+    if (!issueId) {
+      return c.json({ message: "Issue ID is required" }, 400);
+    }
+
+    const query = c.req.query();
+    const limit = Math.min(100, Math.max(1, Math.trunc(toNumber(query.limit, 50))));
+    const sort = normalizeSort(query.sort);
+
+    console.log(`[WorkerBackend] /issue/:issueId/timeline req: issueId=${issueId}, limit=${limit}, sort=${sort}`);
+    const items = await c.get("articleRepository").getTimelineByIssueId(issueId, { limit, sort });
+    console.log(`[WorkerBackend] /issue/:issueId/timeline res: issueId=${issueId} items=${items.length}`);
+
+    return c.json({ issueId, limit, sort, items, total: items.length });
+  });
+
   // Not found handler
   app.notFound((c) => c.json({ message: "Not Found" }, 404));
 
@@ -156,6 +176,11 @@ function sanitizeDate(value?: string | null): string | undefined {
   const timestamp = Date.parse(trimmed);
   if (Number.isNaN(timestamp)) return undefined;
   return trimmed;
+}
+
+function normalizeSort(value?: string | null): SearchFilters["sort"] {
+  if (value === "date_asc" || value === "date_desc") return value;
+  return "date_asc";
 }
 
 const app = createApp();

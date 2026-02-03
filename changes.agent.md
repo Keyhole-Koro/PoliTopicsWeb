@@ -727,6 +727,66 @@ Details:
 - Added per-section background tones and bullet accents for quicker visual scanning.
 - Files changed:
   - `PoliTopicsWeb/frontend/components/dialog-viewer.tsx`
-  - `PoliTopicsWeb/shared/types/article.d.ts`
-  - `PoliTopicsWeb/workers/backend/src/types/article.ts`
+- `PoliTopicsWeb/shared/types/article.d.ts`
+- `PoliTopicsWeb/workers/backend/src/types/article.ts`
+- `PoliTopicsWeb/terraform/seed/articles.json`
+
+Agent: Codex
+Date/Time: 2026-02-03 10:20 JST
+Keywords: backend, api, timeline, issue
+Topic: Add issue timeline query endpoint
+Details:
+- Added `/issue/:issueId/timeline` endpoint with limit/sort controls.
+- Added repository support to query ISSUE index items for timeline rendering.
+- Updated mock repository to support issue-based timelines in local/dev.
+- Files changed:
+  - `PoliTopicsWeb/workers/backend/src/index.ts`
+  - `PoliTopicsWeb/workers/backend/src/repositories/articleRepository.ts`
+  - `PoliTopicsWeb/workers/backend/src/repositories/dynamodb/repository.ts`
+  - `PoliTopicsWeb/workers/backend/src/repositories/mockArticleRepository.ts`
+
+Agent: Codex
+Date/Time: 2026-02-03 10:30 JST
+Keywords: seed, timeline, issue
+Topic: Add issue timeline seed data
+Details:
+- Added issueID values and extra seed articles to support timeline demos.
+- Files changed:
   - `PoliTopicsWeb/terraform/seed/articles.json`
+
+Agent: Codex
+Date/Time: 2026-02-03 10:40 JST
+Keywords: frontend, article, timeline
+Topic: Show related timeline on article page
+Details:
+- Added timeline fetch helper and rendered related issue items in chronological order on /article.
+- Files changed:
+  - `PoliTopicsWeb/frontend/lib/api.ts`
+  - `PoliTopicsWeb/frontend/app/article/article-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-03 10:45 JST
+Keywords: frontend, article, timeline, ui
+Topic: Collapse related timeline by default
+Details:
+- Moved related timeline section to the bottom of the article page and renamed it to 「関連する会議」.
+- Added a toggle to expand/collapse timeline items.
+- Files changed:
+  - `PoliTopicsWeb/frontend/app/article/article-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-03 11:05 JST
+Keywords: pagination, headlines, performance, cursor
+Topic: Switch headlines to cursor pagination
+Details:
+- Added cursor-based pagination to /headlines and removed offset slicing in repositories.
+- Updated frontend headline fetching/loading logic to use cursors.
+- Propagated nextCursor through the cache cron injection payload.
+- Files changed:
+  - `PoliTopicsWeb/workers/backend/src/index.ts`
+  - `PoliTopicsWeb/workers/backend/src/repositories/articleRepository.ts`
+  - `PoliTopicsWeb/workers/backend/src/repositories/dynamodb/repository.ts`
+  - `PoliTopicsWeb/workers/backend/src/repositories/mockArticleRepository.ts`
+  - `PoliTopicsWeb/frontend/lib/api.ts`
+  - `PoliTopicsWeb/frontend/app/home-client.tsx`
+  - `PoliTopicsWeb/cacheCron/src/index.ts`

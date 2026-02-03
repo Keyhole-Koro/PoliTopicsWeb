@@ -29,11 +29,11 @@ export class DynamoArticleRepository implements ArticleRepository {
   async getHeadlines(
     limit = 6,
     sort: SearchFilters["sort"] = "date_desc",
-    offset = 0
+    cursor?: string
   ): Promise<HeadlinesResult> {
     const safeLimit = Number.isFinite(limit) && limit ? Math.max(1, Math.min(Number(limit), 50)) : 6;
-    const safeOffset = Number.isFinite(offset) && offset ? Math.max(0, Number(offset)) : 0;
-    const queryLimit = Math.min(safeLimit + safeOffset, 100);
+    const queryLimit = Math.min(safeLimit, 50);
+    const exclusiveStartKey = decodeCursor(cursor);
 
     const response = await this.dynamo.query({
       TableName: this.tableName,
@@ -44,14 +44,17 @@ export class DynamoArticleRepository implements ArticleRepository {
       },
       Limit: queryLimit,
       ScanIndexForward: sort === "date_asc",
+      ExclusiveStartKey: exclusiveStartKey ?? undefined,
     });
 
     const items = (response.Items ?? []).map((item) => mapArticleToSummary(unmarshall(item) as DynamoArticleItem));
     const hasMore = Boolean(response.LastEvaluatedKey);
+    const nextCursor = response.LastEvaluatedKey ? encodeCursor(response.LastEvaluatedKey) : undefined;
 
     return {
-      items: items.slice(safeOffset, safeOffset + safeLimit),
+      items,
       hasMore,
+      nextCursor,
     };
   }
 
@@ -146,6 +149,29 @@ export class DynamoArticleRepository implements ArticleRepository {
     return mapItemToArticle(item);
   }
 
+  async getTimelineByIssueId(
+    issueId: string,
+    options: { limit?: number; sort?: SearchFilters["sort"] } = {},
+  ): Promise<ArticleSummary[]> {
+    const safeLimit = Number.isFinite(options.limit) && options.limit
+      ? Math.max(1, Math.min(Number(options.limit), 100))
+      : 50;
+    const sort = options.sort ?? "date_asc";
+    const response = await this.dynamo.query({
+      TableName: this.tableName,
+      KeyConditionExpression: "PK = :pk",
+      ExpressionAttributeValues: {
+        ":pk": M.S(`ISSUE#${issueId}`),
+      },
+      Limit: safeLimit,
+      ScanIndexForward: sort === "date_asc",
+    });
+
+    return (response.Items ?? [])
+      .map((item) => mapIndexToSummary(unmarshall(item) as DynamoIndexItem))
+      .filter((item): item is ArticleSummary => Boolean(item));
+  }
+
   async getSuggestions(
     input: string,
     limit = 5,
@@ -185,4 +211,26 @@ export class DynamoArticleRepository implements ArticleRepository {
 
     return Array.from(suggestions).slice(0, limit);
   }
+}
+
+function encodeCursor(lastEvaluatedKey: Record<string, unknown>): string {
+  const payload = JSON.stringify(lastEvaluatedKey);
+  if (typeof Buffer !== "undefined") {
+    return Buffer.from(payload, "utf8").toString("base64");
+  }
+  return btoa(payload);
+}
+
+function decodeCursor(cursor?: string): Record<string, unknown> | undefined {
+  if (!cursor) return undefined;
+  try {
+    const decoded = typeof Buffer !== "undefined" ? Buffer.from(cursor, "base64").toString("utf8") : atob(cursor);
+    const parsed = JSON.parse(decoded);
+    if (parsed && typeof parsed === "object") {
+      return parsed as Record<string, unknown>;
+    }
+  } catch {
+    return undefined;
+  }
+  return undefined;
 }

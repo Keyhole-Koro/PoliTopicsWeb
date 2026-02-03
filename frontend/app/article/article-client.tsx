@@ -2,15 +2,15 @@
 
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
-import type { Article, ArticleAssetData } from "@shared/types/article"
-import { fetchArticle, fetchArticleAsset } from "@/lib/api"
+import type { Article, ArticleAssetData, ArticleSummary } from "@shared/types/article"
+import { fetchArticle, fetchArticleAsset, fetchTimeline } from "@/lib/api"
 import { ArticleMeta } from "@/components/articles/article-meta"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { DialogViewer, type Dialog as TranscriptDialog } from "@/components/dialog-viewer"
 import { Markdown } from "@/components/markdown"
-import { Quote, Users, Tag, BookOpen, MessageSquare, Loader2, CheckCircle2 } from "lucide-react"
+import { Quote, Users, Tag, BookOpen, MessageSquare, Loader2, CheckCircle2, Clock, ChevronDown } from "lucide-react"
 
 type Props = {
   issueId: string
@@ -20,6 +20,10 @@ export function ArticleClient({ issueId }: Props) {
   const [article, setArticle] = useState<Article | null>(null)
   const [assetData, setAssetData] = useState<ArticleAssetData | null>(null)
   const [assetLoading, setAssetLoading] = useState(false)
+  const [timelineItems, setTimelineItems] = useState<ArticleSummary[]>([])
+  const [timelineLoading, setTimelineLoading] = useState(false)
+  const [timelineError, setTimelineError] = useState<string | null>(null)
+  const [timelineOpen, setTimelineOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [jumpOrders, setJumpOrders] = useState<number[]>([])
   const [jumpToken, setJumpToken] = useState(0)
@@ -45,6 +49,19 @@ export function ArticleClient({ issueId }: Props) {
       })
       .catch(() => setError("記事を取得できませんでした"))
   }, [issueId])
+
+  useEffect(() => {
+    if (!article?.issueID) return
+    setTimelineLoading(true)
+    setTimelineError(null)
+    fetchTimeline(article.issueID, { sort: "date_asc", limit: 50 })
+      .then((response) => {
+        const items = response.items.filter((item) => item.id !== article.id)
+        setTimelineItems(items)
+      })
+      .catch(() => setTimelineError("関連タイムラインを取得できませんでした"))
+      .finally(() => setTimelineLoading(false))
+  }, [article?.id, article?.issueID])
 
   if (error) {
     return (
@@ -93,12 +110,13 @@ export function ArticleClient({ issueId }: Props) {
   }))
 
   const hasDialogData = dialogEntries.length > 0
-      const summaryText =
-        mergedArticle.summary?.summary?.trim() && mergedArticle.summary.summary.length > 0
-          ? mergedArticle.summary.summary
-          : assetLoading ? "読み込み中..." : "詳細要約はまだ登録されていません。"
-    
-      const softSummaryText =    mergedArticle.soft_language_summary?.summary?.trim() && mergedArticle.soft_language_summary.summary.length > 0
+  const summaryText =
+    mergedArticle.summary?.summary?.trim() && mergedArticle.summary.summary.length > 0
+      ? mergedArticle.summary.summary
+      : assetLoading ? "読み込み中..." : "詳細要約はまだ登録されていません。"
+
+  const softSummaryText =
+    mergedArticle.soft_language_summary?.summary?.trim() && mergedArticle.soft_language_summary.summary.length > 0
       ? mergedArticle.soft_language_summary.summary
       : assetLoading ? "読み込み中..." : "簡潔な要約は準備中です。"
   const participantDetails = mergedArticle.participants ?? []
@@ -255,6 +273,71 @@ export function ArticleClient({ issueId }: Props) {
               </div>
             ))}
           </CardContent>
+        </Card>
+      )}
+
+      {article.issueID && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between gap-3">
+            <CardTitle className="flex items-center gap-2 font-serif">
+              <Clock className="h-5 w-5 text-primary" />
+              関連する会議
+            </CardTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setTimelineOpen((previous) => !previous)}
+              aria-expanded={timelineOpen}
+              className="gap-2 rounded-full text-xs text-muted-foreground hover:text-foreground"
+            >
+              {timelineOpen ? "閉じる" : "ひらく"}
+              <ChevronDown className={`h-4 w-4 transition ${timelineOpen ? "rotate-180" : ""}`} />
+            </Button>
+          </CardHeader>
+          {timelineOpen && (
+            <CardContent>
+              {timelineLoading ? (
+                <p className="text-sm text-muted-foreground">読み込み中...</p>
+              ) : timelineError ? (
+                <p className="text-sm text-red-500">{timelineError}</p>
+              ) : timelineItems.length === 0 ? (
+                <p className="text-sm text-muted-foreground">関連する会議はまだありません。</p>
+              ) : (
+                <div className="space-y-4">
+                  {timelineItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className="relative flex flex-col gap-2 rounded-2xl border border-border/60 bg-muted/30 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                    >
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                        <span className="rounded-full bg-white/90 px-2 py-0.5">
+                          {new Date(item.date).toLocaleDateString("ja-JP")}
+                        </span>
+                        {item.nameOfHouse && (
+                          <span className="rounded-full bg-white/90 px-2 py-0.5">{item.nameOfHouse}</span>
+                        )}
+                        {item.nameOfMeeting && (
+                          <span className="rounded-full bg-white/90 px-2 py-0.5">{item.nameOfMeeting}</span>
+                        )}
+                      </div>
+                      <Link
+                        href={`/article/${encodeURIComponent(item.id)}`}
+                        className="text-base font-semibold text-foreground transition hover:underline"
+                      >
+                        {item.title}
+                      </Link>
+                      {item.description && (
+                        <Markdown
+                          content={item.description}
+                          className="text-xs text-muted-foreground line-clamp-3"
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          )}
         </Card>
       )}
     </article>

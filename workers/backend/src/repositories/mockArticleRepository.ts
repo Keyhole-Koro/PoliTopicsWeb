@@ -23,6 +23,7 @@ const DEFAULT_ASSET_BUCKET = "politopics-articles-local";
 
 type SeedArticle = {
   id: string;
+  issueID?: string;
   title?: string;
   description?: string;
   date?: string;
@@ -77,18 +78,21 @@ export class MockArticleRepository implements ArticleRepository {
   async getHeadlines(
     limit = 6,
     sort: SearchFilters["sort"] = "date_desc",
-    offset = 0
+    cursor?: string
   ): Promise<HeadlinesResult> {
     const safeLimit = Number.isFinite(limit) && limit ? Math.max(1, Math.min(Number(limit), 50)) : 6;
-    const safeOffset = Number.isFinite(offset) && offset ? Math.max(0, Number(offset)) : 0;
+    const safeOffset = parseOffsetCursor(cursor);
     const queryLimit = Math.min(safeLimit + safeOffset, 100);
 
     const sorted = this.sortByDate(this.articles, sort);
     const sliced = sorted.slice(safeOffset, safeOffset + safeLimit);
+    const nextOffset = safeOffset + sliced.length;
+    const hasMore = sorted.length > nextOffset;
 
     return {
       items: sliced.map((item) => this.toSummary(item)),
-      hasMore: sorted.length > queryLimit,
+      hasMore,
+      nextCursor: hasMore ? encodeOffsetCursor(nextOffset) : undefined,
     };
   }
 
@@ -134,6 +138,19 @@ export class MockArticleRepository implements ArticleRepository {
     };
   }
 
+  async getTimelineByIssueId(
+    issueId: string,
+    options: { limit?: number; sort?: SearchFilters["sort"] } = {},
+  ): Promise<ArticleSummary[]> {
+    const limit = Number.isFinite(options.limit) && options.limit
+      ? Math.max(1, Math.min(Number(options.limit), 100))
+      : 50;
+    const sort = options.sort ?? "date_asc";
+    const candidates = this.articles.filter((article) => article.issueID === issueId);
+    const sorted = this.sortByDate(candidates, sort);
+    return sorted.slice(0, limit).map((article) => this.toSummary(article));
+  }
+
   async getSuggestions(
     input: string,
     limit = 5,
@@ -175,6 +192,7 @@ export class MockArticleRepository implements ArticleRepository {
     const id = article.id;
     return {
       id,
+      issueID: article.issueID,
       title: article.title ?? "",
       description: article.description ?? "",
       date: article.date ?? "",
@@ -199,6 +217,7 @@ export class MockArticleRepository implements ArticleRepository {
   private toSummary(article: Article): ArticleSummary {
     return {
       id: article.id,
+      issueID: article.issueID,
       title: article.title,
       description: article.description,
       date: article.date,
@@ -302,6 +321,28 @@ export class MockArticleRepository implements ArticleRepository {
         priority: keyword.priority ?? "medium",
       }));
   }
+}
+
+function encodeOffsetCursor(offset: number): string {
+  const payload = JSON.stringify({ offset });
+  if (typeof Buffer !== "undefined") {
+    return Buffer.from(payload, "utf8").toString("base64");
+  }
+  return btoa(payload);
+}
+
+function parseOffsetCursor(cursor?: string): number {
+  if (!cursor) return 0;
+  try {
+    const decoded = typeof Buffer !== "undefined" ? Buffer.from(cursor, "base64").toString("utf8") : atob(cursor);
+    const parsed = JSON.parse(decoded) as { offset?: number } | null;
+    if (parsed && typeof parsed.offset === "number" && Number.isFinite(parsed.offset)) {
+      return Math.max(0, parsed.offset);
+    }
+  } catch {
+    return 0;
+  }
+  return 0;
 }
 
 export function createMockArticleRepository(env: Env): ArticleRepository {

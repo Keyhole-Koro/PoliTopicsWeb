@@ -42,6 +42,7 @@ function spaNavigate(path: string) {
 type HeadlinesCache = {
   items: ArticleSummary[]
   hasMore: boolean
+  nextCursor?: string
   fetchedAt: number
 }
 
@@ -56,8 +57,8 @@ function readHeadlinesCache(): HeadlinesCache | null {
   return headlinesCache
 }
 
-function writeHeadlinesCache(items: ArticleSummary[], hasMore: boolean) {
-  headlinesCache = { items, hasMore, fetchedAt: Date.now() }
+function writeHeadlinesCache(items: ArticleSummary[], hasMore: boolean, nextCursor?: string) {
+  headlinesCache = { items, hasMore, nextCursor, fetchedAt: Date.now() }
 }
 
 export function HomeClient() {
@@ -80,25 +81,28 @@ export function HomeClient() {
   const [isLoadingMoreArticles, setIsLoadingMoreArticles] = useState(false)
   const [articlesError, setArticlesError] = useState<string | null>(null)
   const [hasMoreArticles, setHasMoreArticles] = useState(true)
+  const [nextCursor, setNextCursor] = useState<string | undefined>(undefined)
 
   const loadArticles = useCallback(
     async ({
-      start = 0,
       limit = INITIAL_HEADLINE_LIMIT,
+      cursor,
       force = false,
-    }: { start?: number; limit?: number; force?: boolean } = {}) => {
-      if (!force && start === 0) {
+    }: { limit?: number; cursor?: string; force?: boolean } = {}) => {
+      const isInitial = cursor === undefined
+      if (!force && isInitial) {
         const cached = readHeadlinesCache()
         if (cached) {
           setArticles(cached.items)
           setHasMoreArticles(cached.hasMore)
+          setNextCursor(cached.nextCursor)
           setIsLoadingArticles(false)
           setArticlesError(null)
           return
         }
       }
 
-      if (start === 0) {
+      if (isInitial) {
         setIsLoadingArticles(true)
         setArticlesError(null)
       } else {
@@ -106,19 +110,17 @@ export function HomeClient() {
       }
 
       try {
-        const response = await fetchHeadlines({ start, limit })
-        setHasMoreArticles(response.hasMore)
+        const response = await fetchHeadlines({ cursor, limit })
+        setHasMoreArticles(response.hasMore && Boolean(response.nextCursor))
+        setNextCursor(response.nextCursor)
         setArticles((previous) => {
           let next: ArticleSummary[]
-          if (start === 0) {
+          if (isInitial) {
             next = response.items
-          } else if (start >= previous.length) {
-            next = [...previous, ...response.items]
           } else {
-            next = [...previous]
-            next.splice(start, response.items.length, ...response.items)
+            next = [...previous, ...response.items]
           }
-          writeHeadlinesCache(next, response.hasMore)
+          writeHeadlinesCache(next, response.hasMore, response.nextCursor)
           return next
         })
         setArticlesError(null)
@@ -126,7 +128,7 @@ export function HomeClient() {
         console.error("[home] failed to load headlines", error)
         setArticlesError("最新の審議情報を取得できませんでした。時間をおいて再度お試しください。")
       } finally {
-        if (start === 0) {
+        if (isInitial) {
           setIsLoadingArticles(false)
         } else {
           setIsLoadingMoreArticles(false)
@@ -411,8 +413,8 @@ export function HomeClient() {
     const nextStep =
       GRID_PAGE_STEPS.find((step) => step > gridVisibleCount) ??
       gridVisibleCount + GRID_PREFETCH_COUNT
-    if (gridArticles.length < nextStep && hasMoreArticles) {
-      loadArticles({ start: articles.length, limit: HEADLINE_BATCH_SIZE }).finally(() => {
+    if (gridArticles.length < nextStep && hasMoreArticles && nextCursor) {
+      loadArticles({ cursor: nextCursor, limit: HEADLINE_BATCH_SIZE }).finally(() => {
         setGridVisibleCount(nextStep)
       })
       return

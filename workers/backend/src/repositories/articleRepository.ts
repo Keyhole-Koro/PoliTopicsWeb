@@ -12,12 +12,17 @@ export { DynamoArticleRepository } from "./dynamodb/repository";
 export type HeadlinesResult = {
   items: ArticleSummary[];
   hasMore: boolean;
+  nextCursor?: string;
 };
 
 export interface ArticleRepository {
-  getHeadlines(limit?: number, sort?: SearchFilters["sort"], offset?: number): Promise<HeadlinesResult>;
+  getHeadlines(limit?: number, sort?: SearchFilters["sort"], cursor?: string): Promise<HeadlinesResult>;
   searchArticles(filters: SearchFilters): Promise<ArticleSummary[]>;
   getArticle(id: string): Promise<Article | undefined>;
+  getTimelineByIssueId(
+    issueId: string,
+    options?: { limit?: number; sort?: SearchFilters["sort"] }
+  ): Promise<ArticleSummary[]>;
   getSuggestions(
     input: string,
     limit?: number,

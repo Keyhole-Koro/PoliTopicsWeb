@@ -229,7 +229,8 @@
         "term": "越冬需要対策計画",
         "definition": "越冬需要対策計画"
       }
-    ]
+    ],
+    "issueID": "ISSUE-TIMELINE-001"
   },
   {
     "id": "issue-011",
@@ -1007,7 +1008,8 @@
         2
       ],
       "summary": "給食無償化へ向け国と自治体が費用負担の目安を共有。"
-    }
+    },
+    "issueID": "ISSUE-TIMELINE-001"
   },
   {
     "id": "issue-003",
@@ -1134,7 +1136,8 @@
         2
       ],
       "summary": "バス再編とMaaSアプリを組み合わせた全国支援枠を創設。"
-    }
+    },
+    "issueID": "ISSUE-TIMELINE-001"
   },
   {
     "id": "issue-004",
@@ -3053,5 +3056,277 @@
         "definition": "表示領域の高さを固定し、中身だけスクロールさせるUIのこと。"
       }
     ]
+  },
+  {
+    "id": "issue-016",
+    "title": "気候危機集中審議、追加の越冬対策を報告",
+    "date": "2024-05-20T03:00:00Z",
+    "month": "2024-05",
+    "imageKind": "会議録",
+    "session": 213,
+    "nameOfHouse": "参議院",
+    "nameOfMeeting": "環境委員会",
+    "categories": [
+      "環境",
+      "エネルギー"
+    ],
+    "description": "## 概要\n- 追加の越冬対策として蓄電支援策と自治体連携の状況を報告。\n- **ポイント:** 追加予算の検討と次回会合の段取り",
+    "key_points": [
+      "要点1",
+      "要点2",
+      "要点3"
+    ],
+    "summary": {
+      "based_on_orders": [
+        1,
+        2,
+        3
+      ],
+      "summary": "冬季の再エネ確保策とピークカット支援の即応計画を取りまとめへ。\n\n- **重点1:** 再エネ調達を前倒し\n- **重点2:** 需要家データ活用でピークカット\n- [資料リンク](https://example.com/energy-brief)"
+    },
+    "soft_language_summary": {
+      "based_on_orders": [
+        1,
+        2
+      ],
+      "summary": "冬の電力需給に備えて再エネ導入と節電キャンペーンを議論。"
+    },
+    "middle_summary": [],
+    "dialogs": [
+      {
+        "order": 1,
+        "reaction": "中立",
+        "speaker": "河野桜",
+        "position": "環境大臣、太陽光ストレージ導入を推進",
+        "original_text": "河野桜は環境委員会で環境分野の課題として参議院環境委員会は冬季の電力逼迫に備え、再エネ調達と節電技術導入について議論した。環境大臣、太陽光ストレージ導入を推進って感じだったよ。",
+        "summary_sections": [
+          {
+            "title": "説明",
+            "bullets": [
+              "発言の要点を短く整理した。"
+            ]
+          },
+          {
+            "title": "影響",
+            "bullets": [
+              "次に影響しそうな点を整理した。"
+            ]
+          }
+        ]
+      },
+      {
+        "order": 2,
+        "reaction": "中立",
+        "speaker": "山崎拓海",
+        "position": "野党筆頭理事、需要家データ活用を提案",
+        "original_text": "山崎拓海は環境委員会で環境分野の課題として参議院環境委員会は冬季の電力逼迫に備え、再エネ調達と節電技術導入について議論した。野党筆頭理事、需要家データ活用を提案って感じだったよ。",
+        "summary_sections": [
+          {
+            "title": "説明",
+            "bullets": [
+              "発言の要点を短く整理した。"
+            ]
+          },
+          {
+            "title": "影響",
+            "bullets": [
+              "次に影響しそうな点を整理した。"
+            ]
+          }
+        ]
+      },
+      {
+        "order": 3,
+        "reaction": "中立",
+        "speaker": "環境委員会 議長",
+        "position": "参議院",
+        "original_text": "環境委員会全体で冬季の再エネ確保策とピークカット支援の即応計画を取りまとめへって感じだったよ。",
+        "summary_sections": [
+          {
+            "title": "説明",
+            "bullets": [
+              "発言の要点を短く整理した。"
+            ]
+          },
+          {
+            "title": "影響",
+            "bullets": [
+              "次に影響しそうな点を整理した。"
+            ]
+          }
+        ]
+      }
+    ],
+    "participants": [
+      {
+        "name": "河野桜",
+        "summary": "環境大臣、太陽光ストレージ導入を推進"
+      },
+      {
+        "name": "山崎拓海",
+        "summary": "野党筆頭理事、需要家データ活用を提案"
+      }
+    ],
+    "keywords": [
+      {
+        "keyword": "再エネ",
+        "priority": "medium"
+      },
+      {
+        "keyword": "節電",
+        "priority": "medium"
+      },
+      {
+        "keyword": "気候危機",
+        "priority": "medium"
+      }
+    ],
+    "terms": [
+      {
+        "term": "脱炭素転換支援法案",
+        "definition": "脱炭素転換支援法案"
+      },
+      {
+        "term": "越冬需要対策計画",
+        "definition": "越冬需要対策計画"
+      }
+    ],
+    "issueID": "ISSUE-TIMELINE-001"
+  },
+  {
+    "id": "issue-017",
+    "title": "気候危機集中審議、電力需給の夏季対応を確認",
+    "date": "2024-06-05T01:30:00Z",
+    "month": "2024-06",
+    "imageKind": "会議録",
+    "session": 213,
+    "nameOfHouse": "参議院",
+    "nameOfMeeting": "環境委員会",
+    "categories": [
+      "環境",
+      "エネルギー"
+    ],
+    "description": "## 概要\n- 夏季ピークに向けた需給見通しと需要抑制策を確認。\n- **ポイント:** 需給逼迫時の連絡体制と追加施策の検討",
+    "key_points": [
+      "要点1",
+      "要点2",
+      "要点3"
+    ],
+    "summary": {
+      "based_on_orders": [
+        1,
+        2,
+        3
+      ],
+      "summary": "冬季の再エネ確保策とピークカット支援の即応計画を取りまとめへ。\n\n- **重点1:** 再エネ調達を前倒し\n- **重点2:** 需要家データ活用でピークカット\n- [資料リンク](https://example.com/energy-brief)"
+    },
+    "soft_language_summary": {
+      "based_on_orders": [
+        1,
+        2
+      ],
+      "summary": "冬の電力需給に備えて再エネ導入と節電キャンペーンを議論。"
+    },
+    "middle_summary": [],
+    "dialogs": [
+      {
+        "order": 1,
+        "reaction": "中立",
+        "speaker": "河野桜",
+        "position": "環境大臣、太陽光ストレージ導入を推進",
+        "original_text": "河野桜は環境委員会で環境分野の課題として参議院環境委員会は冬季の電力逼迫に備え、再エネ調達と節電技術導入について議論した。環境大臣、太陽光ストレージ導入を推進って感じだったよ。",
+        "summary_sections": [
+          {
+            "title": "説明",
+            "bullets": [
+              "発言の要点を短く整理した。"
+            ]
+          },
+          {
+            "title": "影響",
+            "bullets": [
+              "次に影響しそうな点を整理した。"
+            ]
+          }
+        ]
+      },
+      {
+        "order": 2,
+        "reaction": "中立",
+        "speaker": "山崎拓海",
+        "position": "野党筆頭理事、需要家データ活用を提案",
+        "original_text": "山崎拓海は環境委員会で環境分野の課題として参議院環境委員会は冬季の電力逼迫に備え、再エネ調達と節電技術導入について議論した。野党筆頭理事、需要家データ活用を提案って感じだったよ。",
+        "summary_sections": [
+          {
+            "title": "説明",
+            "bullets": [
+              "発言の要点を短く整理した。"
+            ]
+          },
+          {
+            "title": "影響",
+            "bullets": [
+              "次に影響しそうな点を整理した。"
+            ]
+          }
+        ]
+      },
+      {
+        "order": 3,
+        "reaction": "中立",
+        "speaker": "環境委員会 議長",
+        "position": "参議院",
+        "original_text": "環境委員会全体で冬季の再エネ確保策とピークカット支援の即応計画を取りまとめへって感じだったよ。",
+        "summary_sections": [
+          {
+            "title": "説明",
+            "bullets": [
+              "発言の要点を短く整理した。"
+            ]
+          },
+          {
+            "title": "影響",
+            "bullets": [
+              "次に影響しそうな点を整理した。"
+            ]
+          }
+        ]
+      }
+    ],
+    "participants": [
+      {
+        "name": "河野桜",
+        "summary": "環境大臣、太陽光ストレージ導入を推進"
+      },
+      {
+        "name": "山崎拓海",
+        "summary": "野党筆頭理事、需要家データ活用を提案"
+      }
+    ],
+    "keywords": [
+      {
+        "keyword": "再エネ",
+        "priority": "medium"
+      },
+      {
+        "keyword": "節電",
+        "priority": "medium"
+      },
+      {
+        "keyword": "気候危機",
+        "priority": "medium"
+      }
+    ],
+    "terms": [
+      {
+        "term": "脱炭素転換支援法案",
+        "definition": "脱炭素転換支援法案"
+      },
+      {
+        "term": "越冬需要対策計画",
+        "definition": "越冬需要対策計画"
+      }
+    ],
+    "issueID": "ISSUE-TIMELINE-001"
   }
 ]

@@ -9,6 +9,7 @@ type HeadlinesResponse = {
   start: number
   end: number
   hasMore: boolean
+  nextCursor?: string
 }
 
 const config = loadConfig()
@@ -55,6 +56,7 @@ export const handler: Handler = async () => {
         start: payload.start,
         end: payload.end,
         hasMore: payload.hasMore,
+        nextCursor: payload.nextCursor,
       },
       null,
       0,
@@ -91,6 +93,7 @@ export const handler: Handler = async () => {
             start: payload.start,
             end: payload.end,
             hasMore: payload.hasMore,
+            nextCursor: payload.nextCursor,
           },
           null,
           0,

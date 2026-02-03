@@ -21,17 +21,25 @@ export type HeadlinesResponse = {
   start: number
   end: number
   hasMore: boolean
+  nextCursor?: string
+}
+
+export type TimelineResponse = {
+  issueId: string
+  items: ArticleSummary[]
+  total: number
+  limit: number
+  sort: SearchFilters["sort"]
 }
 
 type FetchHeadlinesOptions = {
   limit?: number
-  start?: number
-  end?: number
+  cursor?: string
 }
 
 export async function fetchHeadlines(options: FetchHeadlinesOptions = {}) {
   const canUseInjectedCache =
-    (options.start === undefined || options.start === 0) && options.end === undefined
+    options.cursor === undefined
 
   if (canUseInjectedCache && typeof window !== "undefined") {
     const script = document.getElementById("headlines-cache")
@@ -41,30 +49,9 @@ export async function fetchHeadlines(options: FetchHeadlinesOptions = {}) {
         if (injectedData && Array.isArray(injectedData.items)) {
           if (injectedData.items.length === 0) {
             debugLog(`[api] Injected cache empty; falling back to API`)
-          } else if (options.limit === undefined) {
+          } else if (options.limit === undefined || options.limit >= injectedData.items.length) {
             debugLog(`[api] Injected cache hit`)
             return injectedData
-          } else if (injectedData.items.length >= options.limit) {
-            debugLog(`[api] Injected cache hit (sliced)`)
-            const items = injectedData.items.slice(0, options.limit)
-            return {
-              ...injectedData,
-              items,
-              limit: options.limit,
-              start: 0,
-              end: items.length,
-              hasMore: injectedData.hasMore || injectedData.items.length > items.length,
-            }
-          } else {
-            debugLog(`[api] Injected cache partial; using cache`)
-            return {
-              ...injectedData,
-              items: injectedData.items,
-              limit: options.limit,
-              start: 0,
-              end: injectedData.items.length,
-              hasMore: injectedData.hasMore,
-            }
           }
         }
       } catch (e) {
@@ -77,11 +64,8 @@ export async function fetchHeadlines(options: FetchHeadlinesOptions = {}) {
   if (options.limit !== undefined) {
     params.set("limit", String(options.limit))
   }
-  if (options.start !== undefined) {
-    params.set("start", String(options.start))
-  }
-  if (options.end !== undefined) {
-    params.set("end", String(options.end))
+  if (options.cursor) {
+    params.set("cursor", options.cursor)
   }
   const suffix = params.toString() ? `?${params.toString()}` : ""
   return apiFetch<HeadlinesResponse>(`/headlines${suffix}`)
@@ -121,6 +105,18 @@ export async function fetchSearch(filters: SearchFilters) {
 
 export async function fetchArticle(id: string) {
   return apiFetch<{ article: Article }>(`/article/${encodeURIComponent(id)}`)
+}
+
+export async function fetchTimeline(issueId: string, options: { limit?: number; sort?: SearchFilters["sort"] } = {}) {
+  const params = new URLSearchParams()
+  if (options.limit !== undefined) {
+    params.set("limit", String(options.limit))
+  }
+  if (options.sort) {
+    params.set("sort", options.sort)
+  }
+  const suffix = params.toString() ? `?${params.toString()}` : ""
+  return apiFetch<TimelineResponse>(`/issue/${encodeURIComponent(issueId)}/timeline${suffix}`)
 }
 
 /**
