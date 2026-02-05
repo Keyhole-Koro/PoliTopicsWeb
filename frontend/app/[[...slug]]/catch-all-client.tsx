@@ -75,7 +75,6 @@ export function CatchAllClient() {
               <div className="relative h-9 w-9 overflow-hidden rounded-full bg-primary/10">
                 <Image src={Logo} alt="PoliTopics" fill className="object-contain p-1.5" priority />
               </div>
-              <span className="font-serif text-base font-semibold text-foreground">国会議事録ニュース</span>
             </div>
           </div>
         </header>

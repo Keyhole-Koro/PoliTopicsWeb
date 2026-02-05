@@ -351,10 +351,10 @@ function renderSectionedText(
         return (
         <div
           key={`section-${sectionIndex}`}
-          className={`mt-3 rounded-md border p-3 text-xs ${tone?.base ?? "border-primary/10 bg-primary/5"}`}
+          className={`mt-3 rounded-md border p-3 text-sm ${tone?.base ?? "border-primary/10 bg-primary/5"}`}
         >
           {section.title ? (
-            <Badge variant="outline" className="text-[11px] px-2 py-0.5">
+            <Badge variant="outline" className="text-sm px-2.5 py-0.5">
               {section.title}
             </Badge>
           ) : null}
@@ -362,21 +362,21 @@ function renderSectionedText(
             {section.bullets.map((bullet, bulletIndex) => (
               <li key={`section-${sectionIndex}-bullet-${bulletIndex}`} className="flex items-start gap-2">
                 <span
-                  className={`mt-1.5 h-1.5 w-1.5 rounded-full ${
+                  className={`mt-2 h-2 w-2 rounded-full ${
                     tone?.dot ?? "bg-muted-foreground/60"
                   }`}
                 />
                 <div className="flex-1 space-y-1">
-                  <div className="text-sm text-foreground">
+                  <div className="text-base text-foreground">
                     {renderTextWithOrders(bullet.point, terms, onOrdersClick)}
                   </div>
                   {bullet.quote ? (
-                    <div className="rounded-md border border-border/60 bg-background/70 px-3 py-2 text-xs italic text-muted-foreground">
+                    <div className="rounded-md border border-border/60 bg-background/70 px-3 py-2 text-sm italic text-muted-foreground">
                       「{renderTextWithOrders(bullet.quote, terms, onOrdersClick)}」
                     </div>
                   ) : null}
                   {bullet.detail ? (
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-sm text-muted-foreground">
                       {renderTextWithOrders(bullet.detail, terms, onOrdersClick)}
                     </div>
                   ) : null}
@@ -926,10 +926,15 @@ export function DialogViewer({
             {!hasDialogs ? (
               emptyState
             ) : (
-              <div ref={(node) => {
+              <div
+                ref={(node) => {
                 scrollContainersRef.current.original = node
-              }}>
-                <ScrollArea className={`${dialogListHeightClass} pr-1`}>{renderSummaryCards()}</ScrollArea>
+                }}
+                className="relative"
+              >
+                <div className="pointer-events-none absolute left-0 right-2 top-0 z-10 h-4 bg-gradient-to-b from-foreground/10 to-transparent" />
+                <div className="pointer-events-none absolute bottom-0 left-0 right-2 z-10 h-4 bg-gradient-to-t from-foreground/10 to-transparent" />
+                <ScrollArea className={`${dialogListHeightClass} relative z-0 pr-1`}>{renderSummaryCards()}</ScrollArea>
               </div>
             )}
           </TabsContent>
@@ -938,10 +943,15 @@ export function DialogViewer({
             {!hasDialogs ? (
               emptyState
             ) : (
-              <div ref={(node) => {
+              <div
+                ref={(node) => {
                 scrollContainersRef.current.summary = node
-              }}>
-                <ScrollArea className={`${dialogListHeightClass} pr-1`}>{renderSummaryCards()}</ScrollArea>
+                }}
+                className="relative"
+              >
+                <div className="pointer-events-none absolute left-0 right-2 top-0 z-10 h-4 bg-gradient-to-b from-foreground/10 to-transparent" />
+                <div className="pointer-events-none absolute bottom-0 left-0 right-2 z-10 h-4 bg-gradient-to-t from-foreground/10 to-transparent" />
+                <ScrollArea className={`${dialogListHeightClass} relative z-0 pr-1`}>{renderSummaryCards()}</ScrollArea>
               </div>
             )}
           </TabsContent>

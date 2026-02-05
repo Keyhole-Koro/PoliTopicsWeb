@@ -801,3 +801,45 @@ Details:
   - `PoliTopicsWeb/frontend/components/dialog-viewer.tsx`
   - `PoliTopicsWeb/shared/types/article.d.ts`
   - `PoliTopicsWeb/workers/backend/src/types/article.ts`
+
+Agent: Codex
+Date/Time: 2026-02-05 10:30 JST
+Keywords: frontend, dialog, typography
+Topic: Increase dialog section text sizes
+Details:
+- Increased dialog section badge, bullet, quote, and detail text sizes for readability.
+- Files changed:
+  - `PoliTopicsWeb/frontend/components/dialog-viewer.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 10:35 JST
+Keywords: frontend, dialog, scroll
+Topic: Add top shadow to dialog scroll area
+Details:
+- Added a top gradient shadow overlay above the dialog scroll area for visual depth.
+- Files changed:
+  - `PoliTopicsWeb/frontend/components/dialog-viewer.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 10:40 JST
+Keywords: frontend, dialog, scroll, layout
+Topic: Add bottom shadow and tighten dialog card padding
+Details:
+- Added a bottom gradient shadow overlay to the dialog scroll area for depth.
+- Reduced vertical padding on the fallback "会議の議事録" card when dialog data is unavailable.
+Files changed:
+- `PoliTopicsWeb/frontend/components/dialog-viewer.tsx`
+- `PoliTopicsWeb/frontend/app/article/article-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 10:50 JST
+Keywords: frontend, scroll, header, footer
+Topic: Contain dialog scroll and remove header/footer title text
+Details:
+- Prevented scroll chaining by adding overscroll containment to ScrollArea viewports.
+- Removed the "国会議事録ニュース" label from header/footer UI.
+Files changed:
+- `PoliTopicsWeb/frontend/components/ui/scroll-area.tsx`
+- `PoliTopicsWeb/frontend/components/home/home-header.tsx`
+- `PoliTopicsWeb/frontend/components/home/site-footer.tsx`
+- `PoliTopicsWeb/frontend/app/[[...slug]]/catch-all-client.tsx`

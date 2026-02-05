@@ -8,7 +8,6 @@ export function SiteFooter() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <MessageSquare className="h-4 w-4 text-primary-foreground" />
           </div>
-          <span className="font-semibold text-foreground">国会議事録ニュース</span>
         </div>
       </div>
     </footer>

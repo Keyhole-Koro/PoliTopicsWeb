@@ -210,13 +210,13 @@ export function ArticleClient({ issueId }: Props) {
           />
         ) : (
           <Card>
-            <CardHeader>
+            <CardHeader className="py-3">
               <CardTitle className="flex items-center gap-2 font-serif">
                 <MessageSquare className="h-5 w-5 text-primary" />
                 会議の議事録
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="py-4">
               <p className="text-sm text-muted-foreground">議事録データは現在準備中です。</p>
             </CardContent>
           </Card>

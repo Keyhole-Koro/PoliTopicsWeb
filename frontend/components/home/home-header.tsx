@@ -17,7 +17,6 @@ export function HomeHeader({ showAbout, onToggleAbout }: Props) {
             <Image src={Logo} alt="PoliTopics" fill className="object-contain p-1.5" priority />
           </div>
           <div>
-            <p className="text-lg font-semibold text-foreground">国会議事録ニュース</p>
             <p className="text-xs text-muted-foreground">公平で透明な政治情報をお届け</p>
           </div>
         </div>
