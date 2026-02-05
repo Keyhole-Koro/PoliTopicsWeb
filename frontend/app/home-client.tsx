@@ -531,7 +531,7 @@ export function HomeClient() {
       />
 
       {articlesError && (
-        <div className="px-4 py-4 sm:px-6">
+        <div className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6">
           <Alert variant="destructive">
             <AlertTitle>記事を読み込めませんでした</AlertTitle>
             <AlertDescription className="flex w-full flex-wrap items-center gap-3">
@@ -544,8 +544,8 @@ export function HomeClient() {
         </div>
       )}
 
-      <div className="flex-1 space-y-12 bg-background py-10">
-        <div className="space-y-12 px-4 sm:px-6">
+      <div className="flex-1 space-y-12 bg-background py-3">
+        <div className="mx-auto w-full max-w-7xl space-y-12 px-4 sm:px-6">
           {hasActiveFilters && (
             <ActiveFilterSummary
               totalCount={safeArticles.length}

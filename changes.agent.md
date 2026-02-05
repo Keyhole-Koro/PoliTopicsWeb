@@ -843,3 +843,48 @@ Files changed:
 - `PoliTopicsWeb/frontend/components/home/home-header.tsx`
 - `PoliTopicsWeb/frontend/components/home/site-footer.tsx`
 - `PoliTopicsWeb/frontend/app/[[...slug]]/catch-all-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 11:00 JST
+Keywords: frontend, layout, home
+Topic: Align home page horizontal padding with article layout
+Details:
+- Centered home content and error alert to match the article page width and horizontal padding.
+Files changed:
+- `PoliTopicsWeb/frontend/app/home-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 11:05 JST
+Keywords: frontend, layout, home
+Topic: Widen home page container
+Details:
+- Increased the home page content and error container width to max-w-5xl.
+Files changed:
+- `PoliTopicsWeb/frontend/app/home-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 11:10 JST
+Keywords: frontend, layout, search
+Topic: Align search bar width with home container
+Details:
+- Centered search controls and matched width to the home content container.
+Files changed:
+- `PoliTopicsWeb/frontend/components/home/search-controls.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 11:15 JST
+Keywords: frontend, search, layout
+Topic: Remove search section divider
+Details:
+- Removed the bottom border under the search section container.
+Files changed:
+- `PoliTopicsWeb/frontend/components/home/search-controls.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 11:20 JST
+Keywords: frontend, search, spacing
+Topic: Tighten search section padding
+Details:
+- Reduced vertical padding on the search section.
+Files changed:
+- `PoliTopicsWeb/frontend/components/home/search-controls.tsx`

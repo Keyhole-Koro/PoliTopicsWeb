@@ -72,8 +72,8 @@ export function SearchControls({
   onChangeSortOrder,
 }: Props) {
   return (
-    <section id="search-section" className="border-b bg-background py-10">
-      <div className="w-full space-y-6 px-4 sm:px-6">
+    <section id="search-section" className="bg-background py-6">
+      <div className="mx-auto w-full max-w-7xl space-y-6 px-4 sm:px-3">
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
