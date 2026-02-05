@@ -16,9 +16,7 @@ export function HomeHeader({ showAbout, onToggleAbout }: Props) {
           <div className="relative h-10 w-10 overflow-hidden rounded-xl bg-primary/10">
             <Image src={Logo} alt="PoliTopics" fill className="object-contain p-1.5" priority />
           </div>
-          <div>
-            <p className="text-xs text-muted-foreground">公平で透明な政治情報をお届け</p>
-          </div>
+          <div />
         </div>
         <Button variant="outline" size="sm" onClick={onToggleAbout} className="gap-2">
           <Info className="h-4 w-4" />

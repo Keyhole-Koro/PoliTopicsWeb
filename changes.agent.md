@@ -958,3 +958,12 @@ Details:
 Files changed:
 - `PoliTopicsWeb/frontend/app/home-client.tsx`
 - `PoliTopicsWeb/frontend/components/dialog-viewer.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 12:00 JST
+Keywords: frontend, header, copy
+Topic: Remove home header tagline
+Details:
+- Removed the "公平で透明な政治情報をお届け" tagline from the home header.
+Files changed:
+- `PoliTopicsWeb/frontend/components/home/home-header.tsx`
