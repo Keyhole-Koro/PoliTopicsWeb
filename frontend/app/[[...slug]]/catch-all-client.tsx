@@ -71,11 +71,6 @@ export function CatchAllClient() {
               ニュース一覧に戻る
             </Button>
             <Separator orientation="vertical" className="h-6" />
-            <div className="flex items-center gap-3">
-              <div className="relative h-9 w-9 overflow-hidden rounded-full bg-primary/10">
-                <Image src={Logo} alt="PoliTopics" fill className="object-contain p-1.5" priority />
-              </div>
-            </div>
           </div>
         </header>
         <main className="container mx-auto max-w-4xl px-4 py-10">

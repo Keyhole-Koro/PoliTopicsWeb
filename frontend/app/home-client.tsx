@@ -3,14 +3,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import type { ArticleSummary, SearchFilters } from "@shared/types/article"
 import { fetchHeadlines, fetchSuggestions } from "@/lib/api"
-import { HomeHeader } from "@/components/home/home-header"
 import { AboutPanel } from "@/components/home/about-panel"
 import { HeroSection } from "@/components/home/hero-section"
 import { SearchControls } from "@/components/home/search-controls"
 import { PersonInsightCard } from "@/components/home/person-insight-card"
 import { FeaturedArticleCard, LatestArticlesRow, ArticleGridSection } from "@/components/home/articles-sections"
 import { KeywordTrends, KeyParticipants } from "@/components/home/stats-sections"
-import { SiteFooter } from "@/components/home/site-footer"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import {
@@ -503,7 +501,7 @@ export function HomeClient() {
 
   const gridSection = (
     <ArticleGridSection
-      title={hasActiveFilters ? "検索結果" : "すべての審議"}
+      title={hasActiveFilters ? "検索結果" : "すべての会議"}
       articles={visibleGridArticles}
       hasActiveFilters={hasActiveFilters}
       onClearFilters={handleClearFilters}
@@ -522,9 +520,8 @@ export function HomeClient() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <HomeHeader showAbout={showAbout} onToggleAbout={() => setShowAbout((value) => !value)} />
       <AboutPanel isOpen={showAbout} />
-      <HeroSection />
+      <HeroSection showAbout={showAbout} onToggleAbout={() => setShowAbout((value) => !value)} />
       <SearchControls
         searchTerm={searchInputValue}
         onSearchTermChange={setSearchInputValue}
@@ -595,7 +592,6 @@ export function HomeClient() {
         </div>
       </div>
 
-      <SiteFooter />
     </div>
   )
 }

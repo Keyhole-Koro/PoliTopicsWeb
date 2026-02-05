@@ -28,6 +28,7 @@ export function ArticleClient({ issueId }: Props) {
   const [jumpOrders, setJumpOrders] = useState<number[]>([])
   const [jumpToken, setJumpToken] = useState(0)
   const dialogSectionRef = useRef<HTMLDivElement | null>(null)
+  const dialogBodyRef = useRef<HTMLDivElement | null>(null)
   const timelineSentinelRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -153,6 +154,7 @@ export function ArticleClient({ issueId }: Props) {
     dialogSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
   }
 
+
   return (
     <article className="space-y-10">
       <ArticleMeta article={mergedArticle} />
@@ -201,13 +203,15 @@ export function ArticleClient({ issueId }: Props) {
 
       <div ref={dialogSectionRef}>
         {hasDialogData ? (
-          <DialogViewer
-            dialogs={dialogEntries}
-            title="会議の議事録"
-            terms={termDetails}
-            jumpOrders={jumpOrders}
-            jumpToken={jumpToken}
-          />
+          <div ref={dialogBodyRef}>
+            <DialogViewer
+              dialogs={dialogEntries}
+              title="会議の議事録"
+              terms={termDetails}
+              jumpOrders={jumpOrders}
+              jumpToken={jumpToken}
+            />
+          </div>
         ) : (
           <Card>
             <CardHeader className="py-3">

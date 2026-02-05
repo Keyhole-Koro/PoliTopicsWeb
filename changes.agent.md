@@ -967,3 +967,160 @@ Details:
 - Removed the "公平で透明な政治情報をお届け" tagline from the home header.
 Files changed:
 - `PoliTopicsWeb/frontend/components/home/home-header.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 12:05 JST
+Keywords: frontend, dialog, scroll
+Topic: Auto-center dialog section on gentle page scroll
+Details:
+- Added a gentle scroll detector that recenters the dialog section when users scroll into it from above or below.
+Files changed:
+- `PoliTopicsWeb/frontend/app/article/article-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 12:10 JST
+Keywords: frontend, hooks, dialog, scroll
+Topic: Fix hook order for dialog auto-centering
+Details:
+- Moved the dialog auto-centering effect before early returns and guarded it with article/asset data checks to satisfy hook ordering.
+Files changed:
+- `PoliTopicsWeb/frontend/app/article/article-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 12:15 JST
+Keywords: frontend, dialog, scroll, motion
+Topic: Slow down dialog auto-centering scroll
+Details:
+- Replaced native smooth scroll with a slower custom easing animation for dialog auto-centering.
+Files changed:
+- `PoliTopicsWeb/frontend/app/article/article-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 12:20 JST
+Keywords: frontend, dialog, scroll, ui
+Topic: Replace auto-centering with manual center button
+Details:
+- Removed auto-centering on gentle scroll.
+- Added a button to center the dialog section on demand.
+Files changed:
+- `PoliTopicsWeb/frontend/app/article/article-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 12:25 JST
+Keywords: frontend, dialog, scroll, ui
+Topic: Center dialog body and simplify center button
+Details:
+- Centered the dialog viewer itself instead of the full section wrapper.
+- Changed the center button label to a down-triangle symbol.
+Files changed:
+- `PoliTopicsWeb/frontend/app/article/article-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 12:30 JST
+Keywords: frontend, dialog, scroll
+Topic: Center dialog using scrollIntoView
+Details:
+- Switched the center action to use block-centered scrollIntoView for more reliable centering.
+Files changed:
+- `PoliTopicsWeb/frontend/app/article/article-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 12:35 JST
+Keywords: frontend, dialog, scroll, mobile
+Topic: Adjust dialog centering for mobile viewport and header
+Details:
+- Centered the dialog using visualViewport height and header height offsets to reduce mobile misalignment.
+Files changed:
+- `PoliTopicsWeb/frontend/app/article/article-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 12:40 JST
+Keywords: frontend, dialog, ui
+Topic: Remove dialog center button
+Details:
+- Removed the dialog center button and related centering logic.
+Files changed:
+- `PoliTopicsWeb/frontend/app/article/article-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 12:45 JST
+Keywords: frontend, header, layout
+Topic: Align home header icon to bottom padding
+Details:
+- Aligned the home header logo container to the bottom of the header padding.
+Files changed:
+- `PoliTopicsWeb/frontend/components/home/home-header.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 12:50 JST
+Keywords: frontend, home, layout
+Topic: Remove home header/footer and keep about button
+Details:
+- Removed the home header and footer components from the home page.
+- Placed the "このサイトについて" button at the top-right of the page.
+Files changed:
+- `PoliTopicsWeb/frontend/app/home-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 12:55 JST
+Keywords: frontend, home, layout
+Topic: Remove top-right about button container
+Details:
+- Removed the top-right "このサイトについて" button container.
+Files changed:
+- `PoliTopicsWeb/frontend/app/home-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 13:00 JST
+Keywords: frontend, home, about
+Topic: Re-add about button above hero
+Details:
+- Added the "このサイトについて" button back above the hero section, right-aligned.
+Files changed:
+- `PoliTopicsWeb/frontend/app/home-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 13:05 JST
+Keywords: frontend, home, about, hero
+Topic: Move about button into hero without extra wrapper
+Details:
+- Moved the about toggle into the hero section and removed the extra wrapper from the home page.
+Files changed:
+- `PoliTopicsWeb/frontend/components/home/hero-section.tsx`
+- `PoliTopicsWeb/frontend/app/home-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 13:10 JST
+Keywords: frontend, home, about, mobile
+Topic: Prevent about button overlap on mobile
+Details:
+- Made the about button static on small screens and absolute on larger screens to avoid overlapping the hero title.
+Files changed:
+- `PoliTopicsWeb/frontend/components/home/hero-section.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 13:15 JST
+Keywords: frontend, home, about, layout
+Topic: Keep about button above hero title on desktop
+Details:
+- Removed the absolute positioning on larger screens so the button stays above the hero title.
+Files changed:
+- `PoliTopicsWeb/frontend/components/home/hero-section.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 13:20 JST
+Keywords: frontend, article, header
+Topic: Remove article header icon
+Details:
+- Removed the icon from the /article header.
+Files changed:
+- `PoliTopicsWeb/frontend/app/[[...slug]]/catch-all-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 13:25 JST
+Keywords: frontend, home, copy
+Topic: Rename all meetings section label
+Details:
+- Renamed the "すべての審議" section to "すべての会議".
+Files changed:
+- `PoliTopicsWeb/frontend/app/home-client.tsx`
