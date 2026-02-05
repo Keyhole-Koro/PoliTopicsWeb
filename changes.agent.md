@@ -1124,3 +1124,12 @@ Details:
 - Renamed the "すべての審議" section to "すべての会議".
 Files changed:
 - `PoliTopicsWeb/frontend/app/home-client.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 13:30 JST
+Keywords: frontend, home, copy
+Topic: Rename all meetings section to other meetings
+Details:
+- Renamed the section label to "他の会議".
+Files changed:
+- `PoliTopicsWeb/frontend/app/home-client.tsx`

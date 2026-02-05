@@ -501,7 +501,7 @@ export function HomeClient() {
 
   const gridSection = (
     <ArticleGridSection
-      title={hasActiveFilters ? "検索結果" : "すべての会議"}
+      title={hasActiveFilters ? "検索結果" : "他の会議"}
       articles={visibleGridArticles}
       hasActiveFilters={hasActiveFilters}
       onClearFilters={handleClearFilters}
