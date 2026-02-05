@@ -18,16 +18,136 @@ type FeaturedProps = CommonHandlers & {
   article?: ArticleSummary
 }
 
+function ArticleCard({
+  article,
+  onCategoryClick,
+  onParticipantClick,
+  onKeywordClick,
+  onHouseClick,
+  onMeetingClick,
+  onNavigate,
+  className = "",
+  compact = false,
+}: CommonHandlers & { article: ArticleSummary; className?: string; compact?: boolean }) {
+  const category = article.categories?.[0]
+  return (
+    <Card
+      className={`flex h-full flex-col overflow-hidden transition-shadow hover:shadow-lg ${className}`}
+      onClick={() => onNavigate(`/article/${encodeURIComponent(article.id)}`)}
+    >
+      <div className={`flex items-center justify-between bg-muted/40 px-4 ${compact ? "py-1.5" : "py-2"} text-xs text-muted-foreground`}>
+        <button
+          type="button"
+          className="hover:text-primary"
+          onClick={(event) => handleEvent(event, () => article.nameOfMeeting && onMeetingClick(article.nameOfMeeting))}
+        >
+          {article.nameOfMeeting || "会議情報なし"}
+        </button>
+        <span className="flex items-center gap-1">
+          <Clock className="h-3 w-3" />
+          {new Date(article.date).toLocaleDateString("ja-JP")}
+        </span>
+      </div>
+      <CardHeader className={compact ? "pb-3" : ""}>
+        <div className={`mb-3 flex flex-wrap gap-2 text-xs text-muted-foreground`}>
+          {category && (
+            <Badge
+              variant="outline"
+              className="cursor-pointer"
+              onClick={(event) => handleEvent(event, () => onCategoryClick(category))}
+            >
+              {category}
+            </Badge>
+          )}
+          {article.nameOfHouse && (
+            <Badge
+              variant="secondary"
+              className="cursor-pointer"
+              onClick={(event) => handleEvent(event, () => onHouseClick(article.nameOfHouse))}
+            >
+              {article.nameOfHouse}
+            </Badge>
+          )}
+        </div>
+        <CardTitle className={compact ? "text-base" : "text-lg"}>{article.title}</CardTitle>
+      </CardHeader>
+      <CardContent className={compact ? "space-y-3" : "space-y-4"}>
+        <Markdown
+          content={article.description}
+          className={`text-xs sm:text-xs ${compact ? "line-clamp-3" : "line-clamp-4"}`}
+          tone="muted"
+        />
+        <div className={`space-y-2 text-xs ${compact ? "text-[11px]" : ""}`}>
+          {(article.participants?.length ?? 0) > 0 && (
+            <div>
+              <p className="mb-1 font-semibold text-foreground">主な発言者</p>
+              <div className="flex flex-wrap gap-1">
+                {(article.participants ?? []).slice(0, 2).map((participant) => (
+                  <Badge
+                    key={participant.name}
+                    variant="outline"
+                    className="cursor-pointer"
+                    onClick={(event) => handleEvent(event, () => onParticipantClick(participant.name))}
+                  >
+                    {participant.name}
+                  </Badge>
+                ))}
+                {(article.participants?.length ?? 0) > 2 && (
+                  <Badge variant="outline" className="text-muted-foreground">
+                    +{(article.participants?.length ?? 0) - 2}
+                  </Badge>
+                )}
+              </div>
+            </div>
+          )}
+          {(article.keywords?.length ?? 0) > 0 && (
+            <div>
+              <p className="mb-1 font-semibold text-foreground">議題</p>
+              <div className="flex flex-wrap gap-1">
+                {(article.keywords ?? []).slice(0, 3).map((keyword) => (
+                  <Badge
+                    key={keyword.keyword}
+                    variant="secondary"
+                    className="cursor-pointer"
+                    onClick={(event) => handleEvent(event, () => onKeywordClick(keyword.keyword))}
+                  >
+                    {keyword.keyword}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      <div className={`flex items-center justify-between text-xs text-muted-foreground ${compact ? "pt-1" : ""}`}>
+        <div className="flex items-center gap-1">
+          <Target className="h-3 w-3" />
+          第{article.session ?? "-"}回国会
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(event) =>
+              handleEvent(event, () => onNavigate(`/article/${encodeURIComponent(article.id)}`))
+            }
+          >
+            詳細
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 export function FeaturedArticleCard({
   article,
   onCategoryClick,
   onParticipantClick,
+  onKeywordClick,
+  onHouseClick,
   onMeetingClick,
   onNavigate,
 }: FeaturedProps) {
   if (!article) return null
-
-  const category = article.categories?.[0]
 
   return (
     <section className="space-y-6">
@@ -48,9 +168,13 @@ export function FeaturedArticleCard({
           </div>
           <div className="space-y-4 p-6 md:w-2/3">
             <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-              {category && (
-                <Badge variant="secondary" className="cursor-pointer bg-primary/10 text-primary" onClick={(event) => handleEvent(event, () => onCategoryClick(category))}>
-                  {category}
+              {article.categories?.[0] && (
+                <Badge
+                  variant="secondary"
+                  className="cursor-pointer bg-primary/10 text-primary"
+                  onClick={(event) => handleEvent(event, () => onCategoryClick(article.categories![0]))}
+                >
+                  {article.categories![0]}
                 </Badge>
               )}
               <div className="flex items-center gap-1">
@@ -109,7 +233,12 @@ type LatestProps = CommonHandlers & {
   articles: ArticleSummary[]
 }
 
-export function LatestArticlesRow({ articles, onCategoryClick, onKeywordClick, onNavigate }: LatestProps) {
+export function LatestArticlesRow({
+  articles,
+  onCategoryClick,
+  onKeywordClick,
+  onNavigate,
+}: LatestProps) {
   if (articles.length === 0) return null
 
   return (
@@ -124,7 +253,7 @@ export function LatestArticlesRow({ articles, onCategoryClick, onKeywordClick, o
           return (
             <Card
               key={article.id}
-              className="flex h-full flex-col justify-between w-[85vw] sm:w-[350px] shrink-0 snap-center"
+              className="flex h-[280px] flex-col justify-between w-[85vw] sm:w-[350px] shrink-0 snap-center"
               onClick={() => onNavigate(`/article/${encodeURIComponent(article.id)}`)}
             >
               <CardHeader>
@@ -235,109 +364,16 @@ export function ArticleGridSection({
         <>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {articles.map((article) => {
-              const category = article.categories?.[0]
               return (
-                <Card
-                  key={article.id}
-                  className="flex h-full flex-col overflow-hidden transition-shadow hover:shadow-lg"
-                  onClick={() => onNavigate(`/article/${encodeURIComponent(article.id)}`)}
-                >
-                  <div className="flex items-center justify-between bg-muted/40 px-4 py-2 text-xs text-muted-foreground">
-                    <button
-                      type="button"
-                      className="hover:text-primary"
-                      onClick={(event) => handleEvent(event, () => article.nameOfMeeting && onMeetingClick(article.nameOfMeeting))}
-                    >
-                      {article.nameOfMeeting || "会議情報なし"}
-                    </button>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {new Date(article.date).toLocaleDateString("ja-JP")}
-                    </span>
-                  </div>
-                  <CardHeader>
-                    <div className="mb-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                      {category && (
-                        <Badge
-                          variant="outline"
-                          className="cursor-pointer"
-                          onClick={(event) => handleEvent(event, () => onCategoryClick(category))}
-                        >
-                          {category}
-                        </Badge>
-                      )}
-                      {article.nameOfHouse && (
-                        <Badge
-                          variant="secondary"
-                          className="cursor-pointer"
-                          onClick={(event) => handleEvent(event, () => onHouseClick(article.nameOfHouse))}
-                        >
-                          {article.nameOfHouse}
-                        </Badge>
-                      )}
-                    </div>
-                    <CardTitle className="text-lg">{article.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <Markdown content={article.description} className="text-xs sm:text-xs line-clamp-4" tone="muted" />
-                    <div className="space-y-2 text-xs">
-                      {(article.participants?.length ?? 0) > 0 && (
-                        <div>
-                          <p className="mb-1 font-semibold text-foreground">主な発言者</p>
-                          <div className="flex flex-wrap gap-1">
-                            {(article.participants ?? []).slice(0, 2).map((participant) => (
-                              <Badge
-                                key={participant.name}
-                                variant="outline"
-                                className="cursor-pointer"
-                                onClick={(event) => handleEvent(event, () => onParticipantClick(participant.name))}
-                              >
-                                {participant.name}
-                              </Badge>
-                            ))}
-                            {(article.participants?.length ?? 0) > 2 && (
-                              <Badge variant="outline" className="text-muted-foreground">
-                                +{(article.participants?.length ?? 0) - 2}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                      {(article.keywords?.length ?? 0) > 0 && (
-                        <div>
-                          <p className="mb-1 font-semibold text-foreground">議題</p>
-                          <div className="flex flex-wrap gap-1">
-                            {(article.keywords ?? []).slice(0, 3).map((keyword) => (
-                              <Badge
-                                key={keyword.keyword}
-                                variant="secondary"
-                                className="cursor-pointer"
-                                onClick={(event) => handleEvent(event, () => onKeywordClick(keyword.keyword))}
-                              >
-                                {keyword.keyword}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Target className="h-3 w-3" />
-                        第{article.session ?? "-"}回国会
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(event) =>
-                          handleEvent(event, () => onNavigate(`/article/${encodeURIComponent(article.id)}`))
-                        }
-                      >
-                        詳細
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                <ArticleCard
+                  article={article}
+                  onCategoryClick={onCategoryClick}
+                  onParticipantClick={onParticipantClick}
+                  onKeywordClick={onKeywordClick}
+                  onHouseClick={onHouseClick}
+                  onMeetingClick={onMeetingClick}
+                  onNavigate={onNavigate}
+                />
               )
             })}
           </div>

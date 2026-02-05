@@ -888,3 +888,62 @@ Details:
 - Reduced vertical padding on the search section.
 Files changed:
 - `PoliTopicsWeb/frontend/components/home/search-controls.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 11:25 JST
+Keywords: frontend, latest, cards
+Topic: Fix latest cards to a consistent height
+Details:
+- Set a fixed height for latest article cards to keep the row aligned.
+- Made card content flex to fill the fixed height.
+Files changed:
+- `PoliTopicsWeb/frontend/components/home/articles-sections.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 11:30 JST
+Keywords: frontend, cards, consistency
+Topic: Unify featured/latest card design with grid cards
+Details:
+- Reused the grid card layout for featured and latest sections to align information density.
+- Wired latest cards to use the full click handlers.
+Files changed:
+- `PoliTopicsWeb/frontend/components/home/articles-sections.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 11:35 JST
+Keywords: frontend, cards, layout
+Topic: Restore featured layout and align latest card sizing
+Details:
+- Restored the featured (pickup) card to its original custom layout.
+- Removed fixed height on latest cards while keeping the grid-style layout.
+Files changed:
+- `PoliTopicsWeb/frontend/components/home/articles-sections.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 11:40 JST
+Keywords: frontend, latest, cards
+Topic: Fix latest cards to uniform height
+Details:
+- Set a fixed height on latest cards to keep the row aligned.
+Files changed:
+- `PoliTopicsWeb/frontend/components/home/articles-sections.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 11:45 JST
+Keywords: frontend, latest, cards, layout
+Topic: Increase density for latest cards with truncated descriptions
+Details:
+- Added a compact mode for latest cards to reduce padding and tighten typography.
+- Ensured descriptions are clamped with ellipsis when overflowing.
+Files changed:
+- `PoliTopicsWeb/frontend/components/home/articles-sections.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 11:50 JST
+Keywords: frontend, latest, cards, layout
+Topic: Restore latest card UI
+Details:
+- Reverted latest cards to the original compact layout with title, description, and keyword badges.
+- Kept the row height uniform via a fixed card height.
+Files changed:
+- `PoliTopicsWeb/frontend/components/home/articles-sections.tsx`
