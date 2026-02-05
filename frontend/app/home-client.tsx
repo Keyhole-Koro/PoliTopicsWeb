@@ -313,7 +313,25 @@ export function HomeClient() {
     sortOrder !== "date_desc",
   ].filter(Boolean).length
 
-  const featuredArticle = filteredArticles[0]
+  const featuredArticle = useMemo(() => {
+    if (filteredArticles.length === 0) return undefined
+    const highlightedKeywords = keywordStats
+      .filter((stat) => stat.priority === "high")
+      .map((stat) => stat.keyword.toLowerCase())
+    const minDescriptionLength = 80
+    const isLongEnough = (article: ArticleSummary) =>
+      article.description?.trim().length >= minDescriptionLength
+    const hasHighlightedKeyword = (article: ArticleSummary) =>
+      (article.keywords ?? []).some((keyword) =>
+        highlightedKeywords.includes(keyword.keyword.toLowerCase()),
+      )
+
+    return (
+      filteredArticles.find((article) => hasHighlightedKeyword(article) && isLongEnough(article)) ??
+      filteredArticles.find((article) => isLongEnough(article)) ??
+      filteredArticles[0]
+    )
+  }, [filteredArticles, keywordStats])
   const latestArticles = filteredArticles.slice(1, 5)
   const gridArticles = useMemo(() => {
     return hasActiveFilters || filteredArticles.length <= 4 ? filteredArticles : filteredArticles.slice(4)

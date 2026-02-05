@@ -947,3 +947,14 @@ Details:
 - Kept the row height uniform via a fixed card height.
 Files changed:
 - `PoliTopicsWeb/frontend/components/home/articles-sections.tsx`
+
+Agent: Codex
+Date/Time: 2026-02-05 11:55 JST
+Keywords: frontend, featured, dialog, qa
+Topic: Refine featured selection and enlarge QA text
+Details:
+- Selected the featured article from highlighted keywords with a minimum description length, falling back to the first viable article.
+- Increased dialog QA text sizes to match section readability.
+Files changed:
+- `PoliTopicsWeb/frontend/app/home-client.tsx`
+- `PoliTopicsWeb/frontend/components/dialog-viewer.tsx`

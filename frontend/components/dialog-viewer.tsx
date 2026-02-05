@@ -692,14 +692,14 @@ export function DialogViewer({
                     {renderedContent}
                   </div>
                   {hasQa && (
-                    <div className="mt-3 rounded-md border border-primary/10 bg-primary/5 p-3 text-xs">
+                    <div className="mt-3 rounded-md border border-primary/10 bg-primary/5 p-3 text-sm">
                       {qaItems.map((qa, index) => (
                         <div key={`qa-${dialog.order}-${index}`} className={index === 0 ? "" : "mt-3"}>
                           <div className="flex items-start gap-2">
                             <span className="font-semibold text-blue-600">Q</span>
                             <div className="space-y-1">
-                              <p className="font-medium text-foreground">{qa.ask.question}</p>
-                              <p className="text-muted-foreground">質問者: {qa.ask.who}</p>
+                              <p className="text-base font-medium text-foreground">{qa.ask.question}</p>
+                              <p className="text-sm text-muted-foreground">質問者: {qa.ask.who}</p>
                               {qa.ask.orders?.length ? (
                                 <div className="flex flex-wrap gap-1">
                                   {qa.ask.orders.map((order) => (
@@ -707,7 +707,7 @@ export function DialogViewer({
                                       key={`ask-${dialog.order}-${index}-${order}`}
                                       type="button"
                                       onClick={() => scrollToOrder(order)}
-                                      className="rounded bg-blue-100 px-2 py-0.5 text-[11px] text-blue-700 hover:bg-blue-200"
+                                      className="rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-700 hover:bg-blue-200"
                                     >
                                       #{order}
                                     </button>
@@ -719,7 +719,7 @@ export function DialogViewer({
                           <div className="mt-2 flex items-start gap-2">
                             <span className="font-semibold text-purple-600">A</span>
                             <div className="space-y-1">
-                              <p className="text-foreground">{qa.answer}</p>
+                              <p className="text-base text-foreground">{qa.answer}</p>
                               {qa.answer_orders?.length ? (
                                 <div className="flex flex-wrap gap-1">
                                   {qa.answer_orders.map((order) => (
@@ -727,7 +727,7 @@ export function DialogViewer({
                                       key={`answer-${dialog.order}-${index}-${order}`}
                                       type="button"
                                       onClick={() => scrollToOrder(order)}
-                                      className="rounded bg-purple-100 px-2 py-0.5 text-[11px] text-purple-700 hover:bg-purple-200"
+                                      className="rounded bg-purple-100 px-2 py-0.5 text-xs text-purple-700 hover:bg-purple-200"
                                     >
                                       #{order}
                                     </button>
